@@ -1,0 +1,29 @@
+{
+	"name": "search-ui",
+	"version": "1.0.0-alpha",
+	"description": "Canada.ca Search UI with Headless",
+	"main": "index.html",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ServiceCanada/search-ui.git"
+	},
+	"keywords": [
+		"Search",
+		"UI",
+		"Canada-ca"
+	],
+	"author": "ServiceCanada",
+	"license": "(MIT OR Apache-2.0)",
+	"homepage": "https://servicecanada.github.io/search-ui/",
+	"devDependencies": {
+		"grunt": "^0.4.5",
+		"grunt-banner": "^0.6.0",
+		"grunt-contrib-clean": "^2.0.1",
+		"grunt-contrib-copy": "^1.0.0",
+		"grunt-contrib-cssmin": "^5.0.0",
+		"grunt-contrib-jshint": "^3.2.0",
+		"grunt-contrib-uglify": "^5.2.2",
+		"grunt-eslint": "^24.3.0",
+		"grunt-htmllint": "^0.3.0"
+	}
+}
