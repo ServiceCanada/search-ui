@@ -1,0 +1,30 @@
+name: Continous integration
+
+on:
+  pull_request:
+
+jobs:
+  integration-check:
+
+    runs-on: ubuntu-latest
+
+    environment: github-ci
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install global dependencies
+        run: |
+          npm i -g grunt-cli
+          npm ci
+
+      - name: Build distribution files (dist)
+        run: grunt

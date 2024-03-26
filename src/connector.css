@@ -1,0 +1,23 @@
+/*
+ * Search UI: Styles for Query suggestion List "combobox", TO BE eventually replaced by GCWeb reference implementation codebase
+ */
+.query-suggestions {
+    background-color: white;
+    border-bottom: 1px solid #CCC;
+    border-left: 1px solid #CCC;
+    border-right: 1px solid #CCC;
+    cursor: pointer;
+    left: 0px;
+    list-style-type: none;
+    padding: 0;
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    z-index: 60;
+}
+.query-suggestions li {
+    padding: 5px 10px;
+}
+.query-suggestions li:hover {
+    background-color: #DDD;
+}
