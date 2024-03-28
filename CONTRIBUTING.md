@@ -30,7 +30,7 @@ Lorsque vous contribuez, n'hésitez pas à proposer des modifications en créant
 En général, une demande de changement pour soit de la maintenance ou bien l'ajout d'une nouvelle fonctionnalité (ou les deux), devrait être initiée de la sorte :
 
 - À tout moment provenant directement de l'Éditeur principal;
-- Par le fournisseur APRÈS avoir donné à l'Éditeur principal un quelconque préavis(verbalement ou par écrit) mentionnant qu'un changement est nécessaire;
+- Par le fournisseur APRÈS avoir donné à l'Éditeur principal un quelconque préavis (verbalement ou par écrit) mentionnant qu'un changement est nécessaire;
 - Par le fournisseur APRÈS avoir été demandé explicitement par l'Éditeur principal d'initier un changement précis;
 - Toute autre méthode pour initier une demande de changement pourrait être considérée et l'Éditeur principal se réserve le droit d'accepter ou refuser.
 
