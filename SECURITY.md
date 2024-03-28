@@ -2,7 +2,7 @@
 
 # Security
 
-**Do not post any security issues on the public repository!** Security vulnerabilities must be reported via contact method listed on Principal Publisher's GCpedia page: https://www.gcpedia.gc.ca/wiki/Principal_Publisher_at_Service_Canada.
+**Do not post any security issues on the public repository!** Security vulnerabilities must be reported via a contact method listed on Principal Publisher's GCpedia page: https://www.gcpedia.gc.ca/wiki/Principal_Publisher_at_Service_Canada.
 
 ______________________
 
