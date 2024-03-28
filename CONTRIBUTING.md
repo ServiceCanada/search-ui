@@ -15,7 +15,7 @@ In general, a change request for either maintenance purposes or for the addition
 
 If you don't have write access, editing a file will create a Fork of this project for you to save your proposed changes to. Submitting a change to a file will write it to a new Branch in your Fork, so you can send a Pull Request.
 
-If this is your first time contributing on GitHub, don't worry! Let us know if you have any questions via contact method listed on [Principal Publisher's GCpedia page](https://www.gcpedia.gc.ca/wiki/Principal_Publisher_at_Service_Canada).
+If this is your first time contributing on GitHub, don't worry! Let us know if you have any questions via a contact method listed on [Principal Publisher's GCpedia page](https://www.gcpedia.gc.ca/wiki/Principal_Publisher_at_Service_Canada).
 
 ### Security
 
