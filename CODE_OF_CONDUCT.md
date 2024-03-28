@@ -40,7 +40,7 @@ Representation of a project may be further defined and clarified by project main
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team via contact method listed on [Principal Publisher's GCpedia page](https://www.gcpedia.gc.ca/wiki/Principal_Publisher_at_Service_Canada).
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team via a contact method listed on [Principal Publisher's GCpedia page](https://www.gcpedia.gc.ca/wiki/Principal_Publisher_at_Service_Canada).
 
 All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances.
 
