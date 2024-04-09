@@ -2,7 +2,7 @@
 
 ([Français](#code-de-conduite-pour-le-projet-iu-recherche))
 
-Contributors to repositories hosted in [`Canada.ca Search UI`] are expected to follow the Contributor Covenant Code of Conduct, and those working within Government are also expected to follow the Values and Ethics Code for the Public Sector
+Contributors to repositories hosted in Canada.ca Search UI are expected to follow the Contributor Covenant Code of Conduct, and those working within Government are also expected to follow the Values and Ethics Code for the Public Sector
 
 ## Our Pledge
 
