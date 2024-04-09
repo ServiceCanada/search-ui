@@ -1,4 +1,4 @@
-# Contributor Covenant Code of Conduct for the [`Canada.ca Search User Interface (UI)`] project
+# Contributor Covenant Code of Conduct for the Canada.ca Search User Interface (UI) project
 
 ([Français](#code-de-conduite-pour-le-projet-iu-recherche))
 
