@@ -65,7 +65,7 @@ This Code of Conduct is also inspired by GDS' `alphagov` [Code of conduct](https
 
 ([English](#contributor-covenant-code-of-conduct-for-the-search-ui-project))
 
-Les contributeurs aux dépôts hébergés dans [`IU de Recherche pour Canada.ca`] sont tenus de respecter le Code de conduite du Pacte des contributeurs, et ceux qui travaillent au sein du gouvernement sont également tenus de respecter le [Code de valeurs et d'éthique du secteur public](https://www.tbs-sct.canada.ca/pol/doc-fra.aspx?id=25049).
+Les contributeurs aux dépôts hébergés dans IU de Recherche pour Canada.ca sont tenus de respecter le Code de conduite du Pacte des contributeurs, et ceux qui travaillent au sein du gouvernement sont également tenus de respecter le [Code de valeurs et d'éthique du secteur public](https://www.tbs-sct.canada.ca/pol/doc-fra.aspx?id=25049).
 
 ## Notre engagement
 
