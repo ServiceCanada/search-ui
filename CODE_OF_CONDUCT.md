@@ -60,7 +60,7 @@ This Code of Conduct is also inspired by GDS' `alphagov` [Code of conduct](https
 
 ---
 <!--markdownlint-disable MD025-->
-# Code de conduite pour le projet [`Interface utilisateur (IU) de Recherche pour Canada.ca`]
+# Code de conduite pour le projet Interface utilisateur (IU) de Recherche pour Canada.ca
 <!--markdownlint-enable MD025-->
 
 ([English](#contributor-covenant-code-of-conduct-for-the-search-ui-project))
