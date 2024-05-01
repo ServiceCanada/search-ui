@@ -148,14 +148,14 @@ if ( !resultTemplateHTML ) {
 			`<h3><a class="result-link" href="%[result.clickUri]" data-dtm-srchlnknm="%[index]">%[result.title]</a></h3> 
 			<ul class="context-labels"><li>%[result.raw.author]</li></ul> 
 			<ol class="location"><li>%[result.printableUri]</li></ol> 
-			<p><time datetime="%[short-date-en]" class="text-muted">%[long-date-en]</time> - %[highlightedExcerpt]</p>`;
+			<p><time datetime="%[short-date-fr]" class="text-muted">%[long-date-fr]</time> - %[highlightedExcerpt]</p>`;
 	}
 	else {
 		resultTemplateHTML = 
 			`<h3><a class="result-link" href="%[result.clickUri]" data-dtm-srchlnknm="%[index]">%[result.title]</a></h3> 
 			<ul class="context-labels"><li>%[result.raw.author]</li></ul> 
 			<ol class="location"><li>%[result.printableUri]</li></ol> 
-			<p><time datetime="%[short-date-fr]" class="text-muted">%[long-date-fr]</time> - %[highlightedExcerpt]</p>`;
+			<p><time datetime="%[short-date-en]" class="text-muted">%[long-date-en]</time> - %[highlightedExcerpt]</p>`;
 	}
 }
 
@@ -397,7 +397,7 @@ const didYouMeanController = buildDidYouMean( headlessEngine, { options: { autom
 const pagerController = buildPager( headlessEngine, { options: { numberOfPages: 9 } } );
 const statusController = buildSearchStatus( headlessEngine );
 
-if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || urlParams.dmn || urlParams.fqocct ) { 
+if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat ) { 
 	let q = [];
 	if ( urlParams.allq ) {
 		q.push( urlParams.allq );
@@ -409,7 +409,7 @@ if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || u
 		q.push( urlParams.anyq.replace( ' ', ' OR ' ) );
 	}
 	if ( urlParams.noneq ) {
-		q.push( "NOT (" + urlParams.noneq + ")" );
+		q.push( "NOT (" + urlParams.noneq.replace('+',' ').replaceAll(' ',') NOT(') + ")" );
 	}
 	
 	let qString = q.length ? '(' + q.join( ')(' ) + ')' : '';
@@ -444,21 +444,47 @@ if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || u
 	if ( urlParams.dmn ) {
 		aqString += ' @hostname="' + urlParams.dmn + '"';
 	}
-	
+
 	if ( urlParams.sort ) {
-		const sortAction = loadSortCriteriaActions( headlessEngine ).updateSortCriterion( {
-			criterion: "SortByDate",
+		const sortAction = loadSortCriteriaActions( headlessEngine ).registerSortCriterion( {
+			by: "date",
+			order: "descending",
 		} );
 		headlessEngine.dispatch( sortAction );
 	}
 	
+	if ( urlParams.elctn_cat ) {
+		let elctn_cat = urlParams.elctn_cat.toLowerCase();
+		if( elctn_cat === "his" ) {
+			aqString += ' @uri="dir=his"';
+		}
+		else if( elctn_cat === "comp" ) {
+			aqString += ' @uri="compendium"';
+		}
+		else if( elctn_cat === "ogi" ) {
+			aqString += ' @uri="dir=gui"';
+		}
+		else if( elctn_cat === "officer_manuals" ) {
+			aqString += ' @uri="dir=pub"';
+		}
+		else if( elctn_cat === "research" ) {
+			aqString += ' @uri="dir=rec"';
+		}
+		else if( elctn_cat === "press_release" ) {
+			aqString += ' @uri="dir=pre"';
+		}
+		else if( elctn_cat === "legislation" ) {
+			aqString += ' @uri="dir=loi"';
+		}
+	}
+
 	if ( aqString ) {
 		const action = loadAdvancedSearchQueryActions( headlessEngine ).updateAdvancedSearchQueries( { 	
 			aq: aqString,
 		} );
 		headlessEngine.dispatch( action ); 
 	}
-	
+
 	searchBoxController.updateText( qString );
 	searchBoxController.submit();
 }
@@ -474,7 +500,7 @@ else if ( urlParams.q && searchBoxElement ) {
 const fragment = () => {
 	const hash = window.location.hash.slice( 1 );
 	if (!statusController.state.firstSearchExecuted && !hashParams.q ) {					
-		return window.location.search.slice( 1 ); // use query string if hash is empty
+		return window.location.search.slice( 1 ).replace( '+', ' ' ); // use query string if hash is empty
 	}
 	
 	return hash;
@@ -639,8 +665,8 @@ function updateResultListState( newState ) {
 				.replace( '%[result.raw.author]', author )
 				.replace( '%[result.breadcrumb]', result.raw.displaynavlabel ? result.raw.displaynavlabel : result.printableUri )
 				.replace( '%[result.printableUri]', result.printableUri )
-				.replace( '%[short-date-en]', resultDate.getFullYear() + "-" + resultDate.getMonth() + 1 + "-" + resultDate.getDate() )
-				.replace( '%[short-date-fr]', resultDate.getFullYear() + "-" + resultDate.getMonth() + 1 + "-" + resultDate.getDate() )
+				.replace( '%[short-date-en]', resultDate.getFullYear() + "-" + ( resultDate.getMonth() + 1 ) + "-" + resultDate.getDate() )
+				.replace( '%[short-date-fr]', resultDate.getFullYear() + "-" + ( resultDate.getMonth() + 1 ) + "-" + resultDate.getDate() )
 				.replace( '%[long-date-en]',  monthsEn[ resultDate.getMonth() ] + " " + resultDate.getDate() + ", " + resultDate.getFullYear() )
 				.replace( '%[long-date-fr]', resultDate.getDate() + " " + monthsFr[ resultDate.getMonth() ] + " " + resultDate.getFullYear() )
 				.replace( '%[highlightedExcerpt]', highlightedExcerpt );
