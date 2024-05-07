@@ -57,4 +57,3 @@ Take a look at the reducer(s) handling this action type: `+N.type+`.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//# sourceMappingURL=headless.esm.js.map

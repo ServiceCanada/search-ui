@@ -48,7 +48,6 @@ if ( lang.startsWith( "fr" ) ) {
 
 paramsDetect.isContextSearch = !winPath.endsWith( '/sr/srb.html' ) && !winPath.endsWith( '/sr/sra.html' );
 paramsDetect.isAdvancedSearch = !!document.getElementById( 'advseacon1' ) || winPath.endsWith( '/advanced-search.html' ) || winPath.endsWith( '/recherche-avancee.html' );
-paramsDetect.enableHistoryPush = !paramsDetect.isAdvancedSearch;
 
 // Final parameters object
 params = Object.assign( defaults, paramsDetect, JSON.parse( baseElement.dataset.gcSearch ) );
@@ -78,6 +77,11 @@ window.onpopstate = () => {
 };
 
 window.onpopstate();
+
+// override origineLevel3 through query parameters 
+if ( urlParams.originLevel3 ){
+	params.originLevel3 = urlParams.originLevel3;
+}
 
 // Initiate headless engine
 if ( !params.endpoints ) {
@@ -708,7 +712,8 @@ function updateQuerySummaryState( newState ) {
 
 			querySummaryElement.innerHTML = ( ( querySummaryState.query !== "" && !params.isAdvancedSearch ) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML )
 				.replace( '%[numberOfResults]', numberOfResults )
-				.replace( '%[query]', querySummaryState.query );
+				.replace( '%[query]', querySummaryState.query )
+				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString() );
 		}
 	}
 	else if ( querySummaryState.hasError ) {
@@ -763,7 +768,14 @@ function updatePagerState( newState ) {
 		const liNode = document.createElement( "li" );
 		const pageNo = page;
 
-		liNode.innerHTML = pageTemplateHTML.replace( '%[page]', pageNo );
+		liNode.innerHTML = pageTemplateHTML.replaceAll( '%[page]', pageNo );
+		
+		if ( page < pagerState.currentPage - 1 || page > pagerState.currentPage + 1 ) {
+			liNode.classList.add( 'hidden-xs', 'hidden-sm' );
+			if ( page < pagerState.currentPage - 2 || page > pagerState.currentPage + 2 ) {
+				liNode.classList.add( 'hidden-md' );
+			}
+		}
 
 		const buttonNode = liNode.querySelector( 'button' );
 
