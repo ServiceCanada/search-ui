@@ -409,16 +409,16 @@ if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || u
 	 urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site ) { 
 	let q = [];
 	if ( urlParams.allq ) {
-		q.push( urlParams.allq );
+		q.push( urlParams.allq.replaceAll( '+', ' ' ) );
 	}
 	if ( urlParams.exctq ) {
-		q.push( '"' + urlParams.exctq + '"' );
+		q.push( '"' + urlParams.exctq.replaceAll( '+', ' ' ) + '"' );
 	}
 	if ( urlParams.anyq ) {
-		q.push( urlParams.anyq.replace( ' ', ' OR ' ) );
+		q.push( urlParams.anyq.replaceAll( '+', ' ' ).replaceAll( ' ', ' OR ' ) );
 	}
 	if ( urlParams.noneq ) {
-		q.push( "NOT (" + urlParams.noneq.replace( '+', ' ' ).replaceAll( ' ', ') NOT(' ) + ")" );
+		q.push( "NOT (" + urlParams.noneq.replaceAll( '+', ' ' ).replaceAll( ' ', ') NOT(' ) + ")" );
 	}
 	
 	let qString = q.length ? '(' + q.join( ')(' ) + ')' : '';
@@ -536,7 +536,7 @@ else if ( urlParams.q && searchBoxElement ) {
 const fragment = () => {
 	const hash = window.location.hash.slice( 1 );
 	if (!statusController.state.firstSearchExecuted && !hashParams.q ) {					
-		return window.location.search.slice( 1 ).replace( '+', ' ' ); // use query string if hash is empty
+		return window.location.search.slice( 1 ).replaceAll( '+', ' ' ); // use query string if hash is empty
 	}
 	
 	return hash;
