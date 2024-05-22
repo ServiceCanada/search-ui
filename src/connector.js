@@ -588,7 +588,7 @@ window.addEventListener( 'hashchange', onHashChange );
 window.addEventListener( 'unload', onUnload );
 
 // Execute a search if parameters in the URL on page load
-if ( !statusController.state.firstSearchExecuted && fragment() ) {
+if ( !statusController.state.firstSearchExecuted && fragment() && fragment() != 'q=' ) {
 	headlessEngine.executeFirstSearch();
 }
 
