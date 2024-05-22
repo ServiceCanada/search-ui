@@ -48,6 +48,7 @@ if ( lang.startsWith( "fr" ) ) {
 
 paramsDetect.isContextSearch = !winPath.endsWith( '/sr/srb.html' ) && !winPath.endsWith( '/sr/sra.html' );
 paramsDetect.isAdvancedSearch = !!document.getElementById( 'advseacon1' ) || winPath.endsWith( '/advanced-search.html' ) || winPath.endsWith( '/recherche-avancee.html' );
+paramsDetect.enableHistoryPush = !paramsDetect.isAdvancedSearch;
 
 // Final parameters object
 params = Object.assign( defaults, paramsDetect, JSON.parse( baseElement.dataset.gcSearch ) );
@@ -105,6 +106,9 @@ const headlessEngine = buildSearchEngine( {
 					// filter user sensitive content
 					requestContent.originLevel3 = params.originLevel3;
 					request.body = JSON.stringify( requestContent );
+
+					const searchEvent = new CustomEvent( "searchEvent", { detail: requestContent } );
+					document.dispatchEvent( searchEvent );
 				}
 				if( clientOrigin === 'searchApiFetch' ) {
 					let requestContent = JSON.parse( request.body );
@@ -151,14 +155,14 @@ if ( !resultTemplateHTML ) {
 		resultTemplateHTML = 
 			`<h3><a class="result-link" href="%[result.clickUri]" data-dtm-srchlnknm="%[index]">%[result.title]</a></h3> 
 			<ul class="context-labels"><li>%[result.raw.author]</li></ul> 
-			<ol class="location"><li>%[result.printableUri]</li></ol> 
+			<ol class="location"><li>%[result.breadcrumb]</li></ol> 
 			<p><time datetime="%[short-date-fr]" class="text-muted">%[long-date-fr]</time> - %[highlightedExcerpt]</p>`;
 	}
 	else {
 		resultTemplateHTML = 
 			`<h3><a class="result-link" href="%[result.clickUri]" data-dtm-srchlnknm="%[index]">%[result.title]</a></h3> 
 			<ul class="context-labels"><li>%[result.raw.author]</li></ul> 
-			<ol class="location"><li>%[result.printableUri]</li></ol> 
+			<ol class="location"><li>%[result.breadcrumb]</li></ol> 
 			<p><time datetime="%[short-date-en]" class="text-muted">%[long-date-en]</time> - %[highlightedExcerpt]</p>`;
 	}
 }
@@ -175,7 +179,7 @@ if ( !noResultTemplateHTML ) {
 					<li>Utilisez de différents termes de recherche </li>
 					<li>Utilisez des termes de recherche plus généraux </li>
 					<li>Consultez les&nbsp;<a href="/fr/sr/tr.html"> trucs de recherche </a></li>
-					<li>Essayez la <a href="/fr/chaires-recherche/rechercher/recherche-avancee.html">recherche avancée</a></li>
+					<li>Essayez la <a href="/fr/sr/srb/sra.html">recherche avancée</a></li>
 				</ul>
 			</section>`;
 	}
@@ -401,7 +405,8 @@ const didYouMeanController = buildDidYouMean( headlessEngine, { options: { autom
 const pagerController = buildPager( headlessEngine, { options: { numberOfPages: 9 } } );
 const statusController = buildSearchStatus( headlessEngine );
 
-if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat ) { 
+if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || 
+	 urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site ) { 
 	let q = [];
 	if ( urlParams.allq ) {
 		q.push( urlParams.allq );
@@ -413,7 +418,7 @@ if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || u
 		q.push( urlParams.anyq.replace( ' ', ' OR ' ) );
 	}
 	if ( urlParams.noneq ) {
-		q.push( "NOT (" + urlParams.noneq.replace('+',' ').replaceAll(' ',') NOT(') + ")" );
+		q.push( "NOT (" + urlParams.noneq.replace( '+', ' ' ).replaceAll( ' ', ') NOT(' ) + ")" );
 	}
 	
 	let qString = q.length ? '(' + q.join( ')(' ) + ')' : '';
@@ -480,6 +485,33 @@ if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || u
 		else if( elctn_cat === "legislation" ) {
 			aqString += ' @uri="dir=loi"';
 		}
+	}
+
+	if ( urlParams.filetype ) {
+		let filetype = urlParams.filetype.toLowerCase();
+		if ( filetype == "application/pdf" ) {
+			aqString += ' @filetype==(doc,docx)';
+		}
+		else if ( filetype == "ps" ) {
+			aqString += ' @filetype==(doc,docx)';
+		}
+		else if ( filetype == "application/msword" ) {
+			aqString += ' @filetype==(doc,docx)';
+		}
+		else if ( filetype == "application/vnd.ms-excel" ) {
+			aqString += ' @filetype==(doc,docx)';
+		}
+		else if ( filetype == "application/vnd.ms-powerpoint" ) {
+			aqString += ' @filetype==(doc,docx)';
+		}
+		else if ( filetype == "application/rtf" ) {
+			aqString += ' @filetype==(rtf)';
+		}
+	}
+
+	if ( urlParams.site ) {
+		let site = urlParams.site.toLowerCase().replace( '*', '' );
+		aqString += ' @canadagazettesite==' + site;
 	}
 
 	if ( aqString ) {
@@ -619,6 +651,28 @@ function filterProtocol( uri ) {
 	return isAbsolute || isRelative ? uri : '';
 }
 
+// Get date converted from GMT (Coveo) to current timezone
+function getDateInCurrentTimeZone( date ){
+	const offset = date.getTimezoneOffset();
+	return new Date( date.getTime() + ( offset * 60 * 1000 ) );
+}
+
+// get a short date format like YYYY-MM-DD
+function getShortDateFormat( date ){
+	let currentTZDate = getDateInCurrentTimeZone( date );
+	return currentTZDate.toISOString().split( 'T' )[ 0 ];
+}
+
+// get a short date format like May 21, 2024
+function getLongDateFormat( date, lang ){
+	let currentTZDate = getDateInCurrentTimeZone( date );
+	if ( lang == 'en' ) {
+		return monthsEn[ currentTZDate.getMonth() ] + " " + currentTZDate.getDate() + ", " + currentTZDate.getFullYear();
+	}
+
+	return currentTZDate.getDate() + " " + monthsFr[ currentTZDate.getMonth() ] + " " + currentTZDate.getFullYear();
+}
+
 // Update results list
 function updateResultListState( newState ) {
 	resultListState = newState;
@@ -663,16 +717,16 @@ function updateResultListState( newState ) {
 
 			sectionNode.innerHTML = resultTemplateHTML
 				.replace( '%[index]', index + 1 )
-				.replace( '%[result.clickUri]', filterProtocol( result.clickUri ) )
 				.replace( 'https://www.canada.ca', filterProtocol( result.clickUri ) ) // workaround, invalid href are stripped
+				.replace( '%[result.clickUri]', filterProtocol( result.clickUri ) )
 				.replace( '%[result.title]', result.title )
 				.replace( '%[result.raw.author]', author )
 				.replace( '%[result.breadcrumb]', result.raw.displaynavlabel ? result.raw.displaynavlabel : result.printableUri )
 				.replace( '%[result.printableUri]', result.printableUri )
-				.replace( '%[short-date-en]', resultDate.getFullYear() + "-" + ( resultDate.getMonth() + 1 ) + "-" + resultDate.getDate() )
-				.replace( '%[short-date-fr]', resultDate.getFullYear() + "-" + ( resultDate.getMonth() + 1 ) + "-" + resultDate.getDate() )
-				.replace( '%[long-date-en]',  monthsEn[ resultDate.getMonth() ] + " " + resultDate.getDate() + ", " + resultDate.getFullYear() )
-				.replace( '%[long-date-fr]', resultDate.getDate() + " " + monthsFr[ resultDate.getMonth() ] + " " + resultDate.getFullYear() )
+				.replace( '%[short-date-en]', getShortDateFormat( resultDate ) )
+				.replace( '%[short-date-fr]', getShortDateFormat( resultDate ) )
+				.replace( '%[long-date-en]', getLongDateFormat( resultDate, 'en' ) )
+				.replace( '%[long-date-fr]', getLongDateFormat( resultDate, 'fr' ) )
 				.replace( '%[highlightedExcerpt]', highlightedExcerpt );
 			
 			const interactiveResult = buildInteractiveResult(
@@ -708,12 +762,12 @@ function updateQuerySummaryState( newState ) {
 	if ( resultListState.firstSearchExecuted && !querySummaryState.isLoading && !querySummaryState.hasError ) {
 		querySummaryElement.textContent = "";
 		if ( querySummaryState.total > 0 ) {
-			let numberOfResults = querySummaryState.total.toLocaleString();
+			let numberOfResults = querySummaryState.total.toLocaleString( params.lang );
 
 			querySummaryElement.innerHTML = ( ( querySummaryState.query !== "" && !params.isAdvancedSearch ) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML )
 				.replace( '%[numberOfResults]', numberOfResults )
 				.replace( '%[query]', querySummaryState.query )
-				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString() );
+				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString( params.lang ) );
 		}
 	}
 	else if ( querySummaryState.hasError ) {
