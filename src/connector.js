@@ -461,7 +461,7 @@ if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || u
 		} );
 		headlessEngine.dispatch( sortAction );
 	}
-	
+
 	if ( urlParams.elctn_cat ) {
 		let elctn_cat = urlParams.elctn_cat.toLowerCase();
 		if( elctn_cat === "his" ) {
@@ -484,6 +484,24 @@ if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || u
 		}
 		else if( elctn_cat === "legislation" ) {
 			aqString += ' @uri="dir=loi"';
+		}
+		else if( elctn_cat === "charg" ) {
+			aqString += ' @uri="section=charg"';
+		}
+		else if( elctn_cat === "ca" ) {
+			aqString += ' @uri="dir=ca"';
+		}
+		else if( elctn_cat === "un" ) {
+			aqString += ' @uri="dir=un"';
+		}
+		else if( elctn_cat === "pre" ) {
+			aqString += ' @uri="dir=pre-com"';
+		}
+		else if( elctn_cat === "spe" ) {
+			aqString += ' @uri="dir=spe-com"';
+		}
+		else if( elctn_cat === "rep" ) {
+			aqString += ' @uri="section=rep"';
 		}
 	}
 
