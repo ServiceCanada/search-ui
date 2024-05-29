@@ -408,8 +408,9 @@ const statusController = buildSearchStatus( headlessEngine );
 if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || 
 	 urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site ) { 
 	let q = [];
+	let qString = "";
 	if ( urlParams.allq ) {
-		q.push( urlParams.allq.replaceAll( '+', ' ' ) );
+		qString = urlParams.allq.replaceAll( '+', ' ' );
 	}
 	if ( urlParams.exctq ) {
 		q.push( '"' + urlParams.exctq.replaceAll( '+', ' ' ) + '"' );
@@ -421,7 +422,7 @@ if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || u
 		q.push( "NOT (" + urlParams.noneq.replaceAll( '+', ' ' ).replaceAll( ' ', ') NOT(' ) + ")" );
 	}
 	
-	let qString = q.length ? '(' + q.join( ')(' ) + ')' : '';
+	qString += q.length ? ' (' + q.join( ')(' ) + ')' : '';
 	let aqString = '';
 
 	if ( urlParams.fqocct ) {
@@ -508,19 +509,19 @@ if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || u
 	if ( urlParams.filetype ) {
 		let filetype = urlParams.filetype.toLowerCase();
 		if ( filetype == "application/pdf" ) {
-			aqString += ' @filetype==(doc,docx)';
+			aqString += ' @filetype==(pdf)';
 		}
 		else if ( filetype == "ps" ) {
-			aqString += ' @filetype==(doc,docx)';
+			aqString += ' @filetype==(ps)';
 		}
 		else if ( filetype == "application/msword" ) {
 			aqString += ' @filetype==(doc,docx)';
 		}
 		else if ( filetype == "application/vnd.ms-excel" ) {
-			aqString += ' @filetype==(doc,docx)';
+			aqString += ' @filetype==(xls,xlsx)';
 		}
 		else if ( filetype == "application/vnd.ms-powerpoint" ) {
-			aqString += ' @filetype==(doc,docx)';
+			aqString += ' @filetype==(ppt,pptx)';
 		}
 		else if ( filetype == "application/rtf" ) {
 			aqString += ' @filetype==(rtf)';
@@ -892,7 +893,7 @@ if ( searchBoxElement ) {
 	searchBoxElement.onkeyup = ( e ) => {
 		lastCharKeyUp = e.keyCode;
 
-		if( e.keyCode !== 13 ) {
+		if( e.keyCode !== 13 && searchBoxController.state.value != e.target.value ) {
 			searchBoxController.updateText( e.target.value );
 		}
 	};
@@ -908,10 +909,14 @@ if ( formElement ) {
 		if ( params.isAdvancedSearch ) {
 			return; // advanced search forces a post back
 		}
-		
+
 		e.preventDefault();
 
 		if ( searchBoxElement && searchBoxElement.value ) {
+			// Make sure we have the latest value in the search box state
+			if( searchBoxController.state.value != searchBoxElement.value ) {
+				searchBoxController.updateText( searchBoxElement.value );
+			}
 			searchBoxController.submit();
 		}
 		else {
