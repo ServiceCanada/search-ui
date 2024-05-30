@@ -104,14 +104,14 @@ function initSearchUI() {
 	if ( lang.startsWith( "fr" ) ) {
 		paramsDetect.lang = "fr";
 	}
-	
+
 	paramsDetect.isContextSearch = !winPath.endsWith( '/sr/srb.html' ) && !winPath.endsWith( '/sr/sra.html' );
 	paramsDetect.isAdvancedSearch = !!document.getElementById( 'advseacon1' ) || winPath.endsWith( '/advanced-search.html' ) || winPath.endsWith( '/recherche-avancee.html' );
 	paramsDetect.enableHistoryPush = !paramsDetect.isAdvancedSearch;
-	
+
 	// Final parameters object
 	params = Object.assign( defaults, paramsDetect, paramsOverride );
-	
+
 	searchBoxElement = document.querySelector( params.searchBoxQuery );
 
 	// Update the URL params and the hash params on navigation
@@ -121,23 +121,23 @@ function initSearchUI() {
 			search = /([^&=]+)=?([^&]*)/g,
 			decode = function ( s ) { return decodeURIComponent( s.replace( pl, " " ) ); },
 			query = window.location.search.substring( 1 );
-	
+
 		urlParams = {};
 		hashParams = {};
-	
+
 		// Ignore linting errors in regard to affectation instead of condition in the loops
 		// jshint -W084
 		while ( match = search.exec( query ) ) {	// eslint-disable-line no-cond-assign
 			urlParams[ decode(match[ 1 ] ) ] = decode( match[ 2 ] );
 		}
 		query = window.location.hash.substring( 1 );
-	
+
 		while ( match = search.exec( query ) ) {	// eslint-disable-line no-cond-assign
 			hashParams[ decode( match[ 1 ] ) ] = decode( match[ 2 ] );
 		}
 		// jshint +W084
 	};
-	
+
 	window.onpopstate();
 
 	initTpl();
@@ -370,14 +370,14 @@ function initTpl() {
 		if( window.location.hostname === "www.canada.ca" ) {
 			suggestionsElement.remove();
 		}
-	
+
 		// Add an alert banner to clearly state that the Query suggestion feature is at a rough experimental state
 		else {
 			const firstH1 = document.querySelector( "main h1:first-child" );
 			let roughExperimentAlert = document.createElement( "section" );
-	
+
 			roughExperimentAlert.classList.add( "alert", "alert-danger" );
-	
+
 			if ( lang === "fr" ) {
 				roughExperimentAlert.innerHTML = 
 					`<h2 class="h3">Avis de fonctionnalité instable</h2>
@@ -388,7 +388,7 @@ function initTpl() {
 					`<h2 class="h3">Unstable feature notice</h2>
 					<p>This page leverages an experimental feature subject to contain accessibility issues and/or to produce unwanted behavior which may alter the user experience.</p>`;
 			}
-			
+
 			firstH1.after( roughExperimentAlert );
 
 			// Remove Query suggestion if click elsewhere
@@ -416,7 +416,7 @@ function initEngine() {
 				try {
 					if( clientOrigin === 'analyticsFetch' ) {
 						let requestContent = JSON.parse( request.body );
-	
+
 						// filter user sensitive content
 						requestContent.originLevel3 = params.originLevel3;
 						request.body = JSON.stringify( requestContent );
@@ -427,7 +427,7 @@ function initEngine() {
 					}
 					if( clientOrigin === 'searchApiFetch' ) {
 						let requestContent = JSON.parse( request.body );
-	
+
 						// filter user sensitive content
 						requestContent.enableQuerySyntax = params.isAdvancedSearch;
 						requestContent.analytics.originLevel3 = params.originLevel3;
@@ -436,7 +436,7 @@ function initEngine() {
 				} catch {
 					console.warn( "No Headless Engine Loaded." );
 				}
-	
+
 				return request;
 			}
 		}
@@ -488,7 +488,7 @@ function initEngine() {
 		if ( urlParams.noneq ) {
 			q.push( "NOT (" + urlParams.noneq.replaceAll( '+', ' ' ).replaceAll( ' ', ') NOT(' ) + ")" );
 		}
-	
+
 		qString += q.length ? ' (' + q.join( ')(' ) + ')' : '';
 		let aqString = '';
 
@@ -502,7 +502,7 @@ function initEngine() {
 				qString = "";
 			}
 		}
-	
+
 		if ( urlParams.fqupdate ) {
 			let fqupdate = urlParams.fqupdate.toLowerCase();
 			if ( fqupdate === "datemodified_dt:[now-1day to now]" ) {
@@ -601,7 +601,7 @@ function initEngine() {
 		}
 
 		if ( aqString ) {
-			const action = loadAdvancedSearchQueryActions( headlessEngine ).updateAdvancedSearchQueries( { 	
+			const action = loadAdvancedSearchQueryActions( headlessEngine ).updateAdvancedSearchQueries( { 
 				aq: aqString,
 			} );
 			headlessEngine.dispatch( action ); 
@@ -621,10 +621,10 @@ function initEngine() {
 	// Get the query portion of the URL
 	const fragment = () => {
 		const hash = window.location.hash.slice( 1 );
-		if (!statusController.state.firstSearchExecuted && !hashParams.q ) {					
+		if (!statusController.state.firstSearchExecuted && !hashParams.q ) {
 			return window.location.search.slice( 1 ).replaceAll( '+', ' ' ); // use query string if hash is empty
 		}
-	
+
 		return hash;
 	};
 
@@ -705,7 +705,7 @@ function initEngine() {
 			if ( params.isAdvancedSearch ) {
 				return; // advanced search forces a post back
 			}
-			
+
 			e.preventDefault();
 
 			if ( searchBoxElement && searchBoxElement.value ) {
@@ -729,17 +729,17 @@ function initEngine() {
 function updateSearchBoxState( newState ) {
 	const previousState = searchBoxState;
 	searchBoxState = newState;
-	
+
 	if ( updateSearchBoxFromState && searchBoxElement && searchBoxElement.value !== newState.value ) {
 		searchBoxElement.value = newState.value;
 		updateSearchBoxFromState = false;
 		return;
 	}
-	
+
 	if ( !suggestionsElement ) {
 		return;
 	}
-		
+
 	if ( lastCharKeyUp === 13 ) {
 		suggestionsElement.hidden = true;
 		return;
@@ -757,7 +757,7 @@ function updateSearchBoxState( newState ) {
 			node.innerHTML = suggestion.highlightedValue;
 			suggestionsElement.appendChild( node );
 		});
-		
+
 		if ( searchBoxState.suggestions.length > 0 ) {
 			suggestionsElement.hidden = false;
 		}
@@ -803,7 +803,7 @@ function getLongDateFormat( date, lang ){
 // Update results list
 function updateResultListState( newState ) {
 	resultListState = newState;
-	
+
 	if ( resultListState.isLoading ) {
 		if ( suggestionsElement ) {
 			suggestionsElement.hidden = true;
@@ -855,7 +855,7 @@ function updateResultListState( newState ) {
 				.replace( '%[long-date-en]', getLongDateFormat( resultDate, 'en' ) )
 				.replace( '%[long-date-fr]', getLongDateFormat( resultDate, 'fr' ) )
 				.replace( '%[highlightedExcerpt]', highlightedExcerpt );
-			
+
 			const interactiveResult = buildInteractiveResult(
 				headlessEngine, {
 					options: { result },
@@ -881,11 +881,11 @@ function updateResultListState( newState ) {
 // Update heading that has number of results displayed
 function updateQuerySummaryState( newState ) {
 	querySummaryState = newState;
-	
+
 	if ( !querySummaryElement ) {
 		return;
 	}
-	
+
 	if ( resultListState.firstSearchExecuted && !querySummaryState.isLoading && !querySummaryState.hasError ) {
 		querySummaryElement.textContent = "";
 		if ( querySummaryState.total > 0 ) {
@@ -906,10 +906,10 @@ function updateQuerySummaryState( newState ) {
 // update did you mean
 function updateDidYouMeanState( newState ) {
 	didYouMeanState = newState;
-	
+
 	if ( !didYouMeanElement )
 		return;
-	
+
 	if ( resultListState.firstSearchExecuted ) {
 		didYouMeanElement.textContent = "";
 		if ( didYouMeanState.hasQueryCorrection ) {
@@ -950,7 +950,7 @@ function updatePagerState( newState ) {
 		const pageNo = page;
 
 		liNode.innerHTML = pageTemplateHTML.replaceAll( '%[page]', pageNo );
-		
+
 		if ( page < pagerState.currentPage - 1 || page > pagerState.currentPage + 1 ) {
 			liNode.classList.add( 'hidden-xs', 'hidden-sm' );
 			if ( page < pagerState.currentPage - 2 || page > pagerState.currentPage + 2 ) {
@@ -970,7 +970,7 @@ function updatePagerState( newState ) {
 			scrollToTop();
 		};
 
-		pagerElement.appendChild( liNode );	
+		pagerElement.appendChild( liNode );
 	} );
 
 	if ( pagerState.hasNextPage ) {
