@@ -473,7 +473,7 @@ function initEngine() {
 	statusController = buildSearchStatus( headlessEngine );
 
 	if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || 
-		 urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site ) { 
+		urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site ) { 
 		let q = [];
 		let qString = "";
 		if ( urlParams.allq ) {
@@ -575,22 +575,22 @@ function initEngine() {
 
 		if ( urlParams.filetype ) {
 			let filetype = urlParams.filetype.toLowerCase();
-			if ( filetype == "application/pdf" ) {
+			if ( filetype === "application/pdf" ) {
 				aqString += ' @filetype==(pdf)';
 			}
-			else if ( filetype == "ps" ) {
+			else if ( filetype === "ps" ) {
 				aqString += ' @filetype==(ps)';
 			}
-			else if ( filetype == "application/msword" ) {
+			else if ( filetype === "application/msword" ) {
 				aqString += ' @filetype==(doc,docx)';
 			}
-			else if ( filetype == "application/vnd.ms-excel" ) {
+			else if ( filetype === "application/vnd.ms-excel" ) {
 				aqString += ' @filetype==(xls,xlsx)';
 			}
-			else if ( filetype == "application/vnd.ms-powerpoint" ) {
+			else if ( filetype === "application/vnd.ms-powerpoint" ) {
 				aqString += ' @filetype==(ppt,pptx)';
 			}
-			else if ( filetype == "application/rtf" ) {
+			else if ( filetype === "application/rtf" ) {
 				aqString += ' @filetype==(rtf)';
 			}
 		}
@@ -656,7 +656,7 @@ function initEngine() {
 	};
 
 	// Execute a search if parameters in the URL on page load
-	if ( !statusController.state.firstSearchExecuted && fragment() && fragment() != 'q=' ) {
+	if ( !statusController.state.firstSearchExecuted && fragment() && fragment() !== 'q=' ) {
 		headlessEngine.executeFirstSearch();
 	}
 
@@ -689,7 +689,7 @@ function initEngine() {
 		searchBoxElement.onkeyup = ( e ) => {
 			lastCharKeyUp = e.keyCode;
 
-			if( e.keyCode !== 13 && searchBoxController.state.value != e.target.value ) {
+			if( e.keyCode !== 13 && searchBoxController.state.value !== e.target.value ) {
 				searchBoxController.updateText( e.target.value );
 			}
 		};
@@ -710,7 +710,7 @@ function initEngine() {
 
 			if ( searchBoxElement && searchBoxElement.value ) {
 				// Make sure we have the latest value in the search box state
-				if( searchBoxController.state.value != searchBoxElement.value ) {
+				if( searchBoxController.state.value !== searchBoxElement.value ) {
 					searchBoxController.updateText( searchBoxElement.value );
 				}
 				searchBoxController.submit();
@@ -793,7 +793,7 @@ function getShortDateFormat( date ){
 // get a long date format like May 21, 2024
 function getLongDateFormat( date, lang ){
 	let currentTZDate = getDateInCurrentTimeZone( date );
-	if ( lang == 'en' ) {
+	if ( lang === 'en' ) {
 		return monthsEn[ currentTZDate.getMonth() ] + " " + currentTZDate.getDate() + ", " + currentTZDate.getFullYear();
 	}
 
