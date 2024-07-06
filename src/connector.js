@@ -94,7 +94,9 @@ let pagerContainerTemplateHTML = document.getElementById( 'sr-pager-container' )
 
 // Init parameters and UI
 function initSearchUI() {
-	if( !baseElement ) {
+
+	// Check that all the required dependencies are there prior to load the search-ui
+	if( !baseElement || !DOMPurify) {
 		return;
 	}
 
@@ -884,7 +886,7 @@ function updateQuerySummaryState( newState ) {
 
 			querySummaryElement.innerHTML = ( ( querySummaryState.query !== "" && !params.isAdvancedSearch ) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML )
 				.replace( '%[numberOfResults]', numberOfResults )
-				.replace( '%[query]', querySummaryState.query )
+				.replace( '%[query]', DOMPurify.sanitize( querySummaryState.query ) )
 				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString( params.lang ) );
 		}
 		else {
