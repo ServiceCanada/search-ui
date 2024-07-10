@@ -94,7 +94,7 @@ let pagerContainerTemplateHTML = document.getElementById( 'sr-pager-container' )
 
 // Init parameters and UI
 function initSearchUI() {
-	if( !baseElement ) {
+	if( !baseElement || !DOMPurify ) {
 		return;
 	}
 
@@ -128,12 +128,12 @@ function initSearchUI() {
 		// Ignore linting errors in regard to affectation instead of condition in the loops
 		// jshint -W084
 		while ( match = search.exec( query ) ) {	// eslint-disable-line no-cond-assign
-			urlParams[ decode(match[ 1 ] ) ] = decode( match[ 2 ] );
+			urlParams[ decode(match[ 1 ] ) ] = DOMPurify.sanitize( decode( match[ 2 ] ) );
 		}
 		query = window.location.hash.substring( 1 );
 
 		while ( match = search.exec( query ) ) {	// eslint-disable-line no-cond-assign
-			hashParams[ decode( match[ 1 ] ) ] = decode( match[ 2 ] );
+			hashParams[ decode( match[ 1 ] ) ] = DOMPurify.sanitize( decode( match[ 2 ] ) );
 		}
 		// jshint +W084
 	};
@@ -884,7 +884,7 @@ function updateQuerySummaryState( newState ) {
 
 			querySummaryElement.innerHTML = ( ( querySummaryState.query !== "" && !params.isAdvancedSearch ) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML )
 				.replace( '%[numberOfResults]', numberOfResults )
-				.replace( '%[query]', querySummaryState.query )
+				.replace( '%[query]', DOMPurify.sanitize( querySummaryState.query ) )
 				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString( params.lang ) );
 		}
 		else {
