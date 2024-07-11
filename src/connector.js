@@ -689,7 +689,7 @@ function initEngine() {
 			lastCharKeyUp = e.keyCode;
 
 			if( e.keyCode !== 13 && searchBoxController.state.value !== e.target.value ) {
-				searchBoxController.updateText( e.target.value );
+				searchBoxController.updateText( DOMPurify.sanitize( e.target.value ) );
 			}
 		};
 		searchBoxElement.onfocus = () => {
@@ -710,7 +710,7 @@ function initEngine() {
 			if ( searchBoxElement && searchBoxElement.value ) {
 				// Make sure we have the latest value in the search box state
 				if( searchBoxController.state.value !== searchBoxElement.value ) {
-					searchBoxController.updateText( searchBoxElement.value );
+					searchBoxController.updateText( DOMPurify.sanitize( searchBoxElement.value ) );
 				}
 				searchBoxController.submit();
 			}
