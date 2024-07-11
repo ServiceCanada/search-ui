@@ -611,10 +611,10 @@ function initEngine() {
 	}
 
 	if ( hashParams.q && searchBoxElement ) {
-		searchBoxElement.value = hashParams.q;
+		searchBoxElement.value = DOMPurify.sanitize( hashParams.q );
 	}
 	else if ( urlParams.q && searchBoxElement ) {
-		searchBoxElement.value = urlParams.q;
+		searchBoxElement.value = DOMPurify.sanitize( urlParams.q );
 	}
 
 	// Get the query portion of the URL
