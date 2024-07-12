@@ -730,7 +730,7 @@ function updateSearchBoxState( newState ) {
 	searchBoxState = newState;
 
 	if ( updateSearchBoxFromState && searchBoxElement && searchBoxElement.value !== newState.value ) {
-		searchBoxElement.value = newState.value;
+		searchBoxElement.value = DOMPurify.sanitize( newState.value );
 		updateSearchBoxFromState = false;
 		return;
 	}
@@ -751,7 +751,7 @@ function updateSearchBoxState( newState ) {
 			node.setAttribute( "class", "suggestion-item" );
 			node.onclick = ( e ) => { 
 				searchBoxController.selectSuggestion(e.currentTarget.innerText);
-				searchBoxElement.value = e.currentTarget.innerText;
+				searchBoxElement.value = DOMPurify.sanitize( e.currentTarget.innerText );
 			};
 			node.innerHTML = suggestion.highlightedValue;
 			suggestionsElement.appendChild( node );
