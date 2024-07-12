@@ -619,12 +619,11 @@ function initEngine() {
 
 	// Get the query portion of the URL
 	const fragment = () => {
-		const hash = window.location.hash.slice( 1 );
-		if (!statusController.state.firstSearchExecuted && !hashParams.q ) {
-			return window.location.search.slice( 1 ).replaceAll( '+', ' ' ); // use query string if hash is empty
+		if ( !statusController.state.firstSearchExecuted && !hashParams.q ) {
+			return buildCleanQueryString( urlParams );
 		}
 
-		return hash;
+		return buildCleanQueryString( hashParams );
 	};
 
 	urlManager = buildUrlManager( headlessEngine, {
@@ -761,6 +760,22 @@ function updateSearchBoxState( newState ) {
 			suggestionsElement.hidden = false;
 		}
 	}
+}
+
+// rebuild a clean query string out of a JSON object
+function buildCleanQueryString( paramsObject ) {
+	let urlParam = "";
+	for ( var prop in paramsObject ) {
+		if ( paramsObject[ prop ] ) {
+			if ( urlParam !== "" ) {
+				urlParam += "&";
+			}
+
+			urlParam += prop + "=" + DOMPurify.sanitize( paramsObject[ prop ].replaceAll( '+', ' ' ) );
+		}	
+	}
+
+	return urlParam;
 }
 
 // Filters out dangerous URIs that can create XSS attacks such as `javascript:`.
