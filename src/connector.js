@@ -94,6 +94,9 @@ let pagerContainerTemplateHTML = document.getElementById( 'sr-pager-container' )
 
 // Init parameters and UI
 function initSearchUI() {
+
+	console.log( "Search UI Connector Initialized" );
+	debugger
 	if( !baseElement || !DOMPurify ) {
 		return;
 	}
