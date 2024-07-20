@@ -404,6 +404,7 @@ function initTpl() {
 
 // Initiate headless engine
 function initEngine() {
+	console.log("hiii")
 	headlessEngine = buildSearchEngine({
 		configuration: {
 			organizationEndpoints: params.endpoints,
