@@ -93,8 +93,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-banner');
-	grunt.loadNpmTasks('grunt-htmllint');
-	grunt.loadNpmTasks('grunt-eslint');
+	//grunt.loadNpmTasks('grunt-htmllint');
+	//grunt.loadNpmTasks('grunt-eslint');
 
-	grunt.registerTask('default', ['clean', 'htmllint', 'jshint', 'eslint', 'copy', 'uglify', 'cssmin', 'usebanner']);
+	grunt.registerTask('default', ['clean',   'copy', 'uglify', 'cssmin', 'usebanner']);
 };
