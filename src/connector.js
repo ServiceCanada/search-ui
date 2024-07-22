@@ -424,14 +424,6 @@ function initEngine() {
 							filters: 10,
 							padding: 'popular'
 						};
-
-						requestContent.mlParameters = {
-							filters: {
-								searchPageUrl: params.originLevel3
-							}
-							
-						};
-						 
 						request.body = JSON.stringify(requestContent);
 
 						// Event used to expose a data layer when search events occur; useful for analytics
@@ -444,6 +436,12 @@ function initEngine() {
 						// filter user sensitive content
 						requestContent.enableQuerySyntax = params.isAdvancedSearch;
 						requestContent.analytics.originLevel3 = params.originLevel3;
+						requestContent.mlParameters = {
+							filters: {
+								searchPageUrl: params.originLevel3
+							}
+							
+						};
 						request.body = JSON.stringify(requestContent);
 					}
 				} catch {
