@@ -94,8 +94,7 @@ let pagerContainerTemplateHTML = document.getElementById('sr-pager-container')?.
 
 // Init parameters and UI
 function initSearchUI() {
-	console.log("INIT SEARH TEST HERE");
-	console.log("Search UI Connector Initialized");
+ 
 
 	if (!baseElement || !DOMPurify) {
 		return;
@@ -404,7 +403,7 @@ function initTpl() {
 
 // Initiate headless engine
 function initEngine() {
-	console.log("hiii")
+ 
 	headlessEngine = buildSearchEngine({
 		configuration: {
 			organizationEndpoints: params.endpoints,
@@ -432,8 +431,7 @@ function initEngine() {
 							}
 							
 						};
-						console.log("requestContent :");
-						console.log(requestContent);
+						 
 						request.body = JSON.stringify(requestContent);
 
 						// Event used to expose a data layer when search events occur; useful for analytics
