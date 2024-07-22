@@ -1,7 +1,10 @@
 name: Continous integration
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
+
 
 jobs:
   integration-check:
