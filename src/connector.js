@@ -429,6 +429,12 @@ function initEngine() {
 						// filter user sensitive content
 						requestContent.enableQuerySyntax = params.isAdvancedSearch;
 						requestContent.analytics.originLevel3 = params.originLevel3;
+						requestContent.mlParameters = {
+							filters: {
+								searchPageUrl: params.originLevel3
+							}
+							
+						};
 						request.body = JSON.stringify( requestContent );
 					}
 				} catch {
