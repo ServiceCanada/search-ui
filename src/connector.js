@@ -424,7 +424,6 @@ function initEngine() {
 					}
 					if( clientOrigin === 'searchApiFetch' ) {
 						let requestContent = JSON.parse( request.body );
-
 						// filter user sensitive content
 						requestContent.enableQuerySyntax = params.isAdvancedSearch;
 						requestContent.analytics.originLevel3 = params.originLevel3;
