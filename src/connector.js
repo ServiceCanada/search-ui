@@ -414,7 +414,6 @@ function initEngine() {
 				try {
 					if( clientOrigin === 'analyticsFetch' ) {
 						let requestContent = JSON.parse( request.body );
-					debugger
 						// filter user sensitive content
 						requestContent.originLevel3 = params.originLevel3;
 						request.body = JSON.stringify( requestContent );
