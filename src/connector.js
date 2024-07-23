@@ -530,7 +530,7 @@ function initEngine() {
 			}
 		}
 		if (urlParams.dmn) {
-			aqString += ' @hostname="' + urlParams.dmn + '"';
+			aqString += ' @uri="' + urlParams.dmn + '"';
 		}
 
 		if (urlParams.sort) {
