@@ -899,7 +899,7 @@ function updateQuerySummaryState( newState ) {
 
 			querySummaryElement.innerHTML = ( ( querySummaryState.query !== "" && !params.isAdvancedSearch ) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML )
 				.replace( '%[numberOfResults]', numberOfResults )
-				.replace( '%[query]', DOMPurify.sanitize( querySummaryState.query ) )
+				.replace( '%[query]', DOMPurify.sanitize( querySummaryState.query ).replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" ) )
 				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString( params.lang ) );
 		}
 		else {
