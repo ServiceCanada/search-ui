@@ -398,7 +398,9 @@ function initTpl() {
 		}
 	}
 }
-
+function sanitizeQuery(q) {
+	return q.replace(/<[^>]*>?/gm, '');
+}
 // Initiate headless engine
 function initEngine() {
 	headlessEngine = buildSearchEngine( {
@@ -430,6 +432,9 @@ function initEngine() {
 						requestContent.enableQuerySyntax = params.isAdvancedSearch;
 						requestContent.analytics.originLevel3 = params.originLevel3;
 						request.body = JSON.stringify( requestContent );
+						let q = requestContent.q;
+						requestContent.q = sanitizeQuery(q);
+						request.body = JSON.stringify(requestContent);
 					}
 				} catch {
 					console.warn( "No Headless Engine Loaded." );
@@ -901,6 +906,12 @@ function updateQuerySummaryState( newState ) {
 				.replace( '%[numberOfResults]', numberOfResults )
 				.replace( '%[query]', DOMPurify.sanitize( querySummaryState.query ) )
 				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString( params.lang ) );
+				const clean = DOMPurify.sanitize(dirty, {
+					ALLOWED_TAGS: [],
+					FORBID_ATTR: ["style"],
+				});
+	
+				querySummaryElement.innerHTML = "<h2>" + clean + "</h2>";
 		}
 		else {
 			querySummaryElement.innerHTML = noResultTemplateHTML;
