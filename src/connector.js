@@ -398,7 +398,9 @@ function initTpl() {
 		}
 	}
 }
-
+function sanitizeQuery(q) {
+	return q.replace(/<[^>]*>?/gm, '');
+}
 // Initiate headless engine
 function initEngine() {
 	headlessEngine = buildSearchEngine( {
@@ -430,6 +432,9 @@ function initEngine() {
 						requestContent.enableQuerySyntax = params.isAdvancedSearch;
 						requestContent.analytics.originLevel3 = params.originLevel3;
 						request.body = JSON.stringify( requestContent );
+						let q = requestContent.q;
+						requestContent.q = sanitizeQuery(q);
+						request.body = JSON.stringify(requestContent);
 					}
 				} catch {
 					console.warn( "No Headless Engine Loaded." );
