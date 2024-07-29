@@ -910,8 +910,10 @@ function updateQuerySummaryState( newState ) {
 					ALLOWED_TAGS: [],
 					FORBID_ATTR: ["style"],
 				});
-	
-				querySummaryElement.innerHTML = "<h2>" + clean + "</h2>";
+				const h2Element = document.createElement("h2");
+				//querySummaryElement.innerHTML = "<h2>" + clean + "</h2>";
+
+				h2Element.textContent = clean
 		}
 		else {
 			querySummaryElement.innerHTML = noResultTemplateHTML;
