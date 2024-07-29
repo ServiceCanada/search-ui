@@ -896,11 +896,22 @@ function updateQuerySummaryState( newState ) {
 		querySummaryElement.textContent = "";
 		if ( querySummaryState.total > 0 ) {
 			let numberOfResults = querySummaryState.total.toLocaleString( params.lang );
+			// Create the <h2> element
+			const hTwoAnchor = document.createElement("h2");
+			// Generate the text content
+			const querySummaryText = ((querySummaryState.query !== "" && !params.isAdvancedSearch) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML)
+				.replace('%[numberOfResults]', numberOfResults)
+				.replace('%[query]', querySummaryState.query)
+				.replace('%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString(params.lang));
 
-			querySummaryElement.innerHTML = ( ( querySummaryState.query !== "" && !params.isAdvancedSearch ) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML )
-				.replace( '%[numberOfResults]', numberOfResults )
-				.replace( '%[query]', DOMPurify.sanitize( querySummaryState.query ) )
-				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString( params.lang ) );
+			const dirty = querySummaryText
+			const clean = DOMPurify.sanitize(dirty, {
+				ALLOWED_TAGS: [""],
+				FORBID_ATTR: ["style"],
+			});
+			hTwoAnchor.textContent = clean;
+			querySummaryElement.innerHTML = "";
+			querySummaryElement.appendChild(hTwoAnchor);
 		}
 		else {
 			querySummaryElement.innerHTML = noResultTemplateHTML;
