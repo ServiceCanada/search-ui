@@ -228,11 +228,11 @@ function initTpl() {
 	if ( !querySummaryTemplateHTML ) {
 		if ( lang === "fr" ) {
 			querySummaryTemplateHTML = 
-				`<h2>%[numberOfResults] résultats de recherche pour "%[query]"</h2>`;
+				`%[numberOfResults] résultats de recherche pour "%[query]"`;
 		}
 		else {
 			querySummaryTemplateHTML = 
-				`<h2>%[numberOfResults] search results for "%[query]"</h2>`;
+				`%[numberOfResults] search results for "%[query]"`;
 		}
 	}
 
@@ -250,11 +250,11 @@ function initTpl() {
 	if ( !noQuerySummaryTemplateHTML ) {
 		if ( lang === "fr" ) {
 			noQuerySummaryTemplateHTML = 
-				`<h2>%[numberOfResults] résultats de recherche</h2>`;
+				`%[numberOfResults] résultats de recherche`;
 		}
 		else {
 			noQuerySummaryTemplateHTML = 
-				`<h2>%[numberOfResults] search results</h2>`;
+				`%[numberOfResults] search results`;
 		}
 	}
 
@@ -522,7 +522,7 @@ function initEngine() {
 			}
 		}
 		if ( urlParams.dmn ) {
-			aqString += ' @hostname="' + urlParams.dmn + '"';
+			aqString += ' @uri="' + urlParams.dmn + '"';
 		}
 
 		if ( urlParams.sort ) {
@@ -908,13 +908,7 @@ function updateQuerySummaryState( newState ) {
 				.replace('%[numberOfResults]', numberOfResults)
 				.replace('%[query]', querySummaryState.query)
 				.replace('%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString(params.lang));
-
-			const dirty = querySummaryText
-			const clean = DOMPurify.sanitize(dirty, {
-				ALLOWED_TAGS: [""],
-				FORBID_ATTR: ["style"],
-			});
-			hTwoAnchor.textContent = clean;
+			hTwoAnchor.textContent = querySummaryText;
 			querySummaryElement.innerHTML = "";
 			querySummaryElement.appendChild(hTwoAnchor);
 		}
