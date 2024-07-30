@@ -9,15 +9,15 @@ pageType: recherche
 share: false
 deptfeature: false
 dateModified: 2024-06-05
-css: "../src/connector.css"
-script: "../src/connector.js"
+css: "../../src/connector.css"
+script: "../../src/connector.js"
 ---
 
 <!--FORM-->
 <form id="gc-searchbox" class="mrgn-tp-sm">
 	<div class="input-group mrgn-tp-lg">
 		<label class="wb-inv" for="sch-inp-ac">Rechercher les sites web du Gouvernment du Canada</label>
-		<input id="sch-inp-ac" class="form-control" value="" name="q" autocomplete="off" spellcheck="false" type="search" aria-describedby="gc-pi">
+		<input id="sch-inp-ac" class="form-control" value="" name="q" autocomplete="off" spellcheck="false" type="search" data-fusion-query="safe" aria-describedby="gc-pi">
 		<span class="input-group-btn">
 		<button class="btn btn-primary btn-small" type="submit"> <span class="glyphicon-search glyphicon" aria-hidden="true"></span> <span class="wb-inv">Rechercher</span> </button>
 		</span>

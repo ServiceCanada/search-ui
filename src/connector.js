@@ -94,7 +94,7 @@ let pagerContainerTemplateHTML = document.getElementById( 'sr-pager-container' )
 
 // Init parameters and UI
 function initSearchUI() {
-	if( !baseElement ) {
+	if( !baseElement || !DOMPurify ) {
 		return;
 	}
 
@@ -128,12 +128,12 @@ function initSearchUI() {
 		// Ignore linting errors in regard to affectation instead of condition in the loops
 		// jshint -W084
 		while ( match = search.exec( query ) ) {	// eslint-disable-line no-cond-assign
-			urlParams[ decode(match[ 1 ] ) ] = decode( match[ 2 ] );
+			urlParams[ decode(match[ 1 ] ) ] = DOMPurify.sanitize( decode( match[ 2 ] ) );
 		}
 		query = window.location.hash.substring( 1 );
 
 		while ( match = search.exec( query ) ) {	// eslint-disable-line no-cond-assign
-			hashParams[ decode( match[ 1 ] ) ] = decode( match[ 2 ] );
+			hashParams[ decode( match[ 1 ] ) ] = DOMPurify.sanitize( decode( match[ 2 ] ) );
 		}
 		// jshint +W084
 	};
@@ -228,11 +228,11 @@ function initTpl() {
 	if ( !querySummaryTemplateHTML ) {
 		if ( lang === "fr" ) {
 			querySummaryTemplateHTML = 
-				`<h2>%[numberOfResults] résultats de recherche pour "%[query]"</h2>`;
+				`%[numberOfResults] résultats de recherche pour "%[query]"`;
 		}
 		else {
 			querySummaryTemplateHTML = 
-				`<h2>%[numberOfResults] search results for "%[query]"</h2>`;
+				`%[numberOfResults] search results for "%[query]"`;
 		}
 	}
 
@@ -250,11 +250,11 @@ function initTpl() {
 	if ( !noQuerySummaryTemplateHTML ) {
 		if ( lang === "fr" ) {
 			noQuerySummaryTemplateHTML = 
-				`<h2>%[numberOfResults] résultats de recherche</h2>`;
+				`%[numberOfResults] résultats de recherche`;
 		}
 		else {
 			noQuerySummaryTemplateHTML = 
-				`<h2>%[numberOfResults] search results</h2>`;
+				`%[numberOfResults] search results`;
 		}
 	}
 
@@ -398,7 +398,9 @@ function initTpl() {
 		}
 	}
 }
-
+function sanitizeQuery(q) {
+	return q.replace(/<[^>]*>?/gm, '');
+}
 // Initiate headless engine
 function initEngine() {
 	headlessEngine = buildSearchEngine( {
@@ -430,6 +432,9 @@ function initEngine() {
 						requestContent.enableQuerySyntax = params.isAdvancedSearch;
 						requestContent.analytics.originLevel3 = params.originLevel3;
 						request.body = JSON.stringify( requestContent );
+						let q = requestContent.q;
+						requestContent.q = sanitizeQuery(q);
+						request.body = JSON.stringify(requestContent);
 					}
 				} catch {
 					console.warn( "No Headless Engine Loaded." );
@@ -517,7 +522,7 @@ function initEngine() {
 			}
 		}
 		if ( urlParams.dmn ) {
-			aqString += ' @hostname="' + urlParams.dmn + '"';
+			aqString += ' @uri="' + urlParams.dmn + '"';
 		}
 
 		if ( urlParams.sort ) {
@@ -611,20 +616,19 @@ function initEngine() {
 	}
 
 	if ( hashParams.q && searchBoxElement ) {
-		searchBoxElement.value = hashParams.q;
+		searchBoxElement.value = DOMPurify.sanitize( hashParams.q );
 	}
 	else if ( urlParams.q && searchBoxElement ) {
-		searchBoxElement.value = urlParams.q;
+		searchBoxElement.value = DOMPurify.sanitize( urlParams.q );
 	}
 
 	// Get the query portion of the URL
 	const fragment = () => {
-		const hash = window.location.hash.slice( 1 );
-		if (!statusController.state.firstSearchExecuted && !hashParams.q ) {
-			return window.location.search.slice( 1 ).replaceAll( '+', ' ' ); // use query string if hash is empty
+		if ( !statusController.state.firstSearchExecuted && !hashParams.q ) {
+			return buildCleanQueryString( urlParams );
 		}
 
-		return hash;
+		return buildCleanQueryString( hashParams );
 	};
 
 	urlManager = buildUrlManager( headlessEngine, {
@@ -689,7 +693,7 @@ function initEngine() {
 			lastCharKeyUp = e.keyCode;
 
 			if( e.keyCode !== 13 && searchBoxController.state.value !== e.target.value ) {
-				searchBoxController.updateText( e.target.value );
+				searchBoxController.updateText( DOMPurify.sanitize( e.target.value ) );
 			}
 		};
 		searchBoxElement.onfocus = () => {
@@ -710,7 +714,7 @@ function initEngine() {
 			if ( searchBoxElement && searchBoxElement.value ) {
 				// Make sure we have the latest value in the search box state
 				if( searchBoxController.state.value !== searchBoxElement.value ) {
-					searchBoxController.updateText( searchBoxElement.value );
+					searchBoxController.updateText( DOMPurify.sanitize( searchBoxElement.value ) );
 				}
 				searchBoxController.submit();
 			}
@@ -730,7 +734,7 @@ function updateSearchBoxState( newState ) {
 	searchBoxState = newState;
 
 	if ( updateSearchBoxFromState && searchBoxElement && searchBoxElement.value !== newState.value ) {
-		searchBoxElement.value = newState.value;
+		searchBoxElement.value = DOMPurify.sanitize( newState.value );
 		updateSearchBoxFromState = false;
 		return;
 	}
@@ -751,7 +755,7 @@ function updateSearchBoxState( newState ) {
 			node.setAttribute( "class", "suggestion-item" );
 			node.onclick = ( e ) => { 
 				searchBoxController.selectSuggestion(e.currentTarget.innerText);
-				searchBoxElement.value = e.currentTarget.innerText;
+				searchBoxElement.value = DOMPurify.sanitize( e.currentTarget.innerText );
 			};
 			node.innerHTML = suggestion.highlightedValue;
 			suggestionsElement.appendChild( node );
@@ -761,6 +765,22 @@ function updateSearchBoxState( newState ) {
 			suggestionsElement.hidden = false;
 		}
 	}
+}
+
+// rebuild a clean query string out of a JSON object
+function buildCleanQueryString( paramsObject ) {
+	let urlParam = "";
+	for ( var prop in paramsObject ) {
+		if ( paramsObject[ prop ] ) {
+			if ( urlParam !== "" ) {
+				urlParam += "&";
+			}
+
+			urlParam += prop + "=" + DOMPurify.sanitize( paramsObject[ prop ].replaceAll( '+', ' ' ) );
+		}	
+	}
+
+	return urlParam;
 }
 
 // Filters out dangerous URIs that can create XSS attacks such as `javascript:`.
@@ -881,11 +901,16 @@ function updateQuerySummaryState( newState ) {
 		querySummaryElement.textContent = "";
 		if ( querySummaryState.total > 0 ) {
 			let numberOfResults = querySummaryState.total.toLocaleString( params.lang );
-
-			querySummaryElement.innerHTML = ( ( querySummaryState.query !== "" && !params.isAdvancedSearch ) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML )
-				.replace( '%[numberOfResults]', numberOfResults )
-				.replace( '%[query]', querySummaryState.query )
-				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString( params.lang ) );
+			// Create the <h2> element
+			const hTwoAnchor = document.createElement("h2");
+			// Generate the text content
+			const querySummaryText = ((querySummaryState.query !== "" && !params.isAdvancedSearch) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML)
+				.replace('%[numberOfResults]', numberOfResults)
+				.replace('%[query]', querySummaryState.query)
+				.replace('%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString(params.lang));
+			hTwoAnchor.textContent = querySummaryText;
+			querySummaryElement.innerHTML = "";
+			querySummaryElement.appendChild(hTwoAnchor);
 		}
 		else {
 			querySummaryElement.innerHTML = noResultTemplateHTML;
