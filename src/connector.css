@@ -46,6 +46,11 @@
 	margin-top: 30px;
 }
 
+div#did-you-mean > p {
+    display: flex;
+    align-items: center;
+}
+
 /*
  * Pagination styles 
  * To be added and replaced by out-of-the-box GCWeb
