@@ -863,7 +863,8 @@ function updateResultListState( newState ) {
 				.replace( '%[short-date-fr]', getShortDateFormat( resultDate ) )
 				.replace( '%[long-date-en]', getLongDateFormat( resultDate, 'en' ) )
 				.replace( '%[long-date-fr]', getLongDateFormat( resultDate, 'fr' ) )
-				.replace( '%[highlightedExcerpt]', highlightedExcerpt );
+				.replace( '%[highlightedExcerpt]', highlightedExcerpt )
+				.replace( /&/g, "&amp;" );
 
 			const interactiveResult = buildInteractiveResult(
 				headlessEngine, {
