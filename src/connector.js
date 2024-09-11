@@ -430,7 +430,7 @@ function initEngine() {
 
 						// filter user sensitive content
 						requestContent.enableQuerySyntax = params.isAdvancedSearch;
-						requestContent.mlParameters = { "filters": { "searchpageurl": params.originLevel3 } }
+						requestContent.mlParameters = { "filters": { "searchpageurl": params.originLevel3 } };
 
 						if ( requestContent.analytics ) {
 							requestContent.analytics.originLevel3 = params.originLevel3;
@@ -604,7 +604,7 @@ function initEngine() {
 		}
 
 		if ( urlParams.year ) {
-			const year = Number.parseInt( urlParams.year )
+			const year = Number.parseInt( urlParams.year );
 			if ( Number.isInteger( year )  && ( year > 2000 )  && ( year < 2250 )) {          
 				aqString += ' @uri=".ca/' + urlParams.year + '"';
 			}
