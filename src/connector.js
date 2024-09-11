@@ -228,33 +228,33 @@ function initTpl() {
 	if ( !querySummaryTemplateHTML ) {
 		if ( lang === "fr" ) {
 			querySummaryTemplateHTML = 
-				`%[numberOfResults] résultats de recherche pour "%[query]"`;
+				`<h2>%[numberOfResults] résultats de recherche pour "%[query]"</h2>`;
 		}
 		else {
 			querySummaryTemplateHTML = 
-				`%[numberOfResults] search results for "%[query]"`;
+				`<h2>%[numberOfResults] search results for "%[query]"</h2>`;
 		}
 	}
 
 	if ( !didYouMeanTemplateHTML ) {
 		if ( lang === "fr" ) {
 			didYouMeanTemplateHTML = 
-				`<p class="h5 mrgn-lft-md">Rechercher plutôt <button class="btn btn-lg btn-link p-0" type="button">%[correctedQuery]</button> ?</p>`;
+				`<p class="h5">Rechercher plutôt <button class="btn-lg btn-link p-0" type="button">%[correctedQuery]</button> ?</p>`;
 		}
 		else {
 			didYouMeanTemplateHTML = 
-				`<p class="h5 mrgn-lft-md">Did you mean <button class="btn btn-lg btn-link p-0" type="button">%[correctedQuery]</button> ?</p>`;
+				`<p class="h5">Did you mean <button class="btn-lg btn-link p-0" type="button">%[correctedQuery]</button> ?</p>`;
 		}
 	}
 
 	if ( !noQuerySummaryTemplateHTML ) {
 		if ( lang === "fr" ) {
 			noQuerySummaryTemplateHTML = 
-				`%[numberOfResults] résultats de recherche`;
+				`<h2>%[numberOfResults] résultats de recherche</h2>`;
 		}
 		else {
 			noQuerySummaryTemplateHTML = 
-				`%[numberOfResults] search results`;
+				`<h2>%[numberOfResults] search results</h2>`;
 		}
 	}
 
@@ -414,7 +414,7 @@ function initEngine() {
 			},
 			preprocessRequest: ( request, clientOrigin ) => {
 				try {
-					if( clientOrigin === 'analyticsFetch' ) {
+					if ( clientOrigin === 'analyticsFetch' ) {
 						let requestContent = JSON.parse( request.body );
 
 						// filter user sensitive content
@@ -425,16 +425,20 @@ function initEngine() {
 						const searchEvent = new CustomEvent( "searchEvent", { detail: requestContent } );
 						document.dispatchEvent( searchEvent );
 					}
-					if( clientOrigin === 'searchApiFetch' ) {
+					if ( clientOrigin === 'searchApiFetch' ) {
 						let requestContent = JSON.parse( request.body );
 
 						// filter user sensitive content
 						requestContent.enableQuerySyntax = params.isAdvancedSearch;
-						requestContent.analytics.originLevel3 = params.originLevel3;
-						request.body = JSON.stringify( requestContent );
+						requestContent.mlParameters = { "filters": { "searchpageurl": params.originLevel3 } }
+
+						if ( requestContent.analytics ) {
+							requestContent.analytics.originLevel3 = params.originLevel3;
+						}
+
 						let q = requestContent.q;
-						requestContent.q = sanitizeQuery(q);
-						request.body = JSON.stringify(requestContent);
+						requestContent.q = sanitizeQuery( q );
+						request.body = JSON.stringify( requestContent );
 					}
 				} catch {
 					console.warn( "No Headless Engine Loaded." );
@@ -868,7 +872,7 @@ function updateResultListState( newState ) {
 				.replace( '%[short-date-fr]', getShortDateFormat( resultDate ) )
 				.replace( '%[long-date-en]', getLongDateFormat( resultDate, 'en' ) )
 				.replace( '%[long-date-fr]', getLongDateFormat( resultDate, 'fr' ) )
-				.replace( '%[highlightedExcerpt]', highlightedExcerpt );
+				.replace( '%[highlightedExcerpt]', highlightedExcerpt.replace( '&amp;' , '&' ).replace( '&' , '&amp;' ) );
 
 			const interactiveResult = buildInteractiveResult(
 				headlessEngine, {
@@ -901,16 +905,12 @@ function updateQuerySummaryState( newState ) {
 		querySummaryElement.textContent = "";
 		if ( querySummaryState.total > 0 ) {
 			let numberOfResults = querySummaryState.total.toLocaleString( params.lang );
-			// Create the <h2> element
-			const hTwoAnchor = document.createElement("h2");
 			// Generate the text content
-			const querySummaryText = ((querySummaryState.query !== "" && !params.isAdvancedSearch) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML)
-				.replace('%[numberOfResults]', numberOfResults)
-				.replace('%[query]', querySummaryState.query)
-				.replace('%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString(params.lang));
-			hTwoAnchor.textContent = querySummaryText;
-			querySummaryElement.innerHTML = "";
-			querySummaryElement.appendChild(hTwoAnchor);
+			const querySummaryHTML = ( ( querySummaryState.query !== "" && !params.isAdvancedSearch ) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML )
+				.replace( '%[numberOfResults]', numberOfResults )
+				.replace( '%[query]', querySummaryState.query )
+				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString( params.lang ) );
+			querySummaryElement.innerHTML = querySummaryHTML;
 		}
 		else {
 			querySummaryElement.innerHTML = noResultTemplateHTML;
