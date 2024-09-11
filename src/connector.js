@@ -480,7 +480,7 @@ function initEngine() {
 	statusController = buildSearchStatus( headlessEngine );
 
 	if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || 
-		urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site ) { 
+		urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site || urlParams.year ) { 
 		let q = [];
 		let qString = "";
 		if ( urlParams.allq ) {
@@ -600,6 +600,13 @@ function initEngine() {
 			}
 			else if ( filetype === "application/rtf" ) {
 				aqString += ' @filetype==(rtf)';
+			}
+		}
+
+		if ( urlParams.year ) {
+			const year = Number.parseInt( urlParams.year )
+			if ( Number.isInteger( year )  && ( year > 2000 )  && ( year < 2250 )) {          
+				aqString += ' @uri=".ca/' + urlParams.year + '"';
 			}
 		}
 
