@@ -605,7 +605,7 @@ function initEngine() {
 
 		if ( urlParams.year ) {
 			const year = Number.parseInt( urlParams.year );
-			if ( Number.isInteger( year )  && ( year > 2000 )  && ( year < 2250 )) {          
+			if ( Number.isInteger( year )  && ( year > 2000 )  && ( year <= ( new Date().getFullYear() + 1 ) ) ) {          
 				aqString += ' @uri=".ca/' + urlParams.year + '"';
 			}
 		}
@@ -874,12 +874,12 @@ function updateResultListState( newState ) {
 				.replace( '%[result.title]', result.title )
 				.replace( '%[result.raw.author]', author )
 				.replace( '%[result.breadcrumb]', result.raw.displaynavlabel ? result.raw.displaynavlabel : result.printableUri )
-				.replace( '%[result.printableUri]', result.printableUri )
+				.replace( '%[result.printableUri]', result.printableUri.replaceAll( '&' , '&amp;' ) )
 				.replace( '%[short-date-en]', getShortDateFormat( resultDate ) )
 				.replace( '%[short-date-fr]', getShortDateFormat( resultDate ) )
 				.replace( '%[long-date-en]', getLongDateFormat( resultDate, 'en' ) )
 				.replace( '%[long-date-fr]', getLongDateFormat( resultDate, 'fr' ) )
-				.replace( '%[highlightedExcerpt]', highlightedExcerpt.replace( '&amp;' , '&' ).replace( '&' , '&amp;' ) );
+				.replace( '%[highlightedExcerpt]', highlightedExcerpt );
 
 			const interactiveResult = buildInteractiveResult(
 				headlessEngine, {
@@ -915,9 +915,16 @@ function updateQuerySummaryState( newState ) {
 			// Generate the text content
 			const querySummaryHTML = ( ( querySummaryState.query !== "" && !params.isAdvancedSearch ) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML )
 				.replace( '%[numberOfResults]', numberOfResults )
-				.replace( '%[query]', querySummaryState.query )
+				.replace( '%[query]', '<span class="sr-query"></span>' )
 				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString( params.lang ) );
+			
 			querySummaryElement.innerHTML = querySummaryHTML;
+
+			// Setting query using textContent to protect against cross-site scripting 
+			const queryElement = querySummaryElement.querySelector( '.sr-query' );
+			if ( queryElement ){
+				queryElement.textContent = querySummaryState.query;
+			}
 		}
 		else {
 			querySummaryElement.innerHTML = noResultTemplateHTML;
