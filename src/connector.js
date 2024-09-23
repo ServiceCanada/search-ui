@@ -605,8 +605,11 @@ function initEngine() {
 
 		if ( urlParams.year ) {
 			const year = Number.parseInt( urlParams.year );
-			if ( Number.isInteger( year )  && ( year > 2000 )  && ( year <= ( new Date().getFullYear() + 1 ) ) ) {          
+			if ( Number.isInteger( year )  && ( year >= 2000 )  && ( year <= ( new Date().getFullYear() + 1 ) ) ) {
 				aqString += ' @uri=".ca/' + urlParams.year + '"';
+			}
+			else {
+				aqString += ' NOT @uri';
 			}
 		}
 
