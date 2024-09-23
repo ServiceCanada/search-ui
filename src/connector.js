@@ -920,10 +920,9 @@ function updateQuerySummaryState( newState ) {
 				.replace( '%[numberOfResults]', numberOfResults )
 				.replace( '%[query]', '<span class="sr-query"></span>' )
 				.replace( '%[queryDurationInSeconds]', querySummaryState.durationInSeconds.toLocaleString( params.lang ) );
-			
+
 			querySummaryElement.innerHTML = querySummaryHTML;
 
-			// Setting query using textContent to protect against cross-site scripting 
 			const queryElement = querySummaryElement.querySelector( '.sr-query' );
 			if ( queryElement ){
 				queryElement.textContent = querySummaryState.query;
