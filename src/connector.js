@@ -239,7 +239,7 @@ function initTpl() {
 	if ( !didYouMeanTemplateHTML ) {
 		if ( lang === "fr" ) {
 			didYouMeanTemplateHTML = 
-				`<p class="h5">Rechercher plutôt <button class="btn-lg btn-link p-0" type="button">%[correctedQuery]</button> ?</p>`;
+				`<p class="h5">Rechercher plutôt <button class="btn btn-lg btn-link p-0 mrgn-bttm-sm" type="button">%[correctedQuery]</button> ?</p>`;
 		}
 		else {
 			didYouMeanTemplateHTML = 
