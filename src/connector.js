@@ -243,7 +243,7 @@ function initTpl() {
 		}
 		else {
 			didYouMeanTemplateHTML = 
-				`<p class="h5">Did you mean <button class="btn-lg btn-link p-0" type="button">%[correctedQuery]</button> ?</p>`;
+				`<p class="h5">Did you mean <button class="btn btn-lg btn-link p-0 mrgn-bttm-sm" type="button">%[correctedQuery]</button> ?</p>`;
 		}
 	}
 
