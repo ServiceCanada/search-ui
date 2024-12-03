@@ -35,7 +35,8 @@ const defaults = {
 	"enableHistoryPush": true,
 	"isContextSearch": false,
 	"isAdvancedSearch": false,
-	"originLevel3": window.location.origin + winPath
+	"originLevel3": window.location.origin + winPath,
+	"pipeline": ""
 };
 let lang = document.querySelector( "html" )?.lang;
 let paramsOverride = baseElement ? JSON.parse( baseElement.dataset.gcSearch ) : {};
@@ -411,6 +412,7 @@ function initEngine() {
 			search: {
 				locale: params.lang,
 				searchHub: params.searchHub,
+				pipeline: params.pipeline
 			},
 			preprocessRequest: ( request, clientOrigin ) => {
 				try {
