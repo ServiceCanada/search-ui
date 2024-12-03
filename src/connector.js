@@ -479,7 +479,7 @@ function initEngine() {
 
 	resultListController = buildResultList( headlessEngine, {
 		options: {
-			fieldsToInclude: [ "author", "date", "language", "urihash", "objecttype", "collection", "source", "permanentid", "displaynavlabel" ]
+			fieldsToInclude: [ "author", "date", "language", "urihash", "objecttype", "collection", "source", "permanentid", "displaynavlabel", "hostname" ]
 		}
 	} );
 	querySummaryController = buildQuerySummary( headlessEngine );
@@ -872,6 +872,11 @@ function updateResultListState( newState ) {
 
 				author = author.replaceAll( ';' , '</li> <li>' );
 			}
+
+			let breadcrumb = "";
+			if ( result.raw.hostname && result.raw.displaynavlabel ) {
+				const splittedNavLabel = ( Array.isArray( result.raw.displaynavlabel ) ? result.raw.displaynavlabel[0] : result.raw.displaynavlabel).split( '>' );
+				breadcrumb = result.raw.hostname + '&nbsp;</li><li>' + splittedNavLabel[splittedNavLabel.length-1];
 			}
 
 			sectionNode.innerHTML = resultTemplateHTML
@@ -880,7 +885,7 @@ function updateResultListState( newState ) {
 				.replace( '%[result.clickUri]', filterProtocol( result.clickUri ) )
 				.replace( '%[result.title]', result.title )
 				.replace( '%[result.raw.author]', author )
-				.replace( '%[result.breadcrumb]', result.raw.displaynavlabel ? result.raw.displaynavlabel : result.printableUri )
+				.replace( '%[result.breadcrumb]', breadcrumb ? breadcrumb : result.printableUri )
 				.replace( '%[result.printableUri]', result.printableUri.replaceAll( '&' , '&amp;' ) )
 				.replace( '%[short-date-en]', getShortDateFormat( resultDate ) )
 				.replace( '%[short-date-fr]', getShortDateFormat( resultDate ) )
