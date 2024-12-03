@@ -869,13 +869,9 @@ function updateResultListState( newState ) {
 				else {
 					author = result.raw.author;
 				}
-				if( params.isContextSearch ) {
-					author = author.replace( ';', ', ' );
-				}
-				else {
-					author = author.replace( ',', ';' );
-					author = author.replace( ';' , '</li> <li>' );
-				}
+
+				author = author.replaceAll( ';' , '</li> <li>' );
+			}
 			}
 
 			sectionNode.innerHTML = resultTemplateHTML
