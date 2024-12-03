@@ -31,6 +31,7 @@ const defaults = {
 	"searchBoxQuery": "#sch-inp-ac",
 	"lang": "en",
 	"numberOfSuggestions": 0,
+	"minimumCharsForSuggestions": 1,
 	"unsupportedSuggestions": false,
 	"enableHistoryPush": true,
 	"isContextSearch": false,
@@ -70,6 +71,12 @@ let querySummaryState;
 let didYouMeanState;
 let pagerState;
 let lastCharKeyUp;
+let activeSuggestion = 0;
+let activeSuggestionWaitMouseMove = true;
+
+// Firefox patch
+let isFirefox = navigator.userAgent.indexOf( "Firefox" ) != -1;
+let waitForkeyUp = false;
 
 // UI Elements placeholders 
 let searchBoxElement;
@@ -114,6 +121,9 @@ function initSearchUI() {
 	params = Object.assign( defaults, paramsDetect, paramsOverride );
 
 	searchBoxElement = document.querySelector( params.searchBoxQuery );
+	if ( params.numberOfSuggestions > 0 && searchBoxElement ) {
+		searchBoxElement.role = "combobox";
+	}
 
 	// Update the URL params and the hash params on navigation
 	window.onpopstate = () => {
@@ -357,47 +367,19 @@ function initTpl() {
 	if ( !suggestionsElement && searchBoxElement && params.unsupportedSuggestions && params.numberOfSuggestions > 0 ) {
 		suggestionsElement = document.createElement( "ul" );
 		suggestionsElement.id = "suggestions";
+		suggestionsElement.role = "listbox";
 		suggestionsElement.classList.add( "rough-experimental", "query-suggestions" );
 
 		searchBoxElement.after( suggestionsElement );
+		searchBoxElement.setAttribute('aria-controls', 'suggestions');
 	}
 
-	// Query suggestions
-	if ( suggestionsElement ) {
-
-		// Remove unsupported query suggestion if on production (www.canada.ca)
-		if( window.location.hostname === "www.canada.ca" ) {
-			suggestionsElement.remove();
+	// Remove Query suggestion if click elsewhere
+	document.addEventListener( "click", function( evnt ) {
+		if ( suggestionsElement && ( evnt.target.className !== "suggestion-item" && evnt.target.id !== "sch-inp-ac" ) ) {
+			closeSuggestionsBox();
 		}
-
-		// Add an alert banner to clearly state that the Query suggestion feature is at a rough experimental state
-		else {
-			const firstH1 = document.querySelector( "main h1:first-child" );
-			let roughExperimentAlert = document.createElement( "section" );
-
-			roughExperimentAlert.classList.add( "alert", "alert-danger" );
-
-			if ( lang === "fr" ) {
-				roughExperimentAlert.innerHTML = 
-					`<h2 class="h3">Avis de fonctionnalité instable</h2>
-					<p>Cette page utilise une fonctionnalité expérimentale pouvant contenir des problèmes d'accessibilité et/ou de produire des effets indésirables qui peuvent altérer l'expérience de l'utilisateur.</p>`;
-			}
-			else {
-				roughExperimentAlert.innerHTML = 
-					`<h2 class="h3">Unstable feature notice</h2>
-					<p>This page leverages an experimental feature subject to contain accessibility issues and/or to produce unwanted behavior which may alter the user experience.</p>`;
-			}
-
-			firstH1.after( roughExperimentAlert );
-
-			// Remove Query suggestion if click elsewhere
-			document.addEventListener( "click", function( evnt ) {
-				if ( suggestionsElement && ( evnt.target.className !== "suggestion-item" && evnt.target.id !== "sch-inp-ac" ) ) {
-					suggestionsElement.hidden = true;
-				}
-			} );
-		}
-	}
+	} );
 }
 function sanitizeQuery(q) {
 	return q.replace(/<[^>]*>?/gm, '');
@@ -468,10 +450,6 @@ function initEngine() {
 				notMatchDelimiters: {
 					open: '<strong>',
 					close: '</strong>',
-				},
-				correctionDelimiters: {
-					open: '<em>',
-					close: '</em>',
 				},
 			},
 		}
@@ -711,16 +689,58 @@ function initEngine() {
 
 	// Listen to "Enter" key up event for search suggestions
 	if ( searchBoxElement ) {
-		searchBoxElement.onkeyup = ( e ) => {
-			lastCharKeyUp = e.keyCode;
+		searchBoxElement.onkeydown = ( e ) => {
+			// Enter
+			if ( e.keyCode === 13 && ( activeSuggestion != 0 && suggestionsElement && !suggestionsElement.hidden ) ) {
+				closeSuggestionsBox();
+				e.preventDefault();
+			}
+			// Escape or Tab
+			else if ( e.keyCode === 27 || e.keyCode === 9 ) {
+				closeSuggestionsBox();
 
-			if( e.keyCode !== 13 && searchBoxController.state.value !== e.target.value ) {
+				if ( e.keyCode === 27 ) {
+					e.preventDefault();
+				}
+			}
+			// Arrow key up
+			else if ( e.keyCode === 38 ) {
+				if ( !( isFirefox && waitForkeyUp ) ){
+					waitForkeyUp = true;
+					searchBoxArrowKeyUp();
+					e.preventDefault();
+				}
+			}
+			// Arrow key down
+			else if ( e.keyCode === 40 ) {
+				if ( !( isFirefox && waitForkeyUp ) ){
+					waitForkeyUp = true;
+					searchBoxArrowKeyDown();
+				}
+			}
+		}
+		searchBoxElement.onkeyup = ( e ) => {
+			waitForkeyUp = false;
+			lastCharKeyUp = e.keyCode;
+			// Keys that don't changes the input value
+			if ( ( e.key.length !== 1 && e.keyCode !== 46 && e.keyCode !== 8 ) ||                        // Non-printable char except Delete or Backspace
+			     ( e.ctrlKey && e.key !== "x" && e.key !== "X" && e.key !== "v" && e.key !== "V" ) ) {   // Ctrl-key is pressed but not X or V is use 
+				return;
+			}
+
+			// Any other key
+			if ( searchBoxController.state.value !== e.target.value ) {
 				searchBoxController.updateText( DOMPurify.sanitize( e.target.value ) );
+			}
+			if ( e.target.value.length < params.minimumCharsForSuggestions ){
+				closeSuggestionsBox();
 			}
 		};
 		searchBoxElement.onfocus = () => {
 			lastCharKeyUp = null;
-			searchBoxController.showSuggestions();
+			if ( searchBoxElement.value.length >= params.minimumCharsForSuggestions ) {
+				searchBoxController.showSuggestions();
+			}
 		};
 	}
 
@@ -750,6 +770,48 @@ function initEngine() {
 	}
 }
 
+function searchBoxArrowKeyUp() {
+	if ( suggestionsElement.hidden ){
+		return;
+	}
+
+	if ( !activeSuggestion || activeSuggestion <= 1 )
+		activeSuggestion = searchBoxState.suggestions.length;
+	else
+		activeSuggestion -= 1;
+
+	updateSuggestionSelection();
+}
+
+function searchBoxArrowKeyDown() {
+	if ( suggestionsElement.hidden ){
+		return;
+	}
+
+	if ( !activeSuggestion || activeSuggestion >= searchBoxState.suggestions.length )
+		activeSuggestion = 1;
+	else
+		activeSuggestion += 1;
+
+	updateSuggestionSelection();
+}
+
+function updateSuggestionSelection() {
+    // clear current suggestion
+    let activeSelection = suggestionsElement.getElementsByClassName( 'selected-suggestion' );
+    Array.prototype.forEach.call(activeSelection, function( suggestion ) {
+        suggestion.classList.remove( 'selected-suggestion' );
+        suggestion.removeAttribute( 'aria-selected' );
+    });
+    
+    let selectedSuggestionId = 'suggestion-' + activeSuggestion;
+    let suggestionElement = document.getElementById( selectedSuggestionId );
+    suggestionElement.classList.add( 'selected-suggestion' );
+    suggestionElement.setAttribute( 'aria-selected', "true" );
+    searchBoxElement.setAttribute( 'aria-activedescendant', selectedSuggestionId );
+    searchBoxElement.value = suggestionElement.innerText;
+}
+
 // Show query suggestions if a search action was not executed (if enabled)
 function updateSearchBoxState( newState ) {
 	const previousState = searchBoxState;
@@ -766,27 +828,57 @@ function updateSearchBoxState( newState ) {
 	}
 
 	if ( lastCharKeyUp === 13 ) {
-		suggestionsElement.hidden = true;
+		closeSuggestionsBox();
 		return;
 	}
 
+	activeSuggestion = 0;
 	if ( !searchBoxState.isLoadingSuggestions && previousState?.isLoadingSuggestions ) {
-		suggestionsElement.textContent = '';
-		searchBoxState.suggestions.forEach( ( suggestion ) => {
-			const node = document.createElement( "li" );
-			node.setAttribute( "class", "suggestion-item" );
-			node.onclick = ( e ) => { 
-				searchBoxController.selectSuggestion(e.currentTarget.innerText);
-				searchBoxElement.value = DOMPurify.sanitize( e.currentTarget.innerText );
-			};
-			node.innerHTML = suggestion.highlightedValue;
-			suggestionsElement.appendChild( node );
-		});
+        suggestionsElement.textContent = '';
+        activeSuggestionWaitMouseMove = true;
+        searchBoxState.suggestions.forEach( ( suggestion, index ) => {
+            const suggestionId = "suggestion-" + ( index + 1 );
+            const node = document.createElement( "li" );
+            node.setAttribute( "class", "suggestion-item" );
+            node.setAttribute( "role", "option" );
+            node.id = suggestionId;
+            node.onmouseenter = ( e ) => {
+                if ( !activeSuggestionWaitMouseMove ) {
+                    activeSuggestion = index + 1;
+                    updateSuggestionSelection();
+                }
+            }
+            node.onmousemove = ( e ) => {
+                activeSuggestionWaitMouseMove = false;
+            }
+            node.onclick = ( e ) => { 
+                searchBoxController.selectSuggestion(e.currentTarget.innerText);
+                searchBoxElement.value = DOMPurify.sanitize( e.currentTarget.innerText );
+            };
+            node.innerHTML = suggestion.highlightedValue;
+            suggestionsElement.appendChild( node );
+        });
 
-		if ( searchBoxState.suggestions.length > 0 ) {
-			suggestionsElement.hidden = false;
-		}
-	}
+        if ( !searchBoxState.isLoading && searchBoxState.suggestions.length > 0 && searchBoxState.value.length >= params.minimumCharsForSuggestions ) {
+            openSuggestionsBox();
+        }
+        else{
+            closeSuggestionsBox();
+        }
+    }
+}
+
+// open the suggestions box 
+function openSuggestionsBox() {
+	suggestionsElement.hidden = false;
+	searchBoxElement.setAttribute('aria-expanded', 'true');
+}
+
+// open the suggestions box 
+function closeSuggestionsBox() {
+	suggestionsElement.hidden = true;
+	activeSuggestion = 0;
+	searchBoxElement.setAttribute('aria-expanded', 'false');
 }
 
 // rebuild a clean query string out of a JSON object
@@ -842,7 +934,7 @@ function updateResultListState( newState ) {
 
 	if ( resultListState.isLoading ) {
 		if ( suggestionsElement ) {
-			suggestionsElement.hidden = true;
+			closeSuggestionsBox();
 		}
 		return;
 	}
