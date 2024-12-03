@@ -416,11 +416,17 @@ function initEngine() {
 			},
 			preprocessRequest: ( request, clientOrigin ) => {
 				try {
-					if ( clientOrigin === 'analyticsFetch' ) {
+					if( clientOrigin === 'analyticsFetch' || clientOrigin === 'analyticsBeacon' ) {
 						let requestContent = JSON.parse( request.body );
 
 						// filter user sensitive content
 						requestContent.originLevel3 = params.originLevel3;
+
+						// documentAuthor cannot be longer than 128 chars
+						if ( requestContent.documentAuthor ){
+							requestContent.documentAuthor = requestContent.documentAuthor.substring( 0, 128 );
+						}
+						
 						request.body = JSON.stringify( requestContent );
 
 						// Event used to expose a data layer when search events occur; useful for analytics
