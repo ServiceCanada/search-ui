@@ -32,7 +32,6 @@ const defaults = {
 	"lang": "en",
 	"numberOfSuggestions": 0,
 	"minimumCharsForSuggestions": 1,
-	"unsupportedSuggestions": false,
 	"enableHistoryPush": true,
 	"isContextSearch": false,
 	"isAdvancedSearch": false,
@@ -364,7 +363,7 @@ function initTpl() {
 	}
 
 	// auto-create suggestions element
-	if ( !suggestionsElement && searchBoxElement && params.unsupportedSuggestions && params.numberOfSuggestions > 0 ) {
+	if ( !suggestionsElement && searchBoxElement && params.numberOfSuggestions > 0 ) {
 		suggestionsElement = document.createElement( "ul" );
 		suggestionsElement.id = "suggestions";
 		suggestionsElement.role = "listbox";
@@ -847,10 +846,10 @@ function updateSearchBoxState( newState ) {
                     activeSuggestion = index + 1;
                     updateSuggestionSelection();
                 }
-            }
+            };
             node.onmousemove = ( e ) => {
                 activeSuggestionWaitMouseMove = false;
-            }
+            };
             node.onclick = ( e ) => { 
                 searchBoxController.selectSuggestion(e.currentTarget.innerText);
                 searchBoxElement.value = DOMPurify.sanitize( e.currentTarget.innerText );
