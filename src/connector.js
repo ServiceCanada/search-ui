@@ -717,7 +717,7 @@ function initEngine() {
 					searchBoxArrowKeyDown();
 				}
 			}
-		}
+		};
 		searchBoxElement.onkeyup = ( e ) => {
 			waitForkeyUp = false;
 			lastCharKeyUp = e.keyCode;
