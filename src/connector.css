@@ -1,7 +1,7 @@
 /*
  * Search UI: Styles for Query suggestion List "combobox", TO BE eventually replaced by GCWeb reference implementation codebase
  */
- .rough-experimental.query-suggestions {
+ .query-suggestions {
 	background-color: white;
 	border-bottom: 1px solid #ccc;
 	border-left: 1px solid #ccc;
@@ -15,10 +15,13 @@
 	width: 100%;
 	z-index: 60;
 }
-.rough-experimental.query-suggestions li {
+.query-suggestions li {
 	padding: 5px 10px;
 }
-.rough-experimental.query-suggestions li:hover {
+.query-suggestions li:hover {
+	background-color: #ddd;
+}
+.query-suggestions .selected-suggestion {
 	background-color: #ddd;
 }
 

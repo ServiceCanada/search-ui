@@ -31,7 +31,7 @@ const defaults = {
 	"searchBoxQuery": "#sch-inp-ac",
 	"lang": "en",
 	"numberOfSuggestions": 0,
-	"minimumCharsForSuggestions": 1,
+	"minimumCharsForSuggestions": 2,
 	"enableHistoryPush": true,
 	"isContextSearch": false,
 	"isAdvancedSearch": false,
@@ -74,7 +74,7 @@ let activeSuggestion = 0;
 let activeSuggestionWaitMouseMove = true;
 
 // Firefox patch
-let isFirefox = navigator.userAgent.indexOf( "Firefox" ) != -1;
+let isFirefox = navigator.userAgent.indexOf( "Firefox" ) !== -1;
 let waitForkeyUp = false;
 
 // UI Elements placeholders 
@@ -118,11 +118,6 @@ function initSearchUI() {
 
 	// Final parameters object
 	params = Object.assign( defaults, paramsDetect, paramsOverride );
-
-	searchBoxElement = document.querySelector( params.searchBoxQuery );
-	if ( params.numberOfSuggestions > 0 && searchBoxElement ) {
-		searchBoxElement.role = "combobox";
-	}
 
 	// Update the URL params and the hash params on navigation
 	window.onpopstate = () => {
@@ -363,11 +358,17 @@ function initTpl() {
 	}
 
 	// auto-create suggestions element
+	searchBoxElement = document.querySelector( params.searchBoxQuery );
 	if ( !suggestionsElement && searchBoxElement && params.numberOfSuggestions > 0 ) {
+		if ( params.numberOfSuggestions > 0 ) {
+			searchBoxElement.role = "combobox";
+			searchBoxElement.setAttribute('aria-autocomplete', 'list');
+		}
+
 		suggestionsElement = document.createElement( "ul" );
 		suggestionsElement.id = "suggestions";
 		suggestionsElement.role = "listbox";
-		suggestionsElement.classList.add( "rough-experimental", "query-suggestions" );
+		suggestionsElement.classList.add( "query-suggestions" );
 
 		searchBoxElement.after( suggestionsElement );
 		searchBoxElement.setAttribute('aria-controls', 'suggestions');
@@ -404,7 +405,7 @@ function initEngine() {
 						requestContent.originLevel3 = params.originLevel3;
 
 						// documentAuthor cannot be longer than 128 chars
-						if ( requestContent.documentAuthor ){
+						if ( requestContent.documentAuthor ) {
 							requestContent.documentAuthor = requestContent.documentAuthor.substring( 0, 128 );
 						}
 						
@@ -690,7 +691,7 @@ function initEngine() {
 	if ( searchBoxElement ) {
 		searchBoxElement.onkeydown = ( e ) => {
 			// Enter
-			if ( e.keyCode === 13 && ( activeSuggestion != 0 && suggestionsElement && !suggestionsElement.hidden ) ) {
+			if ( e.keyCode === 13 && ( activeSuggestion !== 0 && suggestionsElement && !suggestionsElement.hidden ) ) {
 				closeSuggestionsBox();
 				e.preventDefault();
 			}
@@ -704,7 +705,7 @@ function initEngine() {
 			}
 			// Arrow key up
 			else if ( e.keyCode === 38 ) {
-				if ( !( isFirefox && waitForkeyUp ) ){
+				if ( !( isFirefox && waitForkeyUp ) ) {
 					waitForkeyUp = true;
 					searchBoxArrowKeyUp();
 					e.preventDefault();
@@ -712,7 +713,7 @@ function initEngine() {
 			}
 			// Arrow key down
 			else if ( e.keyCode === 40 ) {
-				if ( !( isFirefox && waitForkeyUp ) ){
+				if ( !( isFirefox && waitForkeyUp ) ) {
 					waitForkeyUp = true;
 					searchBoxArrowKeyDown();
 				}
@@ -722,8 +723,8 @@ function initEngine() {
 			waitForkeyUp = false;
 			lastCharKeyUp = e.keyCode;
 			// Keys that don't changes the input value
-			if ( ( e.key.length !== 1 && e.keyCode !== 46 && e.keyCode !== 8 ) ||                        // Non-printable char except Delete or Backspace
-			     ( e.ctrlKey && e.key !== "x" && e.key !== "X" && e.key !== "v" && e.key !== "V" ) ) {   // Ctrl-key is pressed but not X or V is use 
+			if ( ( e.key.length !== 1 && e.keyCode !== 46 && e.keyCode !== 8 ) ||                       // Non-printable char except Delete or Backspace
+				( e.ctrlKey && e.key !== "x" && e.key !== "X" && e.key !== "v" && e.key !== "V" ) ) {   // Ctrl-key is pressed but not X or V is use 
 				return;
 			}
 
@@ -770,45 +771,49 @@ function initEngine() {
 }
 
 function searchBoxArrowKeyUp() {
-	if ( suggestionsElement.hidden ){
+	if ( suggestionsElement.hidden ) {
 		return;
 	}
 
-	if ( !activeSuggestion || activeSuggestion <= 1 )
+	if ( !activeSuggestion || activeSuggestion <= 1 ) {
 		activeSuggestion = searchBoxState.suggestions.length;
-	else
+	}
+	else {
 		activeSuggestion -= 1;
+	}
 
 	updateSuggestionSelection();
 }
 
 function searchBoxArrowKeyDown() {
-	if ( suggestionsElement.hidden ){
+	if ( suggestionsElement.hidden ) {
 		return;
 	}
 
-	if ( !activeSuggestion || activeSuggestion >= searchBoxState.suggestions.length )
+	if ( !activeSuggestion || activeSuggestion >= searchBoxState.suggestions.length ) {
 		activeSuggestion = 1;
-	else
+	}
+	else {
 		activeSuggestion += 1;
+	}
 
 	updateSuggestionSelection();
 }
 
 function updateSuggestionSelection() {
-    // clear current suggestion
-    let activeSelection = suggestionsElement.getElementsByClassName( 'selected-suggestion' );
-    Array.prototype.forEach.call(activeSelection, function( suggestion ) {
-        suggestion.classList.remove( 'selected-suggestion' );
-        suggestion.removeAttribute( 'aria-selected' );
-    });
-    
-    let selectedSuggestionId = 'suggestion-' + activeSuggestion;
-    let suggestionElement = document.getElementById( selectedSuggestionId );
-    suggestionElement.classList.add( 'selected-suggestion' );
-    suggestionElement.setAttribute( 'aria-selected', "true" );
-    searchBoxElement.setAttribute( 'aria-activedescendant', selectedSuggestionId );
-    searchBoxElement.value = suggestionElement.innerText;
+	// clear current suggestion
+	let activeSelection = suggestionsElement.getElementsByClassName( 'selected-suggestion' );
+	Array.prototype.forEach.call(activeSelection, function( suggestion ) {
+		suggestion.classList.remove( 'selected-suggestion' );
+		suggestion.removeAttribute( 'aria-selected' );
+	});
+
+	let selectedSuggestionId = 'suggestion-' + activeSuggestion;
+	let suggestionElement = document.getElementById( selectedSuggestionId );
+	suggestionElement.classList.add( 'selected-suggestion' );
+	suggestionElement.setAttribute( 'aria-selected', "true" );
+	searchBoxElement.setAttribute( 'aria-activedescendant', selectedSuggestionId );
+	searchBoxElement.value = suggestionElement.innerText;
 }
 
 // Show query suggestions if a search action was not executed (if enabled)
@@ -833,51 +838,52 @@ function updateSearchBoxState( newState ) {
 
 	activeSuggestion = 0;
 	if ( !searchBoxState.isLoadingSuggestions && previousState?.isLoadingSuggestions ) {
-        suggestionsElement.textContent = '';
-        activeSuggestionWaitMouseMove = true;
-        searchBoxState.suggestions.forEach( ( suggestion, index ) => {
-            const suggestionId = "suggestion-" + ( index + 1 );
-            const node = document.createElement( "li" );
-            node.setAttribute( "class", "suggestion-item" );
-            node.setAttribute( "role", "option" );
-            node.id = suggestionId;
-            node.onmouseenter = ( e ) => {
-                if ( !activeSuggestionWaitMouseMove ) {
-                    activeSuggestion = index + 1;
-                    updateSuggestionSelection();
-                }
-            };
-            node.onmousemove = ( e ) => {
-                activeSuggestionWaitMouseMove = false;
-            };
-            node.onclick = ( e ) => { 
-                searchBoxController.selectSuggestion(e.currentTarget.innerText);
-                searchBoxElement.value = DOMPurify.sanitize( e.currentTarget.innerText );
-            };
-            node.innerHTML = suggestion.highlightedValue;
-            suggestionsElement.appendChild( node );
-        });
+		suggestionsElement.textContent = '';
+		activeSuggestionWaitMouseMove = true;
+		searchBoxState.suggestions.forEach( ( suggestion, index ) => {
+			const suggestionId = "suggestion-" + ( index + 1 );
+			const node = document.createElement( "li" );
+			node.setAttribute( "class", "suggestion-item" );
+			node.setAttribute( "role", "option" );
+			node.id = suggestionId;
+			node.onmouseenter = () => {
+				if ( !activeSuggestionWaitMouseMove ) {
+					activeSuggestion = index + 1;
+					updateSuggestionSelection();
+				}
+			};
+			node.onmousemove = () => {
+				activeSuggestionWaitMouseMove = false;
+			};
+			node.onclick = ( e ) => { 
+				searchBoxController.selectSuggestion(e.currentTarget.innerText);
+				searchBoxElement.value = DOMPurify.sanitize( e.currentTarget.innerText );
+			};
+			node.innerHTML = suggestion.highlightedValue;
+			suggestionsElement.appendChild( node );
+		});
 
-        if ( !searchBoxState.isLoading && searchBoxState.suggestions.length > 0 && searchBoxState.value.length >= params.minimumCharsForSuggestions ) {
-            openSuggestionsBox();
-        }
-        else{
-            closeSuggestionsBox();
-        }
-    }
+		if ( !searchBoxState.isLoading && searchBoxState.suggestions.length > 0 && searchBoxState.value.length >= params.minimumCharsForSuggestions ) {
+			openSuggestionsBox();
+		}
+		else{
+			closeSuggestionsBox();
+		}
+	}
 }
 
 // open the suggestions box 
 function openSuggestionsBox() {
 	suggestionsElement.hidden = false;
-	searchBoxElement.setAttribute('aria-expanded', 'true');
+	searchBoxElement.setAttribute( 'aria-expanded', 'true' );
 }
 
 // open the suggestions box 
 function closeSuggestionsBox() {
 	suggestionsElement.hidden = true;
 	activeSuggestion = 0;
-	searchBoxElement.setAttribute('aria-expanded', 'false');
+	searchBoxElement.setAttribute( 'aria-expanded', 'false' );
+	searchBoxElement.setAttribute( 'aria-activedescendant', '' );
 }
 
 // rebuild a clean query string out of a JSON object
