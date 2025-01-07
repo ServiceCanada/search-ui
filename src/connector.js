@@ -360,10 +360,8 @@ function initTpl() {
 	// auto-create suggestions element
 	searchBoxElement = document.querySelector( params.searchBoxQuery );
 	if ( !suggestionsElement && searchBoxElement && params.numberOfSuggestions > 0 ) {
-		if ( params.numberOfSuggestions > 0 ) {
-			searchBoxElement.role = "combobox";
-			searchBoxElement.setAttribute('aria-autocomplete', 'list');
-		}
+		searchBoxElement.role = "combobox";
+		searchBoxElement.setAttribute( 'aria-autocomplete', 'list' );
 
 		suggestionsElement = document.createElement( "ul" );
 		suggestionsElement.id = "suggestions";
@@ -371,7 +369,7 @@ function initTpl() {
 		suggestionsElement.classList.add( "query-suggestions" );
 
 		searchBoxElement.after( suggestionsElement );
-		searchBoxElement.setAttribute('aria-controls', 'suggestions');
+		searchBoxElement.setAttribute( 'aria-controls', 'suggestions' );
 	}
 
 	// Remove Query suggestion if click elsewhere
@@ -404,7 +402,7 @@ function initEngine() {
 						// filter user sensitive content
 						requestContent.originLevel3 = params.originLevel3;
 
-						// documentAuthor cannot be longer than 128 chars
+						// documentAuthor cannot be longer than 128 chars based on search platform
 						if ( requestContent.documentAuthor ) {
 							requestContent.documentAuthor = requestContent.documentAuthor.substring( 0, 128 );
 						}
