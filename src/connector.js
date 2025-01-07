@@ -168,14 +168,14 @@ function initTpl() {
 			resultTemplateHTML = 
 				`<h3><a class="result-link" href="%[result.clickUri]" data-dtm-srchlnknm="%[index]">%[result.title]</a></h3> 
 				<ul class="context-labels"><li>%[result.raw.author]</li></ul> 
-				<ol class="location"><li>%[result.breadcrumb]</li></ol> 
+				%[result.breadcrumb] 
 				<p><time datetime="%[short-date-fr]" class="text-muted">%[long-date-fr]</time> - %[highlightedExcerpt]</p>`;
 		}
 		else {
 			resultTemplateHTML = 
 				`<h3><a class="result-link" href="%[result.clickUri]" data-dtm-srchlnknm="%[index]">%[result.title]</a></h3> 
 				<ul class="context-labels"><li>%[result.raw.author]</li></ul> 
-				<ol class="location"><li>%[result.breadcrumb]</li></ol> 
+				%[result.breadcrumb]
 				<p><time datetime="%[short-date-en]" class="text-muted">%[long-date-en]</time> - %[highlightedExcerpt]</p>`;
 		}
 	}
@@ -971,7 +971,10 @@ function updateResultListState( newState ) {
 			let breadcrumb = "";
 			if ( result.raw.hostname && result.raw.displaynavlabel ) {
 				const splittedNavLabel = ( Array.isArray( result.raw.displaynavlabel ) ? result.raw.displaynavlabel[0] : result.raw.displaynavlabel).split( '>' );
-				breadcrumb = result.raw.hostname + '&nbsp;</li><li>' + splittedNavLabel[splittedNavLabel.length-1];
+				breadcrumb = '<ol class="location"><li>' + result.raw.hostname + '&nbsp;</li><li>' + splittedNavLabel[splittedNavLabel.length-1] + '</li></ol>';
+			}
+			else {
+				breadcrumb = '<p class="location"><cite><a href="' + result.printableUri + '">' + result.printableUri + '</a></cite></p>';
 			}
 
 			sectionNode.innerHTML = resultTemplateHTML
@@ -980,7 +983,7 @@ function updateResultListState( newState ) {
 				.replace( '%[result.clickUri]', filterProtocol( result.clickUri ) )
 				.replace( '%[result.title]', result.title )
 				.replace( '%[result.raw.author]', author )
-				.replace( '%[result.breadcrumb]', breadcrumb ? breadcrumb : result.printableUri )
+				.replace( '%[result.breadcrumb]', breadcrumb )
 				.replace( '%[result.printableUri]', result.printableUri.replaceAll( '&' , '&amp;' ) )
 				.replace( '%[short-date-en]', getShortDateFormat( resultDate ) )
 				.replace( '%[short-date-fr]', getShortDateFormat( resultDate ) )
