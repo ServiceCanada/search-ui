@@ -801,13 +801,13 @@ function searchBoxArrowKeyDown() {
 function updateSuggestionSelection() {
 	// clear current suggestion
 	let activeSelection = suggestionsElement.getElementsByClassName( 'selected-suggestion' );
-	Array.prototype.forEach.call(activeSelection, function( suggestion ) {
-		suggestion.classList.remove( 'selected-suggestion' );
-		suggestion.removeAttribute( 'aria-selected' );
-	});
-
 	let selectedSuggestionId = 'suggestion-' + activeSuggestion;
 	let suggestionElement = document.getElementById( selectedSuggestionId );
+	Array.prototype.forEach.call(activeSelection, function( suggestion ) {
+		suggestion.classList.remove( 'selected-suggestion' );
+		suggestion.setAttribute( 'aria-selected', "false" );
+	});
+
 	suggestionElement.classList.add( 'selected-suggestion' );
 	suggestionElement.setAttribute( 'aria-selected', "true" );
 	searchBoxElement.setAttribute( 'aria-activedescendant', selectedSuggestionId );
@@ -839,10 +839,14 @@ function updateSearchBoxState( newState ) {
 		suggestionsElement.textContent = '';
 		activeSuggestionWaitMouseMove = true;
 		searchBoxState.suggestions.forEach( ( suggestion, index ) => {
-			const suggestionId = "suggestion-" + ( index + 1 );
+			const currentIndex = index + 1;
+			const suggestionId = "suggestion-" + currentIndex;
 			const node = document.createElement( "li" );
 			node.setAttribute( "class", "suggestion-item" );
-			node.setAttribute( "role", "option" );
+			node.setAttribute( "aria-selected", "false" );
+			node.setAttribute( "aria-setsize", searchBoxState.suggestions.length );
+			node.setAttribute( "aria-posinset", currentIndex );
+			node.role = "option";			
 			node.id = suggestionId;
 			node.onmouseenter = () => {
 				if ( !activeSuggestionWaitMouseMove ) {
@@ -854,10 +858,10 @@ function updateSearchBoxState( newState ) {
 				activeSuggestionWaitMouseMove = false;
 			};
 			node.onclick = ( e ) => { 
-				searchBoxController.selectSuggestion(e.currentTarget.innerText);
+				searchBoxController.selectSuggestion( e.currentTarget.innerText );
 				searchBoxElement.value = DOMPurify.sanitize( e.currentTarget.innerText );
 			};
-			node.innerHTML = suggestion.highlightedValue;
+			node.innerHTML = DOMPurify.sanitize( suggestion.highlightedValue );
 			suggestionsElement.appendChild( node );
 		});
 
@@ -959,32 +963,36 @@ function updateResultListState( newState ) {
 
 			if( result.raw.author ) {
 				if( Array.isArray( result.raw.author ) ) {
-					author = result.raw.author.join( ';' );
+					author = DOMPurify.sanitize( result.raw.author.join( ';' ) );
 				}
 				else {
-					author = result.raw.author;
+					author = DOMPurify.sanitize( result.raw.author );
 				}
 
 				author = author.replaceAll( ';' , '</li> <li>' );
 			}
 
 			let breadcrumb = "";
+			let printableUri = DOMPurify.sanitize( result.printableUri );
+			let clickUri = DOMPurify.sanitize( result.clickUri );
+			let title = DOMPurify.sanitize( result.title );
 			if ( result.raw.hostname && result.raw.displaynavlabel ) {
 				const splittedNavLabel = ( Array.isArray( result.raw.displaynavlabel ) ? result.raw.displaynavlabel[0] : result.raw.displaynavlabel).split( '>' );
-				breadcrumb = '<ol class="location"><li>' + result.raw.hostname + '&nbsp;</li><li>' + splittedNavLabel[splittedNavLabel.length-1] + '</li></ol>';
+				breadcrumb = '<ol class="location"><li>' + DOMPurify.sanitize( result.raw.hostname ) + 
+					'&nbsp;</li><li>' + DOMPurify.sanitize( splittedNavLabel[splittedNavLabel.length-1] ) + '</li></ol>';
 			}
 			else {
-				breadcrumb = '<p class="location"><cite><a href="' + result.printableUri + '">' + result.printableUri + '</a></cite></p>';
+				breadcrumb = '<p class="location"><cite><a href="' + printableUri + '">' + printableUri + '</a></cite></p>';
 			}
 
 			sectionNode.innerHTML = resultTemplateHTML
 				.replace( '%[index]', index + 1 )
-				.replace( 'https://www.canada.ca', filterProtocol( result.clickUri ) ) // workaround, invalid href are stripped
-				.replace( '%[result.clickUri]', filterProtocol( result.clickUri ) )
-				.replace( '%[result.title]', result.title )
+				.replace( 'https://www.canada.ca', filterProtocol( clickUri ) ) // workaround, invalid href are stripped
+				.replace( '%[result.clickUri]', filterProtocol( clickUri ) )
+				.replace( '%[result.title]', title )
 				.replace( '%[result.raw.author]', author )
 				.replace( '%[result.breadcrumb]', breadcrumb )
-				.replace( '%[result.printableUri]', result.printableUri.replaceAll( '&' , '&amp;' ) )
+				.replace( '%[result.printableUri]', printableUri.replaceAll( '&' , '&amp;' ) )
 				.replace( '%[short-date-en]', getShortDateFormat( resultDate ) )
 				.replace( '%[short-date-fr]', getShortDateFormat( resultDate ) )
 				.replace( '%[long-date-en]', getLongDateFormat( resultDate, 'en' ) )
@@ -1067,7 +1075,9 @@ function updateDidYouMeanState( newState ) {
 	if ( resultListState.firstSearchExecuted ) {
 		didYouMeanElement.textContent = "";
 		if ( didYouMeanState.hasQueryCorrection ) {
-			didYouMeanElement.innerHTML = didYouMeanTemplateHTML.replace( '%[correctedQuery]', didYouMeanState.queryCorrection.correctedQuery );
+			didYouMeanElement.innerHTML = didYouMeanTemplateHTML.replace( 
+				'%[correctedQuery]', 
+				DOMPurify.sanitize( didYouMeanState.queryCorrection.correctedQuery ) );
 			const buttonNode = didYouMeanElement.querySelector( 'button' );
 			buttonNode.onclick = ( e ) => { 
 				updateSearchBoxFromState = true;
@@ -1101,7 +1111,7 @@ function updatePagerState( newState ) {
 		const liNode = document.createElement( "li" );
 		const pageNo = page;
 
-		liNode.innerHTML = pageTemplateHTML.replaceAll( '%[page]', pageNo );
+		liNode.innerHTML = pageTemplateHTML.replaceAll( '%[page]', DOMPurify.sanitize( pageNo ) );
 
 		if ( pagerState.currentPage - 1 > page || page > pagerState.currentPage + 1 ) {
 			liNode.classList.add( 'hidden-xs', 'hidden-sm' );
