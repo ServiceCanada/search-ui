@@ -43,7 +43,7 @@ Search UI follows [Semantic Versioning 2.0.0](https://semver.org/)
 
 This rubric is for developers.
 
-### Build files
+### Build files for release or to test code quality before opening a Pull request
 
 1. run: npm install -g grunt-cli
 2. run: npm install
@@ -51,19 +51,34 @@ This rubric is for developers.
 
 ### Test as end-user
 
+#### Locally (with Docker)
+
+1. Install Docker
+2. Add an API key to your site settings as described below in [Setting an API key](#setting-an-api-key). Otherwise, please see [Alternative to the API key by getting a token](#alternative-to-the-api-key-by-getting-a-token) below.
+3. run `docker compose up --build`
+
+#### Through GitHub Pages 
+
 1. Push to a branch in your origin remote, in a branch of your choice. It is recommended that you use a dedicated branch for testing, which is different from one where you would be opening a Pull request from.
 2. Make sure your repository has GitHub Pages enabled, on that specific above-mentioned branch.
-3. Since you need a token to communicate with the Coveo API, you can do the following to go to get a token valid for 24 hrs:
-	1. Go to a search page on the Canada.ca preview such as: **/en/sr/srb.html**.
-	2. Open the inspector (developer tool) and look for the `div` tag that has the attribute called `data-gc-search`.
-	3. Inside this attribute, you'll find a Javascript object that has a field called `accessToken`. Grab the value of that token.
-	4. Replace `XYZ` with the token on any page within the /test/ folder of this project, such as **srb-en.html**.
-	5. If you are planning on opening a pull request with your changes, do not forget to put `XYZ` back into the files.
-	6. If the token doesn't seem valid, take another one from the Canada.ca Preview server or you may have passed the 24 hours TTL of the token; get another one.
+
+#### Setting an API key
+
+1. Add a file named `token.yml` inside the `_data` folder. This file needs to simply have a key-value pair of `API_KEY: "[API KEY HERE]"` on line 1. The key value can be found at https://github.com/ServiceCanada/devops-documentation/blob/master/search/local-testing.md to replace the `[API KEY HERE]`. If you do not have access to the previous link, please see the next section on how to use a token as described below.
+
+#### Alternative to the API key by getting a token
+
+Since you need a token to communicate with the Coveo API, you can do the following to go to get a token valid for 24 hrs:
+
+1. Go to a search page on the Canada.ca preview such as: **/en/sr/srb.html**.
+2. Open the inspector (developer tool) and look for the `div` tag that has the attribute called `data-gc-search`.
+3. Inside this attribute, you'll find a Javascript object that has a field called `accessToken`. Grab the value of that token.
+4. Add a file named `token.yml` in the `_data` folder. This file needs to simply have a key-value pair of `API_KEY: "[API KEY HERE]"` on line 1. Add the token value as the key in `[API KEY HERE]`.
+5. If the token doesn't seem valid, take another one from the Canada.ca Preview server or you may have passed the 24 hours TTL of the token; get another one.
 
 ### Deployment
 
-1. Take the content of the "dist" folder and put it on a server. Make sure you have a mechanism in place to handle a key/token
+1. The content of the "dist" folder is what's needed for a release / deployment. See [Build files](#build-files) section above to generate this folder.
 
 ### Configurations, templates and parameters
 
@@ -84,9 +99,7 @@ They must be used within the `[data-gc-search]` attribute. See the **/test/src-e
 - `lang`
 : Langague of the text to output, in short format (`en` or `fr`). Will detect the langauge of the HTML page if not defined. If not determined, default is: `en`
 - `numberOfSuggestions`
-: Number of suggestions to show in the Query suggestion box. Default: `0`
-- `unsupportedSuggestions`
-: Extra mechanism to allow the use of the very early on Query suggestion feature. Default: `false`
+: Number of suggestions to show in the Query Suggestion (QS) box. This will activate the QS feature on your search page. Default: `0`
 - `enableHistoryPush`
 : Allows for UI elements that are not hyperlink tags to register their action in the history, such as pagination. Default: `true`
 - `isContextSearch`
@@ -187,7 +200,7 @@ Sometimes your search pages contain more than one input relevant to the search's
 - `noneq`
 : Search for anything but the search terms in input
 - `fqocct`
-: Search for all of the search terms in input
+: Search for all of the search terms in input, matching on title or URL only
 - `fqupdate`
 : Search for search terms in input, on pages that have been modified only since a certain amount of time. Options are: `datemodified_dt:[now-1day to now]`, `datemodified_dt:[now-7days to now]`, `datemodified_dt:[now-1month to now]`, `datemodified_dt:[now-1year to now]`
 - `dmn`
@@ -197,8 +210,16 @@ Sometimes your search pages contain more than one input relevant to the search's
 - `elctn_cat`
 : Used specifically for Elections Canada, to define a scope of search amongst their collection. See **/src/connector.js** to see all the options available
 - `site`
-: Used specifically for Elections Canada, to search within a specific site
+: Used specifically for Canada Gazette, to search within a specific site
+- `year`
+: Used specifically for budget limit search results to be created or modified on a given year, with minimum being 2000 and max being current year +1
 - `filetype`
 : Search , within documents of a certain file type. Options are: `application/pdf`, `ps`, `application/msword`, `application/vnd.ms-excel`, `application/vnd.ms-powerpoint`, `application/rtf`
 - `originLevel3`
 : Allows for mimicking a specific search page/context by setting its path through this URL parameter
+
+### Other
+
+#### Analytics tracking
+
+Custom event named `searchEvent` can used to hook onto from Analytics tools, such as Adobe Analytics. This allows to listen to search actions, more specifically "doing a search", since the Search UI is acting similar to a Single Page App (SPA).

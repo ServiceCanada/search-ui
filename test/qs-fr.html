@@ -1,14 +1,14 @@
 ---
-title: Résultats de la recherche (base) pour le gouvernement du Canada avec Headless
-description: Page démo pour l'interface utilisateur de recherche Canada.ca (base)
+title: Résultats de la recherche avec Suggestions de termes
+description: Page démo pour la fonctionnalité Suggestions de termes dans l'interface utilisateur de recherche Canada.ca
 lang: fr
-altLangPage: srb-en.html
+altLangPage: qs-en.html
 nositesearch: true
 pageclass: page-type-search
 pageType: recherche
 share: false
 deptfeature: false
-dateModified: 2024-06-05
+dateModified: 2025-02-19
 css: "../src/connector.css"
 script:
 - src: "../src/connector.js"
@@ -32,7 +32,8 @@ script:
 	"searchHub": "canada-gouv-public-websites",
 	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
 	"accessToken":"{{ site.data.token.API_KEY }}",
-	"originLevel3": "/fr/sr/srb.html"
+	"originLevel3": "/fr/sr/srb.html",
+	"numberOfSuggestions": 5
 }'></div>
 <p class="text-center small"><a href="sra-fr.html">Effectuer une recherche avancée</a></p>
 
