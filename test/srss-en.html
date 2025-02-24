@@ -1,0 +1,42 @@
+---
+title: Basic search page for Governement of Canada using Headless
+description: Demo page for the Canada.ca Search UI Basic
+lang: en
+altLangPage: srb-fr.html
+nositesearch: true
+pageclass: page-type-search
+pageType: recherche
+share: false
+deptfeature: false
+dateModified: 2024-06-05
+css: "../src/connector.css"
+mscript: "../src/connector.js"
+---
+<script src="../src/connector.js" type="module"></script>
+<!--FORM-->
+<form id="gc-searchbox" class="mrgn-tp-sm">
+	<div class="input-group mrgn-tp-lg">
+		<label class="wb-inv" for="sch-inp-ac">Search Government of Canada websites</label>
+		<input id="sch-inp-ac" class="form-control" value="" name="q" autocomplete="off" spellcheck="false" type="search" aria-describedby="gc-pi">
+		<span class="input-group-btn">
+		<button class="btn btn-primary btn-small" type="submit"> <span class="glyphicon-search glyphicon" aria-hidden="true"></span> <span class="wb-inv">Search</span> </button>
+		</span>
+	</div>
+	<p id="gc-pi" class="mrgn-tp-md">Don’t include personal information (telephone, email, SIN, financial, medical, or work details).</p>
+</form>
+
+<!--RESULTS-->
+<div data-gc-search='{
+	"searchHub": "canada-gouv-public-websites",
+	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
+	"accessToken":"xx20998bcf-96df-4d67-b61e-6460b26651b9",
+	"originLevel3": "/en/sr/srb.html"
+}'></div>
+<p class="text-center small"><a href="sra-en.html">Perform an advanced search</a></p>
+
+<!--DEMO-EXPECTATIONS-->
+<h2>Expected output for the result section</h2>
+<details>
+	<summary>Output for Results section</summary>
+	[To be completed, see Connector.js for reference until then]
+</details>
