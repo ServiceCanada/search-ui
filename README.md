@@ -33,7 +33,7 @@ For more details, please [consult full checklist of to do items](todo.md).
 
 All changes contributed through Pull requests will be packaged as releases. Releases are completed through the "Releases" tab in this GitHub repository; then, deployment to MWS follows the reguar release management cycle accordingly.
 
-Each new verion of this project is defined based on an evaluaton of the impacts of changes against any formerly up-to-date Search UI implementation. The scope constitutes of all files within the "dist" folder (distribution files), which are JavaScript scripts and CSS styles. The usage of feautures can also be considered as part of the evaluation of impact. For example, a feature of the Javascript which is known by certitude to have never been used in a production environment, wouldn't cause any breaking change if modified and therefore, wouldn't generate a major version.
+Each new verion of this project is defined based on an evaluaton of the impacts of changes against any formerly up-to-date LIVE Search UI implementation on Canada.ca. The scope constitutes of all files within the "dist" folder (distribution files), which are JavaScript scripts and CSS styles. Additionally, volume of usage for features can also be taken into consideration as part of the evaluation of impact on versioning. For example, an interactive feature from the Javascript which is known by certitude to have never been used in a production environment, wouldn't cause any breaking change if modified and therefore, wouldn't generate a major version.
 
 Search UI follows [Semantic Versioning 2.0.0](https://semver.org/)
 
@@ -51,30 +51,32 @@ This rubric is for developers.
 
 ### Test as end-user
 
-#### Locally (with Docker)
+#### Test locally
 
 1. Install Docker
 2. Add an API key to your site settings as described below in [Setting an API key](#setting-an-api-key). Otherwise, please see [Alternative to the API key by getting a token](#alternative-to-the-api-key-by-getting-a-token) below.
 3. run `docker compose up --build`
 
-#### Through GitHub Pages 
+##### Setting an API key
 
-1. Push to a branch in your origin remote, in a branch of your choice. It is recommended that you use a dedicated branch for testing, which is different from one where you would be opening a Pull request from.
-2. Make sure your repository has GitHub Pages enabled, on that specific above-mentioned branch.
+1. Create a `_data` folder at the root. Then, add a file named `token.yml` inside the `_data` folder. This file needs to simply have a key-value pair of `API_KEY: "[API KEY HERE]"` on line 1. The key value can be found at https://github.com/ServiceCanada/devops-documentation/blob/master/search/local-testing.md to replace the `[API KEY HERE]`. If you do not have access to the previous link, please see the next section on how to use a token as described below.
 
-#### Setting an API key
-
-1. Add a file named `token.yml` inside the `_data` folder. This file needs to simply have a key-value pair of `API_KEY: "[API KEY HERE]"` on line 1. The key value can be found at https://github.com/ServiceCanada/devops-documentation/blob/master/search/local-testing.md to replace the `[API KEY HERE]`. If you do not have access to the previous link, please see the next section on how to use a token as described below.
-
-#### Alternative to the API key by getting a token
+##### Alternative to the API key by getting a token
 
 Since you need a token to communicate with the Coveo API, you can do the following to go to get a token valid for 24 hrs:
 
-1. Go to a search page on the Canada.ca preview such as: **/en/sr/srb.html**.
+1. Go to a search page on the Canada.ca Preview server such as: **/en/sr/srb.html**.
 2. Open the inspector (developer tool) and look for the `div` tag that has the attribute called `data-gc-search`.
 3. Inside this attribute, you'll find a Javascript object that has a field called `accessToken`. Grab the value of that token.
-4. Add a file named `token.yml` in the `_data` folder. This file needs to simply have a key-value pair of `API_KEY: "[API KEY HERE]"` on line 1. Add the token value as the key in `[API KEY HERE]`.
-5. If the token doesn't seem valid, take another one from the Canada.ca Preview server or you may have passed the 24 hours TTL of the token; get another one.
+4. a) If you are **testing locally**, create a `_data` folder at the root. Then, add a file named `token.yml` inside the `_data` folder. This file needs to simply have a key-value pair of `API_KEY: "[API KEY HERE]"` on line 1. Add the token value as the key in `[API KEY HERE]`. b) If you are **testing through GitHub pages**, replace instances of `{{ site.data.token.API_KEY }}` with the token, on HTML pages would like to test.
+5. If the token doesn't seem valid or if you have passed the 24 hours time-to-live (TTL), go back to step one and take another one from the Canada.ca Preview server.
+
+#### Testing through GitHub Pages 
+
+1. Add the required token on HTML pages would like to test by [following the instructions on Alternative to the API key by getting a token](#alternative-to-the-api-key-by-getting-a-token). Do not use the `token.yml` approach documented for testing locally, since it may generate potential a [security risk](SECURITY.md) in the context of GitHub pages.
+2. Push your code to a branch of your choice in your origin remote (fork). It is recommended that you use a dedicated branch for testing, one that you would never open a Pull request from.
+3. Make sure your repository has GitHub Pages enabled, on that specific above-mentioned branch.
+4. Your site is live on GitHub pages!
 
 ### Deployment
 
