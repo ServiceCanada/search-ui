@@ -880,8 +880,11 @@ function openSuggestionsBox() {
 	searchBoxElement.setAttribute( 'aria-expanded', 'true' );
 }
 
-// open the suggestions box 
+// close the suggestions box 
 function closeSuggestionsBox() {
+	if( !suggestionsElement ) {
+		return;
+	}
 	suggestionsElement.hidden = true;
 	activeSuggestion = 0;
 	searchBoxElement.setAttribute( 'aria-expanded', 'false' );
