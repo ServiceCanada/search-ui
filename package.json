@@ -1,6 +1,6 @@
 {
 	"name": "search-ui",
-	"version": "1.4.0",
+	"version": "1.5.0",
 	"description": "Canada.ca Search UI with Headless",
 	"main": "index.html",
 	"repository": {
