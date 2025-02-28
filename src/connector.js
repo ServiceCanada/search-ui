@@ -133,12 +133,12 @@ function initSearchUI() {
 		// Ignore linting errors in regard to affectation instead of condition in the loops
 		// jshint -W084
 		while ( match = search.exec( query ) ) {	// eslint-disable-line no-cond-assign
-			urlParams[ decode(match[ 1 ] ) ] = DOMPurify.sanitize( decode( match[ 2 ] ) );
+			urlParams[ decode(match[ 1 ] ) ] = stripHtml( decode( match[ 2 ] ) );
 		}
 		query = window.location.hash.substring( 1 );
 
 		while ( match = search.exec( query ) ) {	// eslint-disable-line no-cond-assign
-			hashParams[ decode( match[ 1 ] ) ] = DOMPurify.sanitize( decode( match[ 2 ] ) );
+			hashParams[ decode( match[ 1 ] ) ] = stripHtml( decode( match[ 2 ] ) );
 		}
 		// jshint +W084
 	};
@@ -614,10 +614,10 @@ function initEngine() {
 	}
 
 	if ( hashParams.q && searchBoxElement ) {
-		searchBoxElement.value = DOMPurify.sanitize( hashParams.q );
+		searchBoxElement.value = stripHtml( hashParams.q );
 	}
 	else if ( urlParams.q && searchBoxElement ) {
-		searchBoxElement.value = DOMPurify.sanitize( urlParams.q );
+		searchBoxElement.value = stripHtml( urlParams.q );
 	}
 
 	// Get the query portion of the URL
@@ -728,7 +728,7 @@ function initEngine() {
 
 			// Any other key
 			if ( searchBoxController.state.value !== e.target.value ) {
-				searchBoxController.updateText( DOMPurify.sanitize( e.target.value ) );
+				searchBoxController.updateText( stripHtml( e.target.value ) );
 			}
 			if ( e.target.value.length < params.minimumCharsForSuggestions ){
 				closeSuggestionsBox();
@@ -754,7 +754,7 @@ function initEngine() {
 			if ( searchBoxElement && searchBoxElement.value ) {
 				// Make sure we have the latest value in the search box state
 				if( searchBoxController.state.value !== searchBoxElement.value ) {
-					searchBoxController.updateText( DOMPurify.sanitize( searchBoxElement.value ) );
+					searchBoxController.updateText( stripHtml( searchBoxElement.value ) );
 				}
 				searchBoxController.submit();
 			}
@@ -820,7 +820,7 @@ function updateSearchBoxState( newState ) {
 	searchBoxState = newState;
 
 	if ( updateSearchBoxFromState && searchBoxElement && searchBoxElement.value !== newState.value ) {
-		searchBoxElement.value = DOMPurify.sanitize( newState.value );
+		searchBoxElement.value = stripHtml( newState.value );
 		updateSearchBoxFromState = false;
 		return;
 	}
@@ -859,7 +859,7 @@ function updateSearchBoxState( newState ) {
 			};
 			node.onclick = ( e ) => { 
 				searchBoxController.selectSuggestion( e.currentTarget.innerText );
-				searchBoxElement.value = DOMPurify.sanitize( e.currentTarget.innerText );
+				searchBoxElement.value = stripHtml( e.currentTarget.innerText );
 			};
 			node.innerHTML = DOMPurify.sanitize( suggestion.highlightedValue );
 			suggestionsElement.appendChild( node );
@@ -897,7 +897,7 @@ function buildCleanQueryString( paramsObject ) {
 				urlParam += "&";
 			}
 
-			urlParam += prop + "=" + DOMPurify.sanitize( paramsObject[ prop ].replaceAll( '+', ' ' ) );
+			urlParam += prop + "=" + stripHtml( paramsObject[ prop ].replaceAll( '+', ' ' ) );
 		}	
 	}
 
@@ -911,6 +911,13 @@ function filterProtocol( uri ) {
 	const isRelative = /^(\/|\.\/|\.\.\/)/.test( uri );
 
 	return isAbsolute || isRelative ? uri : '';
+}
+
+// Strip HTML tags of a given string
+function stripHtml(html) {
+	let tmp = document.createElement( "DIV" );
+	tmp.innerHTML = html;
+	return tmp.textContent || tmp.innerText || "";
 }
 
 // Get date converted from GMT (Coveo) to current timezone
@@ -963,23 +970,23 @@ function updateResultListState( newState ) {
 
 			if( result.raw.author ) {
 				if( Array.isArray( result.raw.author ) ) {
-					author = DOMPurify.sanitize( result.raw.author.join( ';' ) );
+					author = stripHtml( result.raw.author.join( ';' ) );
 				}
 				else {
-					author = DOMPurify.sanitize( result.raw.author );
+					author = stripHtml( result.raw.author );
 				}
 
 				author = author.replaceAll( ';' , '</li> <li>' );
 			}
 
 			let breadcrumb = "";
-			let printableUri = DOMPurify.sanitize( result.printableUri );
-			let clickUri = DOMPurify.sanitize( result.clickUri );
-			let title = DOMPurify.sanitize( result.title );
+			let printableUri = stripHtml( result.printableUri );
+			let clickUri = stripHtml( result.clickUri );
+			let title = stripHtml( result.title );
 			if ( result.raw.hostname && result.raw.displaynavlabel ) {
 				const splittedNavLabel = ( Array.isArray( result.raw.displaynavlabel ) ? result.raw.displaynavlabel[0] : result.raw.displaynavlabel).split( '>' );
-				breadcrumb = '<ol class="location"><li>' + DOMPurify.sanitize( result.raw.hostname ) + 
-					'&nbsp;</li><li>' + DOMPurify.sanitize( splittedNavLabel[splittedNavLabel.length-1] ) + '</li></ol>';
+				breadcrumb = '<ol class="location"><li>' + stripHtml( result.raw.hostname ) + 
+					'&nbsp;</li><li>' + stripHtml( splittedNavLabel[splittedNavLabel.length-1] ) + '</li></ol>';
 			}
 			else {
 				breadcrumb = '<p class="location"><cite><a href="' + printableUri + '">' + printableUri + '</a></cite></p>';
@@ -1077,7 +1084,7 @@ function updateDidYouMeanState( newState ) {
 		if ( didYouMeanState.hasQueryCorrection ) {
 			didYouMeanElement.innerHTML = didYouMeanTemplateHTML.replace( 
 				'%[correctedQuery]', 
-				DOMPurify.sanitize( didYouMeanState.queryCorrection.correctedQuery ) );
+				stripHtml( didYouMeanState.queryCorrection.correctedQuery ) );
 			const buttonNode = didYouMeanElement.querySelector( 'button' );
 			buttonNode.onclick = ( e ) => { 
 				updateSearchBoxFromState = true;
@@ -1111,7 +1118,7 @@ function updatePagerState( newState ) {
 		const liNode = document.createElement( "li" );
 		const pageNo = page;
 
-		liNode.innerHTML = pageTemplateHTML.replaceAll( '%[page]', DOMPurify.sanitize( pageNo ) );
+		liNode.innerHTML = pageTemplateHTML.replaceAll( '%[page]', stripHtml( pageNo ) );
 
 		if ( pagerState.currentPage - 1 > page || page > pagerState.currentPage + 1 ) {
 			liNode.classList.add( 'hidden-xs', 'hidden-sm' );
