@@ -372,9 +372,9 @@ function initTpl() {
 		searchBoxElement.setAttribute( 'aria-controls', 'suggestions' );
 	}
 
-	// Remove Query suggestion if click elsewhere
+	// Close query suggestion box if click elsewhere
 	document.addEventListener( "click", function( evnt ) {
-		if ( suggestionsElement && ( evnt.target.className !== "suggestion-item" && evnt.target.id !== "sch-inp-ac" ) ) {
+		if ( suggestionsElement && ( evnt.target.className !== "suggestion-item" && evnt.target.id !== searchBoxElement?.id ) ) {
 			closeSuggestionsBox();
 		}
 	} );
