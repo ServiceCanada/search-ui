@@ -36,6 +36,8 @@ const defaults = {
 	"isContextSearch": false,
 	"isAdvancedSearch": false,
 	"originLevel3": window.location.origin + winPath,
+	"originLevel3RelativeUrl": winPath,
+	"useRelativeUrlForOriginLevel3": false,
 	"pipeline": ""
 };
 let lang = document.querySelector( "html" )?.lang;
@@ -418,7 +420,12 @@ function initEngine() {
 
 						// filter user sensitive content
 						requestContent.enableQuerySyntax = params.isAdvancedSearch;
-						requestContent.mlParameters = { "filters": { "c_context_searchpageurl": params.originLevel3 } };
+						requestContent.mlParameters = { 
+							"filters": { 
+								"c_context_searchpageurl": params.originLevel3, 
+								"c_context_searchpagerelativeurl": params.originLevel3RelativeUrl 
+							} 
+						};
 
 						if ( requestContent.analytics ) {
 							requestContent.analytics.originLevel3 = params.originLevel3;
@@ -439,6 +446,7 @@ function initEngine() {
 
 	contextController = buildContext( headlessEngine );
 	contextController.set( { "searchPageUrl" : params.originLevel3 } );
+	contextController.set( { "searchPageRelativeUrl" : params.originLevel3RelativeUrl } );
 
 	// build controllers
 	searchBoxController = buildSearchBox( headlessEngine, {
