@@ -445,8 +445,8 @@ function initEngine() {
 	} );
 
 	contextController = buildContext( headlessEngine );
-	contextController.set( { "searchPageUrl" : params.originLevel3 } );
-	contextController.set( { "searchPageRelativeUrl" : params.originLevel3RelativeUrl } );
+	contextController.set( { "searchPageUrl" : params.originLevel3 ,
+							 "searchPageRelativeUrl" : params.originLevel3RelativeUrl } );
 
 	// build controllers
 	searchBoxController = buildSearchBox( headlessEngine, {
