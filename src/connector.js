@@ -37,7 +37,6 @@ const defaults = {
 	"isAdvancedSearch": false,
 	"originLevel3": window.location.origin + winPath,
 	"originLevel3RelativeUrl": winPath,
-	"useRelativeUrlForOriginLevel3": false,
 	"pipeline": ""
 };
 let lang = document.querySelector( "html" )?.lang;
