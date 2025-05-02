@@ -117,6 +117,18 @@ function initSearchUI() {
 	paramsDetect.isAdvancedSearch = !!document.getElementById( 'advseacon1' ) || winPath.endsWith( '/advanced-search.html' ) || winPath.endsWith( '/recherche-avancee.html' );
 	paramsDetect.enableHistoryPush = !paramsDetect.isAdvancedSearch;
 
+	// Auto detect relative path from originLevel3
+	if ( paramsOverride.originLevel3 ) {
+		try {
+			var regPath = /.+?:\/\/.+?(\/.+?)(?:#|\?|$)/;
+			var pathName = regPath.exec( paramsOverride.originLevel3 )[1];
+			paramsDetect.originLevel3RelativeUrl = pathName;
+		}
+		catch( exception ) {
+			console.warn( "Exception while auto detecting relative path: " + exception.message );
+		}
+	}
+
 	// Final parameters object
 	params = Object.assign( defaults, paramsDetect, paramsOverride );
 
