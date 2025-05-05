@@ -84,6 +84,7 @@ let resultsSection = document.querySelector( '#wb-land' );
 let resultListElement = document.querySelector( '#result-list' );
 let querySummaryElement = document.querySelector( '#query-summary' );
 let pagerElement = document.querySelector( '#pager' );
+let pagerParentElement = document.querySelector( '#pager-parent' );
 let suggestionsElement = document.querySelector( '#suggestions' );
 let didYouMeanElement = document.querySelector( '#did-you-mean' );
 
@@ -349,12 +350,12 @@ function initTpl() {
 	}
 
 	// auto-create pager
-	if ( !pagerElement ) {
-		let newPagerElement = document.createElement( "div" );
-		newPagerElement.innerHTML = pagerContainerTemplateHTML;
+	if ( !pagerParentElement ) {
+		pagerParentElement = document.createElement( "div" );
+		pagerParentElement.innerHTML = pagerContainerTemplateHTML;
 
-		resultsSection.append( newPagerElement );
-		pagerElement = newPagerElement.querySelector( "#pager" );
+		resultsSection.append( pagerParentElement );
+		pagerElement = pagerParentElement.querySelector( "#pager" );
 	}
 
 	// auto-create suggestions element
@@ -762,7 +763,7 @@ function initEngine() {
 				resultListElement.textContent = "";
 				querySummaryElement.textContent = "";
 				didYouMeanElement.textContent = "";
-				pagerElement.textContent = "";
+				pagerParentElement.textContent = "";
 			}
 		};
 	}
@@ -1101,6 +1102,15 @@ function updateDidYouMeanState( newState ) {
 // Update pagination
 function updatePagerState( newState ) {
 	pagerState = newState;
+	if ( pagerState.maxPage == 0 ) {
+		pagerParentElement.textContent = "";
+		return;
+	}
+	else if ( pagerParentElement.textContent == "" ) {
+		pagerParentElement.innerHTML = pagerContainerTemplateHTML;
+		pagerElement = pagerParentElement.querySelector( "#pager" );
+	}
+
 	pagerElement.textContent = "";
 
 	if ( pagerState.hasPreviousPage ) {
