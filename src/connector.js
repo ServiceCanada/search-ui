@@ -983,9 +983,9 @@ function updateResultListState( newState ) {
 			}
 
 			let breadcrumb = "";
-			let printableUri = stripHtml( result.printableUri );
-			let clickUri = stripHtml( result.clickUri );
-			let title = stripHtml( result.title );
+			let printableUri = DOMPurify.sanitize( result.printableUri );
+			let clickUri = DOMPurify.sanitize( result.clickUri );
+			let title = DOMPurify.sanitize( result.title );
 			if ( result.raw.hostname && result.raw.displaynavlabel ) {
 				const splittedNavLabel = ( Array.isArray( result.raw.displaynavlabel ) ? result.raw.displaynavlabel[0] : result.raw.displaynavlabel).split( '>' );
 				breadcrumb = '<ol class="location"><li>' + stripHtml( result.raw.hostname ) + 
