@@ -1,0 +1,24 @@
+---
+title: Add token to test search pages
+description: This page allows to add a token to test search pages for the duration of a session
+lang: en
+dateModified: 2025-05-15
+breadcrumbs:
+- title: "GC Search UI"
+  link: "../index.html"
+script: assets/token.js
+---
+
+<div class="alert alert-warning">
+	<p>Use the form below to facilitate testing search pages by saving a token for the <strong>duration of your session</strong>. Please refer to the <a href="https://github.com/ServiceCanada/search-ui?tab=readme-ov-file#setting-an-api-key">Readme file to get a valid access token or API key</a>.</p>
+</div>
+
+<form action="index.html" id="sr-token" class="form-inline">   
+	<div class="form-group"> 
+		<label for="sr-token-input" class="wb-inv">Token:</label> 
+		<input name="token" id="sr-token-input" class="form-control" placeholder="Token" pattern="(\w|\.|-){30,}" maxlength="600" autocomplete="off" required>
+	</div> 
+	<button type="submit" class="btn btn-primary">Save token</button>
+
+	<p id="sr-token-ok" class="mrgn-tp-md mrgn-bttm-lg" role="status" hidden><span class="glyphicon glyphicon-ok text-success mrgn-rght-sm" aria-hidden="true"></span> Token saved!</p>
+</form> 

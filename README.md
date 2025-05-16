@@ -41,7 +41,7 @@ Search UI follows [Semantic Versioning 2.0.0](https://semver.org/)
 
 ## Getting started
 
-This rubric is for developers.
+This rubric is for developers and testers.
 
 ### Build files for release or to test code quality before opening a Pull request
 
@@ -72,6 +72,14 @@ Since you need a token to communicate with the Coveo API, you can do the followi
 5. If the token doesn't seem valid or if you have passed the 24 hours time-to-live (TTL), go back to step one and take another one from the Canada.ca Preview server.
 
 #### Testing through GitHub Pages 
+
+##### Main website
+
+At all time, you can visit the GitHub website to see the GC Search UI with the latest Pull requests merged at play: https://servicecanada.github.io/search-ui/
+
+##### In your fork
+
+This is to test your changes usually before opening a Pull request.
 
 1. Add the required token on HTML pages would like to test by [following the instructions on Alternative to the API key by getting a token](#alternative-to-the-api-key-by-getting-a-token). Do not use the `token.yml` approach documented for testing locally, since it may generate potential a [security risk](SECURITY.md) in the context of GitHub pages.
 2. Push your code to a branch of your choice in your origin remote (fork). It is recommended that you use a dedicated branch for testing, one that you would never open a Pull request from.
