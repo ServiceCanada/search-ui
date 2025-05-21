@@ -359,7 +359,7 @@ function initTpl() {
 
 	// auto-create suggestions element
 	searchBoxElement = document.querySelector( params.searchBoxQuery );
-	if ( !suggestionsElement && searchBoxElement && params.numberOfSuggestions > 0 ) {
+	if ( !suggestionsElement && searchBoxElement && params.numberOfSuggestions > 0 && !params.isAdvancedSearch ) {
 		searchBoxElement.role = "combobox";
 		searchBoxElement.setAttribute( 'aria-autocomplete', 'list' );
 
