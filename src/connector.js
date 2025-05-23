@@ -154,12 +154,17 @@ function initSearchUI() {
 	}
 	
 	// Auto detect relative path from originLevel3
-	try {
-		const absoluteURL = new URL( params.originLevel3 );
-		originLevel3RelativeUrl = absoluteURL.pathname;
+	if( !params.originLevel3.startsWith( "/" ) && /http|www/.test( params.originLevel3 ) ) {
+		try {
+			const absoluteURL = new URL( params.originLevel3 );
+			originLevel3RelativeUrl = absoluteURL.pathname;
+		}
+		catch( exception ) {
+			console.warn( "Exception while auto detecting relative path: " + exception.message );
+		}
 	}
-	catch( exception ) {
-		console.warn( "Exception while auto detecting relative path: " + exception.message );
+	else {
+		originLevel3RelativeUrl = params.originLevel3;
 	}
 
 	if ( !params.endpoints ) {
