@@ -44,6 +44,7 @@ let paramsDetect = {};
 let params = {};
 let urlParams;
 let hashParams;
+let originLevel3RelativeUrl = "";
 
 // Headless controllers
 let headlessEngine;
@@ -150,6 +151,20 @@ function initSearchUI() {
 	// override origineLevel3 through query parameters 
 	if ( urlParams.originLevel3 ){
 		params.originLevel3 = urlParams.originLevel3;
+	}
+	
+	// Auto detect relative path from originLevel3
+	if( !params.originLevel3.startsWith( "/" ) && /http|www/.test( params.originLevel3 ) ) {
+		try {
+			const absoluteURL = new URL( params.originLevel3 );
+			originLevel3RelativeUrl = absoluteURL.pathname;
+		}
+		catch( exception ) {
+			console.warn( "Exception while auto detecting relative path: " + exception.message );
+		}
+	}
+	else {
+		originLevel3RelativeUrl = params.originLevel3;
 	}
 
 	if ( !params.endpoints ) {
@@ -418,7 +433,12 @@ function initEngine() {
 
 						// filter user sensitive content
 						requestContent.enableQuerySyntax = params.isAdvancedSearch;
-						requestContent.mlParameters = { "filters": { "c_context_searchpageurl": params.originLevel3 } };
+						requestContent.mlParameters = { 
+							"filters": { 
+								"c_context_searchpageurl": params.originLevel3, 
+								"c_context_searchpagerelativeurl": originLevel3RelativeUrl 
+							} 
+						};
 
 						if ( requestContent.analytics ) {
 							requestContent.analytics.originLevel3 = params.originLevel3;
@@ -438,8 +458,8 @@ function initEngine() {
 	} );
 
 	contextController = buildContext( headlessEngine );
-	contextController.set( { "searchPageUrl" : params.originLevel3 } );
-
+	contextController.set( { "searchPageUrl" : params.originLevel3, "searchPageRelativeUrl" : originLevel3RelativeUrl } );
+	
 	// build controllers
 	searchBoxController = buildSearchBox( headlessEngine, {
 		options: {
