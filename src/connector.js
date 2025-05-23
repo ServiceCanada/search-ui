@@ -44,7 +44,7 @@ let paramsDetect = {};
 let params = {};
 let urlParams;
 let hashParams;
-let originLevel3RelativeUrl;
+let originLevel3RelativeUrl = "";
 
 // Headless controllers
 let headlessEngine;
