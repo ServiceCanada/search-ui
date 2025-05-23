@@ -1002,7 +1002,7 @@ function updateResultListState( newState ) {
 				.replace( '%[result.clickUri]', filterProtocol( clickUri ) )
 				.replace( '%[result.title]', title )
 				.replace( '%[result.raw.author]', author )
-				.replace( '%[result.breadcrumb]', printableUri )
+				.replace( '%[result.breadcrumb]', breadcrumb )
 				.replace( '%[result.printableUri]', printableUri )
 				.replace( '%[short-date-en]', getShortDateFormat( resultDate ) )
 				.replace( '%[short-date-fr]', getShortDateFormat( resultDate ) )
