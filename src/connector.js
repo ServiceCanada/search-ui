@@ -72,6 +72,7 @@ let pagerState;
 let lastCharKeyUp;
 let activeSuggestion = 0;
 let activeSuggestionWaitMouseMove = true;
+let pagerManuallyCleared = false;
 
 // Firefox patch
 let isFirefox = navigator.userAgent.indexOf( "Firefox" ) !== -1;
@@ -354,7 +355,7 @@ function initTpl() {
 		newPagerElement.innerHTML = pagerContainerTemplateHTML;
 
 		resultsSection.append( newPagerElement );
-		pagerElement = newPagerElement.querySelector( "#pager" );
+		pagerElement = newPagerElement;
 	}
 
 	// auto-create suggestions element
@@ -763,6 +764,7 @@ function initEngine() {
 				querySummaryElement.textContent = "";
 				didYouMeanElement.textContent = "";
 				pagerElement.textContent = "";
+				pagerManuallyCleared = true;
 			}
 		};
 	}
@@ -1040,6 +1042,11 @@ function updateQuerySummaryState( newState ) {
 	if ( resultListState.firstSearchExecuted && !querySummaryState.isLoading && !querySummaryState.hasError ) {
 		querySummaryElement.textContent = "";
 		if ( querySummaryState.total > 0 ) {
+			// Manually ask pager to redraw since even is not sent when manually cleared
+			if ( pagerManuallyCleared ) {
+				updatePagerState( pagerState );
+			}
+
 			let numberOfResults = querySummaryState.total.toLocaleString( params.lang );
 			// Generate the text content
 			const querySummaryHTML = ( ( querySummaryState.query !== "" && !params.isAdvancedSearch ) ? querySummaryTemplateHTML : noQuerySummaryTemplateHTML )
@@ -1058,11 +1065,13 @@ function updateQuerySummaryState( newState ) {
 			querySummaryElement.innerHTML = noResultTemplateHTML;
 		}
 		focusToView();
+		pagerManuallyCleared = false;
 	}
 	else if ( querySummaryState.hasError ) {
 		querySummaryElement.textContent = "";
 		querySummaryElement.innerHTML = resultErrorTemplateHTML;
 		focusToView();
+		pagerManuallyCleared = false;
 	}
 }
 
@@ -1102,7 +1111,16 @@ function updateDidYouMeanState( newState ) {
 // Update pagination
 function updatePagerState( newState ) {
 	pagerState = newState;
-	pagerElement.textContent = "";
+	if ( pagerState.maxPage === 0 ) {
+		pagerElement.textContent = "";
+		return;
+	}
+	else if ( pagerElement.textContent === "" ) {
+		pagerElement.innerHTML = pagerContainerTemplateHTML;
+	}
+
+	let pagerComponentElement = pagerElement.querySelector( "#pager" );
+	pagerComponentElement.textContent = "";
 
 	if ( pagerState.hasPreviousPage ) {
 		const liNode = document.createElement( "li" );
@@ -1115,7 +1133,7 @@ function updatePagerState( newState ) {
 			pagerController.previousPage();
 		};
 
-		pagerElement.appendChild( liNode );
+		pagerComponentElement.appendChild( liNode );
 	}
 
 	pagerState.currentPages.forEach( ( page ) => {
@@ -1142,7 +1160,7 @@ function updatePagerState( newState ) {
 			pagerController.selectPage( pageNo );
 		};
 
-		pagerElement.appendChild( liNode );
+		pagerComponentElement.appendChild( liNode );
 	} );
 
 	if ( pagerState.hasNextPage ) {
@@ -1156,7 +1174,7 @@ function updatePagerState( newState ) {
 			pagerController.nextPage(); 
 		};
 
-		pagerElement.appendChild( liNode );
+		pagerComponentElement.appendChild( liNode );
 	}
 }
 
