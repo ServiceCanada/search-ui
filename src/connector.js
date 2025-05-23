@@ -983,8 +983,9 @@ function updateResultListState( newState ) {
 			}
 
 			let breadcrumb = "";
-			let printableUri = DOMPurify.sanitize( result.printableUri );
-			let clickUri = DOMPurify.sanitize( result.clickUri );
+			let printableUri = encodeURI( result.printableUri );
+			printableUri = printableUri.replaceAll( '&' , '&amp;' );
+			let clickUri = encodeURI( result.clickUri );
 			let title = stripHtml( result.title );
 			if ( result.raw.hostname && result.raw.displaynavlabel ) {
 				const splittedNavLabel = ( Array.isArray( result.raw.displaynavlabel ) ? result.raw.displaynavlabel[0] : result.raw.displaynavlabel).split( '>' );
@@ -992,7 +993,7 @@ function updateResultListState( newState ) {
 					'&nbsp;</li><li>' + stripHtml( splittedNavLabel[splittedNavLabel.length-1] ) + '</li></ol>';
 			}
 			else {
-				breadcrumb = '<p class="location"><cite><a href="' + printableUri + '">' + printableUri + '</a></cite></p>';
+				breadcrumb = '<p class="location"><cite><a href="' + clickUri + '">' + printableUri + '</a></cite></p>';
 			}
 
 			sectionNode.innerHTML = resultTemplateHTML
@@ -1001,8 +1002,8 @@ function updateResultListState( newState ) {
 				.replace( '%[result.clickUri]', filterProtocol( clickUri ) )
 				.replace( '%[result.title]', title )
 				.replace( '%[result.raw.author]', author )
-				.replace( '%[result.breadcrumb]', breadcrumb )
-				.replace( '%[result.printableUri]', printableUri.replaceAll( '&' , '&amp;' ) )
+				.replace( '%[result.breadcrumb]', printableUri )
+				.replace( '%[result.printableUri]', printableUri )
 				.replace( '%[short-date-en]', getShortDateFormat( resultDate ) )
 				.replace( '%[short-date-fr]', getShortDateFormat( resultDate ) )
 				.replace( '%[long-date-en]', getLongDateFormat( resultDate, 'en' ) )
