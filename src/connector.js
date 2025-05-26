@@ -96,7 +96,7 @@ let querySummaryTemplateHTML = document.getElementById( 'sr-query-summary' )?.in
 let didYouMeanTemplateHTML = document.getElementById( 'sr-did-you-mean' )?.innerHTML;
 let noQuerySummaryTemplateHTML = document.getElementById( 'sr-noquery-summary' )?.innerHTML;
 let previousPageTemplateHTML = document.getElementById( 'sr-pager-previous' )?.innerHTML;
-let pageTemplateHTML = document.getElementById( 'sr-pager-page-' )?.innerHTML;
+let pageTemplateHTML = document.getElementById( 'sr-pager-page' )?.innerHTML;
 let nextPageTemplateHTML = document.getElementById( 'sr-pager-next' )?.innerHTML;
 let pagerContainerTemplateHTML = document.getElementById( 'sr-pager-container' )?.innerHTML;
 
