@@ -234,7 +234,7 @@ Sometimes your search pages contain more than one input relevant to the search's
 
 #### Analytics tracking
 
-Custom event named `searchEvent` can used to hook onto from Analytics tools, such as Adobe Analytics. This allows to listen to search actions, more specifically "doing a search", since the Search UI is acting similar to a Single Page App (SPA). The payload varies based on the event type triggered, which is usually dictated by the `actionCause`. In the case where there is no `actionCause` in the payload of a beacon, then the `eventType` will tell you more about it. There are currently 5 types of action cause:
+Custom event named `searchEvent` can used to hook onto from Analytics tools, such as Adobe Analytics. This allows to listen to search actions, more specifically "doing a search", since the Search UI is acting similar to a Single Page App (SPA). The payload varies based on the event type triggered, which is usually dictated by the `actionCause`. In the case where there is no `actionCause` in the payload of a beacon, then the `eventType` will tell you more about it. List of action causes:
 
 - interfaceLoad
 : Search interface was initially loaded (or refreshed) with a search term
@@ -245,7 +245,7 @@ Custom event named `searchEvent` can used to hook onto from Analytics tools, suc
 - documentOpen
 : User clicks on a search result
 
-And the main event type for when an action cause is not provided is:
+And the main event type for when an action cause is not provided:
 
 - getMoreResults
 : User clicked on a pagination button
