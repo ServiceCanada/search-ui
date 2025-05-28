@@ -234,4 +234,111 @@ Sometimes your search pages contain more than one input relevant to the search's
 
 #### Analytics tracking
 
-Custom event named `searchEvent` can used to hook onto from Analytics tools, such as Adobe Analytics. This allows to listen to search actions, more specifically "doing a search", since the Search UI is acting similar to a Single Page App (SPA).
+Custom event named `searchEvent` can used to hook onto from Analytics tools, such as Adobe Analytics. This allows to listen to search actions, more specifically "doing a search", since the Search UI is acting similar to a Single Page App (SPA). The payload varies based on the event type triggered, which is usually dictated by the `actionCause`. In the case where there is no `actionCause` in the payload of a beacon, then the `eventType` will tell you more about it. There are currently 5 types of action cause:
+
+- interfaceLoad
+: Search interface was initially loaded (or refreshed) with a search term
+- searchboxSubmit
+: any subsequent searches from the search box
+- omniboxAnalytics
+: User clicks on a query suggestion
+- documentOpen
+: User clicks on a search result
+
+And the main event type for when an action cause is not provided is:
+
+- getMoreResults
+: User clicked on a pagination button
+
+They each carry the following fields in their respective payloads:
+
+##### interfaceLoad
+
+- language
+- userAgent
+- originContext
+- originLevel1
+- originLevel2
+- originLevel3
+- splitTestRunName
+- splitTestRunVersion
+- customData
+    - context_searchPageUrl
+    - c_context_searchpagerelativeurl
+    - coveoHeadlessVersion
+- facetState
+- anonymous
+- clientId
+- queryText
+- responseTime
+- results
+    - documentUri
+    - documentUriHash
+- numberOfResults
+- queryPipeline
+- actionCause
+- searchQueryUid
+
+##### searchboxSubmit
+
+Same as [interfaceLoad](#interfaceLoad).
+
+##### documentOpen
+
+Same as [interfaceLoad](#interfaceLoad), plus the following:
+
+- collectionName
+- documentAuthor
+- documentPosition
+- documentTitle
+- documentUri
+- documentUriHash
+- documentUrl
+- rankingModifier
+- sourceName
+- customData
+    - context_searchPageUrl
+    - c_context_searchpagerelativeurl
+    - coveoHeadlessVersion
+    - contentIDKey
+    - contentIDValue
+
+##### omniboxAnalytics
+
+Same as [interfaceLoad](#interfaceLoad), plus the following:
+
+- customData
+    - context_searchPageUrl
+    - c_context_searchpagerelativeurl
+    - coveoHeadlessVersion
+    - suggestionRanking
+    - partialQuery
+    - partialQueries
+    - suggestions
+    - querySuggestResponseId
+
+##### getMoreResults
+
+- language
+- userAgent
+- originContext
+- originLevel1
+- originLevel2
+- originLevel3
+- splitTestRunName
+- splitTestRunVersion
+- customData
+    - context_searchPageUrl
+    - c_context_searchpagerelativeurl
+    - coveoHeadlessVersion
+    - pagerNumber
+- facetState
+- anonymous
+- clientId
+- eventType
+- eventValue
+- lastSearchQueryUid
+
+#### Removing on-page content from index
+
+You can add the class `sr-no-index` to any HTML element inside the main content of your page if you wish for that content to be ignored by the search engine. In this case, it won't be indexed, nor returned in the search result excerpts.

@@ -10,13 +10,13 @@ This list contains outstanding suggestions / non-critical issues identified in p
 - [x] Investigate #wb-land focus on Advanced search
 - [x] Document customEvent
 - [x] Finish proper development of Query Suggestion (QS), outside of GCWeb
+- [x] Improve the form code to not rely on an action that points to an anchor for a dynamically added element, which doesn't exist on the page prior to JS
 - [ ] Move QS generic integration to GCWeb
 - [ ] Remove the need for having a CSS file to be handled by GCWeb instead!
 - [ ] Add missing pieces such as "error message", "no result" and "did you mean" into our reference implementation as an example
 - [ ] Add Expected output on test pages (HTML) and use Jekyll highlights
 - [ ] Align search pages with new GCWeb template and/or define new GCWeb templates
 - [ ] Ensure no section or heading or any element with semantic is added alone/empty on the page 
-- [ ] Improve the form code to not rely on an action that points to an anchor for a dynamically added element, which doesn't exist on the page prior to JS
 - [ ] Create search template specific styles (.page-type-search), to get rid of overusage of .h3 class for example
 - [ ] Leverage wb core features instead of reinving the wheel, such as for language of page and dates. For dates, native JS functions could be leveraged such as: toLocaleDateString
 - [ ] Improve caching of variable that are used multiple times in the script, such as: window.location, then window.location.pathname
