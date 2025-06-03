@@ -1,10 +1,11 @@
 # Project: Search UI
 
-Purpose of this repository is to provide MWS pages with the proper JS and CSS assets to achieve a working search page with the vendor's (Coveo) technology called Headless.
+Purpose of this repository is to provide MWS pages with the proper JS and CSS assets to achieve working search pages with the vendor's (Coveo) technology called Headless, sitting on top of GCWeb.
 
 ## References
 
 - Coveo Headless: https://docs.coveo.com/en/headless/latest/
+- GCWeb: https://wet-boew.github.io/GCWeb/index-en.html
 
 ## Key details
 
@@ -16,16 +17,17 @@ This project is led by Principal Publisher at ESDC. The key contact in case of q
 
 The goal is to continue to refine and improve this code base on a regular basis. Every 6 months, if no activity is recorded on this repository, the key contact shall be reached out to in order to ensure it isn't stale.
 
-**Removal date** will coincide with end of contract with vendor.
+**Removal date** would align with end of contract with current vendor.
 
 ### Improvement plan
 
 To manage development activities related to this project, a standard internal issue tracking system used at Principal Publisher will be used. Also, regular touchpoints with the search vendor, as well as formal service requests entered through their portal, could also spark some development activities from a vendor perspective.
 
-In the medium to long term, some activities may take place related to:
-- stabilization of the query suggestion combobox;
-- porting of some parts of the codebase to GCWeb;
-- addition of machine learning features.
+Example of code contributions may be related to:
+
+- development/configurations of AI-powered features and other innovations
+- bug fixes, accessibility and security improvements
+- project maintenance chores
 
 For more details, please [consult full checklist of to do items](todo.md).
 
@@ -316,6 +318,7 @@ Same as [interfaceLoad](#interfaceLoad), plus the following:
     - partialQueries
     - suggestions
     - querySuggestResponseId
+- queryText
 
 ##### getMoreResults
 
@@ -341,4 +344,4 @@ Same as [interfaceLoad](#interfaceLoad), plus the following:
 
 #### Removing on-page content from index
 
-You can add the class `sr-no-index` to any HTML element inside the main content of your page if you wish for that content to be ignored by the search engine. In this case, it won't be indexed, nor returned in the search result excerpts.
+You can add the class `sr-no-index` to any HTML element inside the main content of your page if you wish for that content to be ignored by the search engine. In which case, said content won't be indexed nor returned in the search result excerpts.
