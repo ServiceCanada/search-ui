@@ -11,7 +11,7 @@ Purpose of this repository is to provide MWS pages with the proper JS and CSS as
 
 ### Sponsor / Contact
 
-This project is led by Principal Publisher at ESDC. The key contact in case of questions related to the project is Francis Gorman, who can be reached at francis.gorman@hrsdc-rhdcc.gc.ca. If no reply is received from this person, fallback contact is ESDC.SD.DEV-DEV.DS.EDSC@servicecanada.gc.ca.
+This project is led by Principal Publisher at Service Canada (ESDC). The key contact in case of questions related to the project is Francis Gorman, who can be reached at francis.gorman@hrsdc-rhdcc.gc.ca. If no reply is received from this person, fallback contact is ESDC.SD.DEV-DEV.DS.EDSC@servicecanada.gc.ca.
 
 ### Timeline and frequency
 
@@ -56,37 +56,35 @@ This rubric is for developers and testers.
 #### Test locally
 
 1. Install Docker
-2. Add an API key to your site settings as described below in [Setting an API key](#setting-an-api-key). Otherwise, please see [Alternative to the API key by getting a token](#alternative-to-the-api-key-by-getting-a-token) below.
+2. Add an API key to your site settings as described below in [Setting an API key](#setting-an-api-key).
 3. run `docker compose up --build`
 
 ##### Setting an API key
 
-1. Create a `_data` folder at the root. Then, add a file named `token.yml` inside the `_data` folder. This file needs to simply have a key-value pair of `API_KEY: "[API KEY HERE]"` on line 1. The key value can be found at https://github.com/ServiceCanada/devops-documentation/blob/master/search/local-testing.md to replace the `[API KEY HERE]`. If you do not have access to the previous link, please see the next section on how to use a token as described below.
-
-##### Alternative to the API key by getting a token
-
-Since you need a token to communicate with the Coveo API, you can do the following to go to get a token valid for 24 hrs:
-
-1. Go to a search page on the Canada.ca Preview server such as: **/en/sr/srb.html**.
-2. Open the inspector (developer tool) and look for the `div` tag that has the attribute called `data-gc-search`.
-3. Inside this attribute, you'll find a Javascript object that has a field called `accessToken`. Grab the value of that token.
-4. a) If you are **testing locally**, create a `_data` folder at the root. Then, add a file named `token.yml` inside the `_data` folder. This file needs to simply have a key-value pair of `API_KEY: "[API KEY HERE]"` on line 1. Add the token value as the key in `[API KEY HERE]`. b) If you are **testing through GitHub pages**, replace instances of `{{ site.data.token.API_KEY }}` with the token, on HTML pages would like to test.
-5. If the token doesn't seem valid or if you have passed the 24 hours time-to-live (TTL), go back to step one and take another one from the Canada.ca Preview server.
+Create a `_data` folder at the root. Then, add a file named `token.yml` inside the `_data` folder. This file needs to simply have a key-value pair of `API_KEY: "[API KEY HERE]"` on line 1. The key value can be found at https://github.com/ServiceCanada/devops-documentation/blob/master/search/local-testing.md to replace the `[API KEY HERE]`. If you do not have access to the previous link and/or are unable to get an API key, you can use a token instead; in which case, see the [Getting a token](#getting-a-token) section below.
 
 #### Testing through GitHub Pages 
 
 ##### Main website
 
-At all time, you can visit the GitHub website to see the GC Search UI with the latest Pull requests merged at play: https://servicecanada.github.io/search-ui/
+At all time, you can visit the GitHub website to view and test the GC Search UI with the latest Pull requests merged at play: https://servicecanada.github.io/search-ui/. 
+
+Since search pages need a token to communicate with the Coveo API and functioning properly, you will need to get your token by following the instructions in the [Getting a token](#getting-a-token) section below. You can then take this token and save it through the form linked from the website's index page under the "Test pages" section. Your token will be saved for the duration of your session on the website. If you close the tab or stay inactive for a while, you will need to go back and generate a new one.
 
 ##### In your fork
 
-This is to test your changes usually before opening a Pull request.
+This is usually to test your changes usually before opening a Pull request, or to conduct usability testing and accessibility assessments.
 
-1. Add the required token on HTML pages would like to test by [following the instructions on Alternative to the API key by getting a token](#alternative-to-the-api-key-by-getting-a-token). Do not use the `token.yml` approach documented for testing locally, since it may generate potential a [security risk](SECURITY.md) in the context of GitHub pages.
-2. Push your code to a branch of your choice in your origin remote (fork). It is recommended that you use a dedicated branch for testing, one that you would never open a Pull request from.
+1. Do not use the `token.yml` approach documented for testing locally, since it may generate potential a [security risk](SECURITY.md) in the context of GitHub pages. Instead, get a token described in the [Getting a token](#getting-a-token) section below and replace instances of `{{ site.data.token.API_KEY }}` with the token, on HTML pages would like to test.
+2. Push your code to a branch of your choice in your origin remote (fork). It is recommendeded that you use a dedicated branch for testing, one that you would never open a Pull request from.
 3. Make sure your repository has GitHub Pages enabled, on that specific above-mentioned branch.
 4. Your site is live on GitHub pages!
+
+**Important note:** A token is only available for 24 hrs, after which a new one must be generated. Alternatively, instead of putting a token on all pages, you can let the user get their own token through the same process as described in the [Main website](#main-website) section above.
+
+##### Getting a token
+
+While on the GC network, go to the [Search token](https://canada-preview.adobecqms.net/en/service-canada/francis/get-sr-token.html) page and copy the value of the entire token loaded inside the page.
 
 ### Deployment
 
