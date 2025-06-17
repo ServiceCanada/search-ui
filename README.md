@@ -73,7 +73,7 @@ Since search pages need a token to communicate with the Coveo API and functionin
 
 ##### In your fork
 
-This is usually to test your changes usually before opening a Pull request, or to conduct usability testing and accessibility assessments.
+This is usually to test your changes before opening a pull request, or to conduct usability testing and accessibility assessments.
 
 1. Do not use the `token.yml` approach documented for testing locally, since it may generate potential a [security risk](SECURITY.md) in the context of GitHub pages. Instead, get a token described in the [Getting a token](#getting-a-token) section below and replace instances of `{{ site.data.token.API_KEY }}` with the token, on HTML pages would like to test.
 2. Push your code to a branch of your choice in your origin remote (fork). It is recommendeded that you use a dedicated branch for testing, one that you would never open a Pull request from.
@@ -316,7 +316,7 @@ Same as [interfaceLoad](#interfaceLoad), plus the following:
     - partialQueries
     - suggestions
     - querySuggestResponseId
-- queryText
+    - queryText
 
 ##### getMoreResults
 
