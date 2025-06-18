@@ -1,14 +1,14 @@
 ---
-title: Basic search page for Governement of Canada using Headless
-description: Demo page for the Canada.ca Search UI Basic
+title: Search page without Query Suggestions (QS)
+description: Demo page without the QS feature in the Canada.ca Search UI Basic
 lang: en
-altLangPage: srb-fr.html
+altLangPage: no-qs-fr.html
 nositesearch: true
 pageclass: page-type-search
 pageType: recherche
 share: false
 deptfeature: false
-dateModified: 2024-06-05
+dateModified: 2025-05-21
 breadcrumbs:
 - title: "GC Search UI"
   link: "../index.html"
@@ -36,7 +36,8 @@ script:
 	"searchHub": "canada-gouv-public-websites",
 	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
 	"accessToken":"{{ site.data.token.API_KEY }}",
-	"originLevel3": "/en/sr/srb.html"
+	"originLevel3": "/en/sr/srb.html",
+	"numberOfSuggestions": 0
 }'></div>
 <p class="text-center small"><a href="sra-en.html">Perform an advanced search</a></p>
 

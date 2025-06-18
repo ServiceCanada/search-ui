@@ -1,0 +1,51 @@
+---
+title: Sample advanced search for Gazette (custom)
+description: Demo page for the Canada.ca Search UI Advanced for Gazette
+lang: en
+nositesearch: true
+pageclass: page-type-search
+pageType: recherche
+share: false
+deptfeature: false
+dateModified: 2025-02-24
+breadcrumbs:
+- title: "GC Search UI"
+  link: "../index.html"
+css: "../src/connector.css"
+script:
+- src: "assets/token.js"
+- src: "../src/connector.js"
+  type: module
+---
+
+<!--FORM-->
+<form id="gc-searchbox">  
+	<fieldset> 
+		<legend class="h3 mrgn-tp-sm">Find pages with...</legend> 
+		<div class="form-group"> 
+			<label for="advseacon1">all these words:</label> 
+			<input name="allq" class="form-control" id="advseacon1" maxlength="100" data-fusion-query="safe" aria-describedby="gc-pi">
+		</div> 
+		<p id="gc-pi" class="mrgn-tp-md">Don’t include personal information (telephone, email, SIN, financial, medical, or work details).</p>
+	</fieldset> 
+	<fieldset> 
+		<legend class="h3 mrgn-tp-sm">Then narrow your results by...</legend> 
+		<div class="form-group mrgn-bttm-md">
+			<label for="advseacon5_y">file format:</label>
+			<select class="form-control" name="filetype" id="filetype" data-fusion-query="safe">
+			<option value="">any format</option>
+			<option value="application/pdf">Portable Document Format (.pdf)</option>
+			<option value="text/html">HTML (.html)</option>
+			</select>
+		</div>
+	</fieldset> 
+	<button type="submit" class="btn btn-md btn-primary">Search</button> 
+</form> 
+
+<!--RESULTS-->
+<div data-gc-search='{
+	"searchHub": "canada-gouv-public-websites",
+	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
+	"accessToken":"{{ site.data.token.API_KEY }}",
+	"originLevel3": "/en/public-services-procurement/gazette/advanced-search.html"
+}'></div>

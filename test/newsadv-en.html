@@ -1,0 +1,219 @@
+---
+title: News Advanced Search user interface
+description: Demo page for the Canada.ca News Advanced Search UI 
+lang: en
+altLangPage: newsadv-fr.html
+nositesearch: true
+pageclass: page-type-search
+pageType: recherche
+share: false
+deptfeature: false
+dateModified: 2025-06-18
+breadcrumbs:
+- title: "GC Search UI"
+  link: "../index.html"
+css: "../src/connector.css"
+script:
+- src: "assets/token.js"
+- src: "../src/connector.js"
+  type: module
+---
+
+<!--FORM-->
+<form id="gc-searchbox">  
+	<input type="hidden" id="custId" name="sort" value="true">
+		<div class="form-group mrgn-tp-lg">
+		   <label for="advseacon1" class="col-lg-2">Keywords</label>
+		   <div class="col-sm-10"> 
+			  <input name="allq" class="form-control full-width" id="advseacon1"> 
+		   </div>
+		</div>
+		<div class="form-group">
+		<label for="dprtmnt" class="col-sm-2">Institution</label>
+			<div class="col-sm-10">
+			  <select class="form-control" name="dprtmnt" id="dprtmnt">
+				 <option value="">All</option>
+				 <option value="Accessibility Standards Canada">Accessibility Standards Canada</option>
+				 <option value="Agriculture and Agri-Food Canada">Agriculture and Agri-Food Canada</option>
+				 <option value="Atlantic Canada Opportunities Agency">Atlantic Canada Opportunities Agency</option>
+				 <option value="Canada Border Services Agency">Canada Border Services Agency</option>
+				 <option value="Canada Economic Development for Quebec Regions">Canada Economic Development for Quebec Regions</option>
+				 <option value="Canada Employment Insurance Commission">Canada Employment Insurance Commission</option>
+				 <option value="Canada Infrastructure Bank">Canada Infrastructure Bank</option>
+				 <option value="Canada Research Chairs">Canada Research Chairs</option>
+				 <option value="Canada Research Coordinating Committee">Canada Research Coordinating Committee</option>
+				 <option value="Canada Revenue Agency">Canada Revenue Agency</option>
+				 <option value="Canada School of Public Service">Canada School of Public Service</option>
+				 <option value="Canada Water Agency">Canada Water Agency</option>
+				 <option value="Canadian Army">Canadian Army</option>
+				 <option value="Canadian Centre for Occupational Health and Safety">Canadian Centre for Occupational Health and Safety</option>
+				 <option value="Canadian Coast Guard">Canadian Coast Guard</option>
+				 <option value="Canadian Conservation Institute">Canadian Conservation Institute</option>
+				 <option value="Canadian Food Inspection Agency">Canadian Food Inspection Agency</option>
+				 <option value="Canadian Grain Commission">Canadian Grain Commission</option>
+				 <option value="Canadian Heritage">Canadian Heritage</option>
+				 <option value="Canadian Human Rights Commission">Canadian Human Rights Commission</option>
+				 <option value="Canadian Institutes of Health Research">Canadian Institutes of Health Research</option>
+				 <option value="Canadian Intellectual Property Office">Canadian Intellectual Property Office</option>
+				 <option value="Canadian International Trade Tribunal">Canadian International Trade Tribunal</option>
+				 <option value="Canadian Northern Economic Development Agency">Canadian Northern Economic Development Agency</option>
+				 <option value="Canadian Nuclear Safety Commission">Canadian Nuclear Safety Commission</option>
+				 <option value="Canadian Radio-television and Telecommunications Commission">Canadian Radio-television and Telecommunications Commission</option>
+				 <option value="Canadian Security Intelligence Service">Canadian Security Intelligence Service</option>
+				 <option value="Canadian Space Agency">Canadian Space Agency</option>
+				 <option value="Canadian Special Operations Forces Command">Canadian Special Operations Forces Command</option>
+				 <option value="Canadian Transportation Agency">Canadian Transportation Agency</option>
+				 <option value="Communications Security Establishment Canada">Communications Security Establishment Canada</option>
+				 <option value="Competition Bureau Canada">Competition Bureau Canada</option>
+				 <option value="Correctional Service Canada">Correctional Service Canada</option>
+				 <option value="Crown-Indigenous Relations and Northern Affairs Canada ">Crown-Indigenous Relations and Northern Affairs Canada </option>
+				 <option value="Defence Research and Development Canada">Defence Research and Development Canada</option>
+				 <option value="Democratic Institutions">Democratic Institutions</option>
+				 <option value="Department of Finance Canada">Department of Finance Canada</option>
+				 <option value="Department of Justice Canada">Department of Justice Canada</option>
+				 <option value="Employment and Social Development Canada">Employment and Social Development Canada</option>
+				 <option value="Environment and Climate Change Canada">Environment and Climate Change Canada</option>
+				 <option value="FedNor">FedNor</option>
+				 <option value="Federal Economic Development Agency for Southern Ontario">Federal Economic Development Agency for Southern Ontario</option>
+				 <option value="Financial Consumer Agency of Canada">Financial Consumer Agency of Canada</option>
+				 <option value="Financial Transactions and Reports Analysis Centre of Canada">Financial Transactions and Reports Analysis Centre of Canada</option>
+				 <option value="Fisheries and Oceans Canada">Fisheries and Oceans Canada</option>
+				 <option value="Global Affairs Canada">Global Affairs Canada</option>
+				 <option value="Health Canada">Health Canada</option>
+				 <option value="Housing, Infrastructure and Communities Canada">Housing, Infrastructure and Communities Canada</option>
+				 <option value="Immigration and Refugee Board of Canada">Immigration and Refugee Board of Canada</option>
+				 <option value="Immigration, Refugees and Citizenship Canada">Immigration, Refugees and Citizenship Canada</option>
+				 <option value="impactassessmentagency">Impact Assessment Agency of Canada</option>
+				 <option value="Independent Review Panel for Defence Acquisition">Independent Review Panel for Defence Acquisition</option>
+				 <option value="Indigenous and Northern Affairs Canada">Indigenous and Northern Affairs Canada</option>
+				 <option value="Indigenous Services Canada">Indigenous Services Canada</option>
+				 <option value="Innovation, Science and Economic Development Canada">Innovation, Science and Economic Development Canada</option>
+				 <option value="Intergovernmental Affairs">Intergovernmental Affairs</option>
+				 <option value="Judicial Compensation and Benefits Commission">Judicial Compensation and Benefits Commission</option>
+				 <option value="Labour Program">Labour Program</option>
+				 <option value="Law Commission of Canada">Law Commission of Canada</option>
+				 <option value="Leader of the Government in the House of Commons">Leader of the Government in the House of Commons</option>
+				 <option value="Library and Archives Canada">Library and Archives Canada</option>
+				 <option value="marinesecurityoperationscentresproject">Marine Security Operations Centres Project</option>
+				 <option value="Measurement Canada">Measurement Canada</option>
+				 <option value="Military Grievances External Review Committee">Military Grievances External Review Committee</option>
+				 <option value="Military Police Complaints Commission of Canada">Military Police Complaints Commission of Canada</option>
+				 <option value="National Defence">National Defence</option>
+				 <option value="National Film Board">National Film Board</option>
+				 <option value="National Energy Regulator">National Energy Regulator</option>
+				 <option value="National Research Council Canada">National Research Council Canada</option>
+				 <option value="National Seniors Council">National Seniors Council</option>
+				 <option value="Natural Resources Canada">Natural Resources Canada</option>
+				 <option value="Natural Sciences and Engineering Research Council">Natural Sciences and Engineering Research Council</option>
+				 <option value="Networks of Centres of Excellence of Canada">Networks of Centres of Excellence of Canada</option>
+				 <option value="Northern Pipeline Agency Canada">Northern Pipeline Agency Canada</option>
+				 <option value="Occupational Health and Safety Tribunal Canada">Occupational Health and Safety Tribunal Canada</option>
+				 <option value="Office of the Chief Accessibility Officer">Office of the Chief Accessibility Officer</option>
+				 <option value="Office of the Chief Military Judge">Office of the Chief Military Judge</option>
+				 <option value="Office of the Commissioner for Federal Judicial Affairs Canada">Office of the Commissioner for Federal Judicial Affairs Canada</option>
+				 <option value="Office of the Communications Security Establishment Commissioner">Office of the Communications Security Establishment Commissioner</option>
+				 <option value="Office of the Extractive Sector Corporate Social Responsibility Counsellor">Office of the Extractive Sector Corporate Social Responsibility Counsellor</option>
+				 <option value="Office of the Federal Ombudsman for Victims of Crime">Office of the Federal Ombudsman for Victims of Crime</option>
+				 <option value="Office of the Ombudsperson for the Department of National Defence and the Canadian Forces">Office of the Ombudsperson for the Department of National Defence and the Canadian Forces</option>
+				 <option value="Office of the Procurement Ombud">Office of the Procurement Ombud</option>
+				 <option value="Office of the Superintendent of Bankruptcy Canada">Office of the Superintendent of Bankruptcy Canada</option>
+				 <option value="Office of the Superintendent of Financial Institutions Canada">Office of the Superintendent of Financial Institutions Canada</option>
+				 <option value="Office of the Taxpayers' Ombudsman">Office of the Taxpayers' Ombudsman</option>
+				 <option value="Office of the Veterans' Ombudsman">Office of the Veterans' Ombudsman</option>
+				 <option value="Pacific Economic Development Canada">Pacific Economic Development Canada</option>
+				 <option value="Parks Canada">Parks Canada</option>
+				 <option value="Parole Board of Canada">Parole Board of Canada</option>
+				 <option value="Patented Medicine Prices Review Board Canada">Patented Medicine Prices Review Board Canada</option>
+				 <option value="Physical Resources Bureau">Physical Resources Bureau</option>
+				 <option value="Polar Knowledge Canada">Polar Knowledge Canada</option>
+				 <option value="PPP Canada">PPP Canada</option>
+				 <option value="Prairies Economic Development">Prairies Economic Development</option>
+				 <option value="Privy Council Office">Privy Council Office</option>
+				 <option value="Public Health Agency of Canada">Public Health Agency of Canada</option>
+				 <option value="Public Prosecution Service of Canada">Public Prosecution Service of Canada</option>
+				 <option value="Public Safety Canada">Public Safety Canada</option>
+				 <option value="Public Servants Disclosure Protection Tribunal Canada">Public Servants Disclosure Protection Tribunal Canada</option>
+				 <option value="Public Service Commission of Canada">Public Service Commission of Canada</option>
+				 <option value="Public Service Labour Relations and Employment Board">Public Service Labour Relations and Employment Board</option>
+				 <option value="Public Services and Procurement Canada">Public Services and Procurement Canada</option>
+				 <option value="RCMP External Review Committee">RCMP External Review Committee</option>
+				 <option value="Registry of the Specific Claims Tribunal of Canada">Registry of the Specific Claims Tribunal of Canada</option>
+				 <option value="Royal Canadian Air Force">Royal Canadian Air Force</option>
+				 <option value="Royal Canadian Mounted Police">Royal Canadian Mounted Police</option>
+				 <option value="Royal Canadian Navy">Royal Canadian Navy</option>
+				 <option value="Security Intelligence Review Committee">Security Intelligence Review Committee</option>
+				 <option value="Service Canada">Service Canada</option>
+				 <option value="Shared Services Canada">Shared Services Canada</option>
+				 <option value="Social Sciences and Humanities Research Council of Canada">Social Sciences and Humanities Research Council of Canada</option>
+				 <option value="Social Security Tribunal of Canada">Social Security Tribunal of Canada</option>
+				 <option value="Statistics Canada">Statistics Canada</option>
+				 <option value="The Canadian Shellfish Sanitation Program">The Canadian Shellfish Sanitation Program</option>
+				 <option value="The Correctional Investigator Canada">The Correctional Investigator Canada</option>
+				 <option value="The National Battlefields Commission">The National Battlefields Commission</option>
+				 <option value="The Ontario-Quebec Continental Gateway">The Ontario-Quebec Continental Gateway</option>
+				 <option value="Translation Bureau">Translation Bureau</option>
+				 <option value="Transport Canada">Transport Canada</option>
+				 <option value="Transportation Appeal Tribunal of Canada">Transportation Appeal Tribunal of Canada</option>
+				 <option value="Transportation Safety Board of Canada">Transportation Safety Board of Canada</option>
+				 <option value="Treasury Board of Canada Secretariat">Treasury Board of Canada Secretariat</option>
+				 <option value="Veterans Affairs Canada">Veterans Affairs Canada</option>
+				 <option value="Veterans Review and Appeal Board">Veterans Review and Appeal Board</option>
+				 <option value="Western Economic Diversification Canada">Western Economic Diversification Canada</option>
+				 <option value="Women and Gender Equality Canada">Women and Gender Equality Canada</option>
+				 <option value="Youth">Youth</option>
+			  </select>
+			</div>
+		</div>
+		<div class="form-group">
+		   <label for="declaredtype" class="col-sm-2">News Type</label>
+		   <div class="col-sm-10">
+			  <select class="form-control" name="declaredtype" id="declaredtype">
+				 <option value=""  selected="">All</option>
+				 <option value="backgrounders">Backgrounders</option>
+				 <option value="media advisories">Media Advisories</option>
+				 <option value="news releases">News Releases</option>
+				 <option value="readouts">Readouts</option>
+				 <option value="speeches">Speeches</option>
+				 <option value="statements">Statements</option>
+			  </select>
+		   </div>
+		</div>
+		<div class="form-group mrgn-tp-md">
+		   <label for="startdate" class="col-sm-2">Start date<span class="datepicker-format"> (<abbr title="Four digits year, dash, two digits month, dash, two digits day">YYYY-MM-DD</abbr>)</span></label>
+		   <div class="col-sm-10">
+			  <input min="1999-01-01" max="2027-12-31" class="form-control" type="date" id="startdate" name="startdate">
+		   </div>
+		</div>
+		<div class="form-group mrgn-tp-md">
+		   <label for="enddate" class="col-sm-2">End date<span class="datepicker-format"> (<abbr title="Four digits year, dash, two digits month, dash, two digits day">YYYY-MM-DD</abbr>)</span> </label>
+		   <div class="col-sm-10">
+			  <input min="1999-01-01" max="2027-12-31" class="form-control" type="date" id="enddate" name="enddate">
+		   </div>
+		</div>
+	<button type="submit" class="btn btn-md btn-primary">Search</button>
+</form>
+<div class="row mrgn-tp-md"> 
+	<div class="col-md-2"> 
+		<a href="srb-en.html">Basic search</a> 
+	</div> 
+	<div class="col-md-2"> 
+		<a href="https://www.canada.ca/en/sr/st.html">Search tips</a> 
+	</div> 
+</div>
+
+<!--RESULTS-->
+<div data-gc-search='{
+	"searchHub": "canada-gouv-public-websites",
+	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
+	"accessToken":"{{ site.data.token.API_KEY }}",
+	"isAdvancedSearch": true,
+	"enableHistoryPush": false,
+	"originLevel3": "/en/news/search/advanced-search.html"
+}'></div>
+
+<!--DEMO-EXPECTATIONS-->
+<h2>Expected output for the result section</h2>
+<details>
+	<summary>Output for Results section</summary>
+	[To be completed, see Connector.js for reference until then]
+</details>

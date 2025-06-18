@@ -9,10 +9,10 @@ pageType: recherche
 share: false
 deptfeature: false
 dateModified: 2024-06-05
-css:
-	- "../../src/connector.css"
+css: "../../src/connector.css"
 script:
-	- "../../src/connector.js"
+- src: "../src/connector.js"
+  type: module
 ---
 
 <!--FORM-->
@@ -40,7 +40,7 @@ script:
 <div data-gc-search='{
 	"searchHub": "canada-gouv-public-websites",
 	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
-	"accessToken":"XYZ",
+	"accessToken":"{{ site.data.token.API_KEY }}",
 	"originLevel3": "/en/employment-social-development/search.html"
 }'></div>
 

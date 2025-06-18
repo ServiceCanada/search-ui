@@ -1,0 +1,65 @@
+---
+title: Sample advanced search for Budget (custom)
+description: Demo page for the Canada.ca Search UI Advanced for Budget
+lang: en
+nositesearch: true
+pageclass: page-type-search
+pageType: recherche
+share: false
+deptfeature: false
+dateModified: 2025-02-24
+breadcrumbs:
+- title: "GC Search UI"
+  link: "../index.html"
+css: "../src/connector.css"
+script:
+- src: "assets/token.js"
+- src: "../src/connector.js"
+  type: module
+---
+
+<!-- Sorting example -->
+<div class="alert alert-info">
+	<p><strong>Try this out!</strong> Click on the following link to search for "Taxes" with the search results ordered by dates descending, instead of relevance.</p>
+	<p><a href="budget.html?allq=Taxes&sort=date">Sort results by date</a></p>
+	<p>Note: Current implementation of the sorting feature requires server-side code or additional custom JS to make dynamic with the search query.</p>
+</div>
+
+<!--FORM-->
+<form id="gc-searchbox">  
+	<fieldset> 
+		<legend class="h3 mrgn-tp-sm">Find pages with...</legend> 
+		<div class="form-group"> 
+			<label for="advseacon1">all these words:</label> 
+			<input name="allq" class="form-control" id="advseacon1" maxlength="100" data-fusion-query="safe" aria-describedby="gc-pi">
+		</div> 
+		<p id="gc-pi" class="mrgn-tp-md">Don’t include personal information (telephone, email, SIN, financial, medical, or work details).</p>
+	</fieldset> 
+	<fieldset> 
+		<legend class="h3 mrgn-tp-sm">Then narrow your results by...</legend> 
+		<div class="form-group"> 
+			<label for="advseacon5_y">year:</label> 
+			<select class="form-control" name="year" id="advseacon5_y" data-fusion-query="safe"> 
+			<option selected value="">select year</option> 
+			<option value="2024">2024</option> 
+			<option value="2023">2023</option> 
+			<option value="2022">2022</option> 
+			<option value="2021">2021</option> </select> 
+		</div>
+	</fieldset> 
+	<button type="submit" class="btn btn-md btn-primary">Search</button> 
+</form> 
+
+<!--RESULTS-->
+<div data-gc-search='{
+	"searchHub": "canada-gouv-public-websites",
+	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
+	"accessToken":"{{ site.data.token.API_KEY }}",
+	"isAdvancedSearch": true,
+	"originLevel3": "/en/department-finance/search-budget/advanced-search.html"
+}'></div>
+
+<!--TEMPLATES-->
+<template id="sr-noquery-summary">
+    <h2>Total results: %[numberOfResults] for this search</h2>
+</template>

@@ -2,10 +2,14 @@
 
 # Security
 
-**Do not post any security issues on the public repository!** Security vulnerabilities must be reported via a contact method listed on Principal Publisher's GCpedia page: https://www.gcpedia.gc.ca/wiki/Principal_Publisher_at_Service_Canada.
+**Do not post any security issues on the public repository!** Example of a security issue would be to expose the restricted API key provided through the instructions on the README. 
+
+Security vulnerabilities must be reported via a contact method listed on Principal Publisher's GCxchange site: https://gcxgce.sharepoint.com/teams/10001402/SitePages/Search.aspx.
 
 ______________________
 
 ## Sécurité
 
-**Ne publiez aucun problème de sécurité sur le dépôt publique!** Les vulnérabilités de sécurité doivent être signalées via une méthode de contact proposée sur la page GCpédia de l'Éditeur principal : https://www.gcpedia.gc.ca/wiki/%C3%89diteur_principal_de_Service_Canada.
+**Ne publiez aucun problème de sécurité sur le dépôt publique!** Un exemple de problème de sécurité serait d'exposer la clé API limitée fournie à travers les instructions du README.
+
+Les vulnérabilités de sécurité doivent être signalées via une méthode de contact proposée sur le site GCéchange de l'Éditeur principal : https://gcxgce.sharepoint.com/teams/10001402/SitePages/fr/Home.aspx.
