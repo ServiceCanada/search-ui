@@ -1,0 +1,55 @@
+---
+title: Sample advanced search for Elections (custom)
+description: Demo page for the Canada.ca Search UI Advanced for Elections
+lang: en
+nositesearch: true
+pageclass: page-type-search
+pageType: recherche
+share: false
+deptfeature: false
+dateModified: 2025-02-24
+breadcrumbs:
+- title: "GC Search UI"
+  link: "../index.html"
+css: "../src/connector.css"
+script:
+- src: "assets/token.js"
+- src: "../src/connector.js"
+  type: module
+---
+
+<!--FORM-->
+<form id="gc-searchbox">  
+	<fieldset> 
+		<legend class="h3 mrgn-tp-sm">Find pages with...</legend> 
+		<div class="form-group"> 
+			<label for="advseacon1">all these words:</label> 
+			<input name="allq" class="form-control" id="advseacon1" maxlength="100" data-fusion-query="safe" aria-describedby="gc-pi">
+		</div> 
+		<p id="gc-pi" class="mrgn-tp-md">Don’t include personal information (telephone, email, SIN, financial, medical, or work details).</p>
+	</fieldset> 
+	<fieldset> 
+		<legend class="h3 mrgn-tp-sm">Then narrow your results by...</legend> 
+		<div class="form-group"> 
+			<label for="elctn_cat">collection:</label> 
+			<select class="form-control" id="elctn_cat" name="elctn_cat" data-fusion-query="safe">
+				<option value="">Full Site</option>
+				<option value="press_release">Press releases</option>
+				<option value="research">Research documents</option>
+				<option value="officer_manuals">Election Officer's Manuals</option>
+				<option value="ogi">Opinions, Guidelines and Interpretations</option>
+				<option value="comp">Compendium of Election Administration in Canada</option>
+				<option value="his">A History of the vote in Canada</option>
+			</select>
+		</div> 
+	</fieldset> 
+	<button type="submit" class="btn btn-md btn-primary">Search</button> 
+</form> 
+
+<!--RESULTS-->
+<div data-gc-search='{
+	"searchHub": "canada-gouv-public-websites",
+	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
+	"accessToken":"{{ site.data.token.API_KEY }}",
+	"originLevel3": "/en/elections-canada/search/advanced-search.html"
+}'></div>

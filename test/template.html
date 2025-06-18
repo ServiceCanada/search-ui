@@ -1,0 +1,101 @@
+---
+title: Search page with custom templates for summary and results
+description: Demo page for custom summary and results templates in the Canada.ca Search UI
+lang: en
+nositesearch: true
+pageclass: page-type-search
+pageType: recherche
+share: false
+deptfeature: false
+dateModified: 2025-02-19
+breadcrumbs:
+- title: "GC Search UI"
+  link: "../index.html"
+css: "../src/connector.css"
+script:
+- src: "assets/token.js"
+- src: "../src/connector.js"
+  type: module
+---
+
+<!--FORM-->
+<form id="gc-searchbox" class="mrgn-tp-sm">
+	<div class="input-group mrgn-tp-lg">
+		<label class="wb-inv" for="othersrch">Search Government of Canada websites</label>
+		<input id="othersrch" class="form-control" value="" name="q" autocomplete="off" spellcheck="false" type="search" aria-describedby="gc-pi">
+		<span class="input-group-btn">
+		<button class="btn btn-primary btn-small" type="submit"> <span class="glyphicon-search glyphicon" aria-hidden="true"></span> <span class="wb-inv">Search</span> </button>
+		</span>
+	</div>
+	<p id="gc-pi" class="mrgn-tp-md">Don’t include personal information (telephone, email, SIN, financial, medical, or work details).</p>
+</form>
+
+<!--RESULTS-->
+<div data-gc-search='{
+	"searchHub": "canada-gouv-public-websites",
+	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
+	"accessToken":"{{ site.data.token.API_KEY }}",
+	"originLevel3": "/en/sr/srb.html",
+	"lang": "en",
+	"searchBoxQuery": "#othersrch",
+	"enableHistoryPush": false
+}'></div>
+<p class="text-center small"><a href="sra-en.html">Perform an advanced search</a></p>
+
+<!--TEMPLATES-->
+<template id="sr-query-summary">
+    <div class="bg-gctheme text-white py-3 px-3 mt-1 mb-4"><h2 class="my-0">%[numberOfResults] results for "%[query]". Search took %[queryDurationInSeconds] seconds.</h2></div>
+    </p>
+</template>
+<template id="sr-single">
+    <div class="panel brdr-tp brdr-rght brdr-bttm brdr-lft mb-0">
+        <div class="panel-body">
+            <div class="mrgn-tp-sm mrgn-bttm-sm mrgn-rght-sm mrgn-lft-sm">
+                <h3 class="mrgn-tp-0"><a id="%[itemId]" class="result-link" href="https://www.canada.ca">%[result.title]</a></h3> 
+                <p><time datetime="%[short-date-en]" class="text-muted">%[long-date-en]</time> &ndash; %[highlightedExcerpt]</p>
+            </div>
+        </div>
+    </div>
+</template>
+<template id="sr-did-you-mean">
+    <p class="h5">Did you mean <button class="btn btn-default px-2 py-0 mrgn-rght-sm mrgn-bttm-sm brdr-bttm" type="button">%[correctedQuery]</button>?</p>
+</template>
+<template id="sr-nores">
+    <section class="alert alert-warning">
+		<h2>No results found</h2>
+		<p>Nothing seems to match your search terms. Suggestions:</p>
+		<ul>
+			<li>Make sure all search terms are spelled correctly</li>
+			<li>Try different search terms</li>
+			<li>Try more general search terms</li>
+		</ul>
+	</section>
+</template>
+<template id="sr-error">
+    <section class="alert alert-danger">
+		<h2>The Search encountered an error</h2>
+		<p>We apologize for any inconvenience caused by this issue. You may try to refresh the page.</p>
+	</section>
+</template>
+<template id="sr-pager-container">
+    <div class="text-center">
+		<p class="wb-inv">Results pages</p>
+		<ul id="pager" class="pagination bg-dark"></ul>
+	</div>
+</template>
+<template id="sr-pager-previous">
+    <button class="page-button">Prev<span class="wb-inv"> page of results</span></button>
+</template>
+<template id="sr-pager-next">
+    <button class="page-button">Next<span class="wb-inv"> page of results</span></button>
+</template>
+<template id="sr-pager-page">
+    <button class="page-button"><span class="wb-inv">Page </span>%[page]<span class="wb-inv"> of results</span></button>
+</template>
+
+<!--DEMO-EXPECTATIONS-->
+<h2>Expected output for the result section</h2>
+<details>
+	<summary>Output for Results section</summary>
+	[To be completed, see Connector.js for reference until then]
+</details>

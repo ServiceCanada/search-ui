@@ -10,7 +10,9 @@ share: false
 deptfeature: false
 dateModified: 2024-06-05
 css: "../../src/connector.css"
-script: "../../src/connector.js"
+script:
+- src: "../src/connector.js"
+  type: module
 ---
 
 <!--FORM-->
@@ -29,7 +31,7 @@ script: "../../src/connector.js"
 <div data-gc-search='{
 	"searchHub": "canada-gouv-public-websites",
 	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
-	"accessToken":"XYZ",
+	"accessToken":"{{ site.data.token.API_KEY }}",
 	"originLevel3": "/fr/sr/srb.html"
 }'></div>
 <p class="text-center small"><a href="sra-fr.html">Effectuer une recherche avancée</a></p>

@@ -96,5 +96,12 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-htmllint');
 	grunt.loadNpmTasks('grunt-eslint');
 
-	grunt.registerTask('default', ['clean', 'htmllint', 'jshint', 'eslint', 'copy', 'uglify', 'cssmin', 'usebanner']);
+	// Task to fix line endings after minification
+	grunt.registerTask('fixLineEndings', function () {
+		let content = grunt.file.read('dist/connector.min.css');
+		content = content.replace(/\r\n?/g, '\n');
+		grunt.file.write('dist/connector.min.css', content);
+	});
+
+	grunt.registerTask('default', ['clean', 'htmllint', 'jshint', 'eslint', 'copy', 'uglify', 'cssmin', 'usebanner', 'fixLineEndings']);
 };

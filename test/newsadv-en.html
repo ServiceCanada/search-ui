@@ -1,0 +1,83 @@
+---
+title: News Advanced Search user interface
+description: Demo page for the Canada.ca News Advanced Search UI 
+lang: en
+altLangPage: newsadv-fr.html
+nositesearch: true
+pageclass: page-type-search
+pageType: recherche
+share: false
+deptfeature: false
+dateModified: 2025-06-18
+breadcrumbs:
+- title: "GC Search UI"
+  link: "../index.html"
+css: "../src/connector.css"
+script:
+- src: "assets/token.js"
+- src: "../src/connector.js"
+  type: module
+---
+
+<!--FORM-->
+<form id="gc-searchbox">  
+	<input type="hidden" id="custId" name="sort" value="true">
+		<div class="form-group mrgn-tp-lg">
+		   <label for="advseacon1" class="col-lg-2">Keywords</label>
+		   <div class="col-sm-10"> 
+			  <input name="allq" class="form-control full-width" id="advseacon1"> 
+		   </div>
+		</div>
+		<div class="form-group">
+		   <label for="typ" class="col-sm-2">News Type</label>
+		   <div class="col-sm-10">
+			  <select class="form-control" name="typ" id="typ">
+				 <option value=""  selected="">All</option>
+				 <option value="backgrounders">Backgrounders</option>
+				 <option value="media advisories">Media Advisories</option>
+				 <option value="news releases">News Releases</option>
+				 <option value="readouts">Readouts</option>
+				 <option value="speeches">Speeches</option>
+				 <option value="statements">Statements</option>
+			  </select>
+		   </div>
+		</div>
+		<div class="form-group mrgn-tp-md">
+		   <label for="startdate" class="col-sm-2">Start date<span class="datepicker-format"> (<abbr title="Four digits year, dash, two digits month, dash, two digits day">YYYY-MM-DD</abbr>)</span></label>
+		   <div class="col-sm-10">
+			  <input min="1999-01-01" max="2027-12-31" class="form-control" type="date" id="startdate" name="startdate">
+		   </div>
+		</div>
+		<div class="form-group mrgn-tp-md">
+		   <label for="enddate" class="col-sm-2">End date<span class="datepicker-format"> (<abbr title="Four digits year, dash, two digits month, dash, two digits day">YYYY-MM-DD</abbr>)</span> </label>
+		   <div class="col-sm-10">
+			  <input min="1999-01-01" max="2027-12-31" class="form-control" type="date" id="enddate" name="enddate">
+		   </div>
+		</div>
+	<button type="submit" class="btn btn-md btn-primary">Search</button>
+</form>
+<div class="row mrgn-tp-md"> 
+	<div class="col-md-2"> 
+		<a href="srb-en.html">Basic search</a> 
+	</div> 
+	<div class="col-md-2"> 
+		<a href="https://www.canada.ca/en/sr/st.html">Search tips</a> 
+	</div> 
+</div>
+
+<!--RESULTS-->
+<div data-gc-search='{
+	"searchHub": "canada-gouv-public-websites",
+	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
+	"accessToken":"{{ site.data.token.API_KEY }}",
+	"isAdvancedSearch": true,
+	"enableHistoryPush": false,
+	"originLevel3": "/en/news/search/advanced-search.html"
+}'></div>
+
+<!--DEMO-EXPECTATIONS-->
+<h2>Expected output for the result section</h2>
+<details>
+	<summary>Output for Results section</summary>
+	[To be completed, see Connector.js for reference until then]
+</details>

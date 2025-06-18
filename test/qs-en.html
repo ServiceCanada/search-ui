@@ -1,18 +1,24 @@
 ---
-title: Basic search page for Governement of Canada using Headless
-description: Demo page for the Canada.ca Search UI Basic
+title: Search page with 10 Query Suggestions after at least 2 character entered
+description: Demo page without the QS feature in the Canada.ca Search UI Basic, customized to show 10 suggestion after just 2 characters entered
 lang: en
-altLangPage: srb-fr.html
+altLangPage: qs-fr.html
 nositesearch: true
 pageclass: page-type-search
 pageType: recherche
 share: false
 deptfeature: false
-dateModified: 2024-06-05
+dateModified: 2025-05-21
+breadcrumbs:
+- title: "GC Search UI"
+  link: "../index.html"
 css: "../src/connector.css"
-mscript: "../src/connector.js"
+script:
+- src: "assets/token.js"
+- src: "../src/connector.js"
+  type: module
 ---
-<script src="../src/connector.js" type="module"></script>
+
 <!--FORM-->
 <form id="gc-searchbox" class="mrgn-tp-sm">
 	<div class="input-group mrgn-tp-lg">
@@ -29,8 +35,10 @@ mscript: "../src/connector.js"
 <div data-gc-search='{
 	"searchHub": "canada-gouv-public-websites",
 	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
-	"accessToken":"xx20998bcf-96df-4d67-b61e-6460b26651b9",
-	"originLevel3": "/en/sr/srb.html"
+	"accessToken":"{{ site.data.token.API_KEY }}",
+	"originLevel3": "/en/sr/srb.html",
+	"numberOfSuggestions": 10,
+	"minimumCharsForSuggestions": 2
 }'></div>
 <p class="text-center small"><a href="sra-en.html">Perform an advanced search</a></p>
 

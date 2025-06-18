@@ -9,10 +9,14 @@ pageType: recherche
 share: false
 deptfeature: false
 dateModified: 2024-06-05
-css:
-	- "../src/connector.css"
+breadcrumbs:
+- title: "GC Search UI"
+  link: "../index.html"
+css: "../src/connector.css"
 script:
-	- "../src/connector.js"
+- src: "assets/token.js"
+- src: "../src/connector.js"
+  type: module
 ---
 
 <!--FORM-->
@@ -40,8 +44,9 @@ script:
 <div data-gc-search='{
 	"searchHub": "canada-gouv-public-websites",
 	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
-	"accessToken":"XYZ",
-	"originLevel3": "/en/employment-social-development/search.html"
+	"accessToken":"{{ site.data.token.API_KEY }}",
+	"originLevel3": "/en/employment-social-development/search.html",
+	"isContextSearch": true
 }'></div>
 
 <!--DEMO-EXPECTATIONS-->

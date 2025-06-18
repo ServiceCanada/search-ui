@@ -154,3 +154,13 @@ nbproject/*
 /.project
 .settings
 .vscode/*
+
+# Jekyll
+_site
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+vendor
+Gemfile.lock
+
+_data/token.yml
