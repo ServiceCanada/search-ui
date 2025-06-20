@@ -622,6 +622,10 @@ function initEngine() {
 			let site = urlParams.site.toLowerCase().replace( '*', '' );
 			aqString += ' @canadagazettesite==' + site;
 		}
+		
+		if ( urlParams.startdate && urlParams.enddate ) {
+			aqString += ' @date = "' + urlParams.startdate.replaceAll('-','/') + '..' + urlParams.enddate.replaceAll('-','/') + '"';
+		}
 
 		if ( aqString ) {
 			const action = loadAdvancedSearchQueryActions( headlessEngine ).updateAdvancedSearchQueries( { 

@@ -1,0 +1,82 @@
+---
+title: Interface utilisateur de la recherche avancée d'actualités
+description: Page de démonstration de l'interface utilisateur de la recherche avancée de Canada.ca News
+lang: fr
+altLangPage: newsadv-en.html
+nositesearch: true
+pageclass: page-type-search
+pageType: recherche
+share: false
+deptfeature: false
+dateModified: 2025-06-18
+breadcrumbs:
+- title: "IU Recherche GC"
+  link: "../index.html"
+css: "../src/connector.css"
+script:
+- src: "assets/token.js"
+- src: "../src/connector.js"
+  type: module
+---
+
+<!--FORM-->
+<form id="gc-searchbox">
+	<div class="form-group mrgn-tp-lg">
+	   <label for="advseacon1" class="col-sm-2">Mots-clés</label>
+	   <div class="col-sm-10"> 
+		  <input name="allq" class="form-control full-width" id="advseacon1"> 
+	   </div>
+	</div>
+	<div class="form-group">
+	   <label for="typ" class="col-sm-2">Type de nouvelle</label> 
+	   <div class="col-sm-10">
+		  <select class="form-control" name="typ" id="typ">
+			 <option value="">Tous</option>
+			 <option value="avis aux médias">Avis aux médias</option>
+			 <option value="communiqués de presse">Communiqués de presse</option>
+			 <option value="comptes rendus">Comptes rendus</option>
+			 <option value="discours">Discours</option>
+			 <option value="documents d'information">Documents d'information</option>
+			 <option value="déclarations">Déclarations</option>
+		  </select>
+	   </div>
+	</div>
+	<div class="form-group">
+	   <label for="startdate" class="col-sm-2">Entre le <span class="datepicker-format"> (<abbr title="Année à quatre chiffres, tiret, mois à deux chiffres, tiret, jour à deux chiffres">AAAA-MM-JJ</abbr>)</span></label>
+	   <div class="col-sm-10">
+		  <input min="1999-01-01" max="2027-12-31" class="form-control" type="date" id="startdate" name="startdate">
+	   </div>
+	</div>
+	<div class="form-group mrgn-bttm-md row">
+	   <label for="enddate" class="col-sm-2">Et le<span class="datepicker-format"> (<abbr title="Les quatres chiffres de l'année, tiret, les deux chiffres du mois, tiret, les deux chiffres du jour">AAAA-MM-JJ</abbr>)</span> </label> 
+	   <div class="col-sm-10"> 
+		  <input min="1999-01-01" max="2027-12-31" class="form-control" type="date" id="enddate" name="enddate"> 
+	   </div>
+	</div>
+	<button type="submit" class="btn btn-md btn-primary">Recherche</button> 
+</form>
+<div class="row mrgn-tp-md"> 
+	<div class="col-md-2"> 
+		<a href="srb-fr.html">Recherche de base</a> 
+	</div> 
+	<div class="col-md-2"> 
+		<a href="https://www.canada.ca/fr/sr/tr.html">Trucs de recherche</a> 
+	</div> 
+</div>
+
+<!--RESULTS-->
+<div data-gc-search='{
+	"searchHub": "canada-gouv-public-websites",
+	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
+	"accessToken":"{{ site.data.token.API_KEY }}",
+	"isAdvancedSearch": true,
+	"enableHistoryPush": false,
+	"originLevel3": "/fr/nouvelles/rechercher/recherche-avancee.html"
+}'></div>
+
+<!--DEMO-EXPECTATIONS-->
+<h2>Section Résultats attendu pour la section de résultats</h2>
+<details>
+	<summary>Section Résultats générée</summary>
+	[À compléter, voir Connector.js comme référence pour l'instant]
+</details>
