@@ -447,6 +447,11 @@ function initEngine() {
 
 						let q = requestContent.q;
 						requestContent.q = sanitizeQuery( q );
+
+						// Removes actionsHistory from the request and destroys the cookie/localStorage copies of it
+						requestContent.actionsHistory = [];
+						clearCoveoAnalyticsHistory();
+						
 						request.body = JSON.stringify( requestContent );
 					}
 				} catch {
@@ -787,6 +792,16 @@ function initEngine() {
 				pagerManuallyCleared = true;
 			}
 		};
+	}
+}
+
+function clearCoveoAnalyticsHistory(){
+	const storageKey = '__coveo.analytics.history'
+	if ( storageKey in localStorage ) {
+		localStorage.removeItem(storageKey);
+	}
+	else if( document.cookie.indexOf( storageKey + '=' > -1 ) {
+		document.cookie =`${storageKey}=; expires=; domain=; path=/; SameSite=Lax;`
 	}
 }
 
