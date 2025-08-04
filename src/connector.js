@@ -4,6 +4,7 @@ import {
 	buildResultList,
 	buildQuerySummary,
 	buildPager,
+	buildResultsPerPage,
 	buildSearchStatus,
 	buildUrlManager,
 	buildDidYouMean,
@@ -476,7 +477,7 @@ function initEngine() {
 
 	resultListController = buildResultList( headlessEngine, {
 		options: {
-			fieldsToInclude: [ "author", "date", "language", "urihash", "objecttype", "collection", "source", "permanentid", "displaynavlabel", "hostname" ]
+			fieldsToInclude: [ "author", "date", "language", "urihash", "objecttype", "collection", "source", "permanentid", "displaynavlabel", "hostname", "disp_declared_type", "description" ]
 		}
 	} );
 	querySummaryController = buildQuerySummary( headlessEngine );
@@ -485,7 +486,7 @@ function initEngine() {
 	statusController = buildSearchStatus( headlessEngine );
 
 	if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || 
-		urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site || urlParams.year ) { 
+		urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site || urlParams.year || urlParams.declaredtype || urlParams.startdate || urlParams.enddate || urlParams.dprtmnt ) { 
 		let q = [];
 		let qString = "";
 		if ( urlParams.allq ) {
@@ -621,6 +622,26 @@ function initEngine() {
 		if ( urlParams.site ) {
 			let site = urlParams.site.toLowerCase().replace( '*', '' );
 			aqString += ' @canadagazettesite==' + site;
+		}
+		
+		if ( urlParams.startdate ) {
+			const startDate = getcoveoGMTDate( urlParams.startdate );
+			aqString += ' @date >= "' + startDate + '"';
+		}
+		
+		if ( urlParams.enddate ) {
+			const endDate = getcoveoGMTDate( urlParams.enddate );
+			aqString += ' @date <= "' + endDate + '"';
+		}
+		
+		if ( urlParams.dprtmnt ) { 
+			aqString += ' @author = "' + urlParams.dprtmnt + '"';
+				
+		}
+		
+		if ( urlParams.declaredtype ) {
+			aqString += ' @declared_type="' + urlParams.declaredtype.replaceAll( /'/g, '&#39;' ) + '"';
+			
 		}
 
 		if ( aqString ) {
@@ -1005,6 +1026,8 @@ function updateResultListState( newState ) {
 			}
 
 			let breadcrumb = "";
+			let disp_declared_type = "";
+			let description = "";
 			let printableUri = encodeURI( result.printableUri );
 			printableUri = printableUri.replaceAll( '&' , '&amp;' );
 			let clickUri = encodeURI( result.clickUri );
@@ -1017,6 +1040,16 @@ function updateResultListState( newState ) {
 			else {
 				breadcrumb = '<p class="location"><cite><a href="' + clickUri + '">' + printableUri + '</a></cite></p>';
 			}
+			
+			if ( result.raw.disp_declared_type  ) {
+				disp_declared_type = stripHtml( result.raw.disp_declared_type );
+
+			}
+			
+			if ( result.raw.description ) {
+				description = stripHtml( result.raw.description );
+
+			}
 
 			sectionNode.innerHTML = resultTemplateHTML
 				.replace( '%[index]', index + 1 )
@@ -1026,8 +1059,10 @@ function updateResultListState( newState ) {
 				.replace( '%[result.raw.author]', author )
 				.replace( '%[result.breadcrumb]', breadcrumb )
 				.replace( '%[result.printableUri]', printableUri )
-				.replace( '%[short-date-en]', getShortDateFormat( resultDate ) )
-				.replace( '%[short-date-fr]', getShortDateFormat( resultDate ) )
+				.replace( '%[result.raw.disp_declared_type]', disp_declared_type )
+				.replace( '%[result.raw.description]', description )
+				.replaceAll( '%[short-date-en]', getShortDateFormat( resultDate ) )
+				.replaceAll( '%[short-date-fr]', getShortDateFormat( resultDate ) )
 				.replace( '%[long-date-en]', getLongDateFormat( resultDate, 'en' ) )
 				.replace( '%[long-date-fr]', getLongDateFormat( resultDate, 'fr' ) )
 				.replace( '%[highlightedExcerpt]', highlightedExcerpt );
@@ -1151,6 +1186,10 @@ function updatePagerState( newState ) {
 
 		buttonNode.onclick = () => { 
 			pagerController.previousPage();
+			
+			if ( params.isAdvancedSearch ) {
+				updateUrlParameter( pagerState.currentPage );
+			}
 		};
 
 		pagerComponentElement.appendChild( liNode );
@@ -1178,6 +1217,10 @@ function updatePagerState( newState ) {
 
 		buttonNode.onclick = () => {
 			pagerController.selectPage( pageNo );
+			
+			if ( params.isAdvancedSearch ) {
+				updateUrlParameter( pagerState.currentPage );
+			}
 		};
 
 		pagerComponentElement.appendChild( liNode );
@@ -1192,10 +1235,45 @@ function updatePagerState( newState ) {
 
 		buttonNode.onclick = () => { 
 			pagerController.nextPage(); 
+			
+			if ( params.isAdvancedSearch ) {
+				updateUrlParameter( pagerState.currentPage );
+			}
 		};
 
 		pagerComponentElement.appendChild( liNode );
 	}
+}
+
+function updateUrlParameter( currentPage ) {
+	
+	const resultsPerPage = buildResultsPerPage(headlessEngine);
+	const { numberOfResults } = resultsPerPage.state;
+	const urlParams = new URLSearchParams( window.location.search );
+	const paramName = 'firstResult';
+	const pageNum = ( currentPage - 1 ) * numberOfResults;
+
+	// Set the value of the parameter. If it doesn't exist, it will be added.
+	urlParams.set( paramName, pageNum );
+
+	const newSearch = urlParams.toString();
+	window.history.replaceState( {}, '', `${window.location.pathname}?${newSearch}${window.location.hash}` );
+
+}
+
+function getcoveoGMTDate( date ) {
+	const paramDate = new Date( date );
+	const coveoGMTDateTime = new Date( paramDate.getTime() - paramDate.getTimezoneOffset()*60*1000 );
+	
+	const year = coveoGMTDateTime.getFullYear();
+	const month = coveoGMTDateTime.getMonth() + 1; // Add 1 for 1-indexed month
+	const day = coveoGMTDateTime.getDate();
+
+	const formattedMonth = month < 10 ? '0' + month : month;
+	const formattedDay = day < 10 ? '0' + day : day;
+
+	return `${year}/${formattedMonth}/${formattedDay}`;
+	
 }
 
 // Run Search UI
