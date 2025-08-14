@@ -184,6 +184,7 @@ function initTpl() {
 			resultTemplateHTML = 
 				`<h3><a class="result-link" href="%[result.clickUri]" data-dtm-srchlnknm="%[index]">%[result.title]</a></h3> 
 				<ul class="context-labels"><li>%[result.raw.author]</li></ul> 
+				<nav class="pl-4 sitelinks">%[result.raw.sitelinks]</nav>
 				%[result.breadcrumb] 
 				<p><time datetime="%[short-date-fr]" class="text-muted">%[long-date-fr]</time> - %[highlightedExcerpt]</p>`;
 		}
@@ -191,6 +192,7 @@ function initTpl() {
 			resultTemplateHTML = 
 				`<h3><a class="result-link" href="%[result.clickUri]" data-dtm-srchlnknm="%[index]">%[result.title]</a></h3> 
 				<ul class="context-labels"><li>%[result.raw.author]</li></ul> 
+				<nav class="pl-4 sitelinks">%[result.raw.sitelinks]</nav>
 				%[result.breadcrumb]
 				<p><time datetime="%[short-date-en]" class="text-muted">%[long-date-en]</time> - %[highlightedExcerpt]</p>`;
 		}
@@ -476,7 +478,7 @@ function initEngine() {
 
 	resultListController = buildResultList( headlessEngine, {
 		options: {
-			fieldsToInclude: [ "author", "date", "language", "urihash", "objecttype", "collection", "source", "permanentid", "displaynavlabel", "hostname" ]
+			fieldsToInclude: [ "author", "date", "language", "urihash", "objecttype", "collection", "source", "permanentid", "displaynavlabel", "hostname", "sitelinks" ]
 		}
 	} );
 	querySummaryController = buildQuerySummary( headlessEngine );
@@ -1009,6 +1011,7 @@ function updateResultListState( newState ) {
 			printableUri = printableUri.replaceAll( '&' , '&amp;' );
 			let clickUri = encodeURI( result.clickUri );
 			let title = stripHtml( result.title );
+			let siteLinks = DOMPurify.sanitize( result.raw.sitelinks );
 			if ( result.raw.hostname && result.raw.displaynavlabel ) {
 				const splittedNavLabel = ( Array.isArray( result.raw.displaynavlabel ) ? result.raw.displaynavlabel[0] : result.raw.displaynavlabel).split( '>' );
 				breadcrumb = '<ol class="location"><li>' + stripHtml( result.raw.hostname ) + 
@@ -1024,6 +1027,7 @@ function updateResultListState( newState ) {
 				.replace( '%[result.clickUri]', filterProtocol( clickUri ) )
 				.replace( '%[result.title]', title )
 				.replace( '%[result.raw.author]', author )
+				.replace( '%[result.raw.sitelinks]', siteLinks )
 				.replace( '%[result.breadcrumb]', breadcrumb )
 				.replace( '%[result.printableUri]', printableUri )
 				.replace( '%[short-date-en]', getShortDateFormat( resultDate ) )
