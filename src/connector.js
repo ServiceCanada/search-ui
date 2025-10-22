@@ -156,7 +156,8 @@ function initSearchUI() {
 	}
 	// override sort through query parameters 
 	if (urlParams.sort){
-		 params.sort = urlParams.sort}						 
+		params.sort = urlParams.sort;
+	}						 
 	
 	// Auto detect relative path from originLevel3
 	if( !params.originLevel3.startsWith( "/" ) && /http|www/.test( params.originLevel3 ) ) {
@@ -538,13 +539,6 @@ function initEngine() {
 			aqString += ' @uri="' + urlParams.dmn + '"';
 		}
 
-						 
-																						
-			   
-						
-	   
-										 
-   
 
 		// Specifically for Elections Canada, allows to search within scope
 		if ( urlParams.elctn_cat ) {
@@ -682,13 +676,13 @@ function initEngine() {
 			fragment: fragment(),
 		},
 	} );
-		if ( params.sort ) { 
-			const sortAction = loadSortCriteriaActions( headlessEngine ).registerSortCriterion( {
-				by: "date",
-				order: params.sort ,
-			} );
-			headlessEngine.dispatch( sortAction );
-		}																								
+	if ( params.sort ) { 
+		const sortAction = loadSortCriteriaActions( headlessEngine ).registerSortCriterion( {
+			by: "date",
+			order: params.sort ,
+		} );
+		headlessEngine.dispatch( sortAction );
+	}																								
 
 	// Unsubscribe to controllers
 	unsubscribeManager = urlManager.subscribe( () => {
@@ -1003,10 +997,10 @@ function getLongDateFormat( date, lang ){
 
 
 function isEmptyDate(date) { // checking for default date , Jan 1st, 1970
-    return date instanceof Date &&
-           date.getFullYear() === 1970 &&
-           date.getMonth() === 0 &&     // January is 0
-           date.getDate() === 1;
+	return date instanceof Date &&
+	date.getFullYear() === 1970 &&
+	date.getMonth() === 0 &&     // January is 0
+	date.getDate() === 1;
 }
 // Update results list
 function updateResultListState( newState ) {
@@ -1085,10 +1079,10 @@ function updateResultListState( newState ) {
 				.replace( '%[result.printableUri]', printableUri )
 				.replace( '%[result.raw.disp_declared_type]', disp_declared_type )
 				.replace( '%[result.raw.description]', description )
-				.replaceAll( '%[short-date-en]', isEmptyDate(resultDate) ? ' ' : getShortDateFormat( resultDate ) )
-				.replaceAll( '%[short-date-fr]', isEmptyDate(resultDate) ? ' ' : getShortDateFormat( resultDate ) )
-				.replace( '%[long-date-en]', isEmptyDate(resultDate) ? ' ' : getLongDateFormat( resultDate, 'en' ) )
-				.replace( '%[long-date-fr]', isEmptyDate(resultDate) ? ' ' : getLongDateFormat( resultDate, 'fr' ) )
+				.replaceAll( '%[short-date-en]', isEmptyDate(resultDate) ? '' : getShortDateFormat( resultDate ) )
+				.replaceAll( '%[short-date-fr]', isEmptyDate(resultDate) ? '' : getShortDateFormat( resultDate ) )
+				.replace( '%[long-date-en]', isEmptyDate(resultDate) ? '' : getLongDateFormat( resultDate, 'en' ) )
+				.replace( '%[long-date-fr]', isEmptyDate(resultDate) ? '' : getLongDateFormat( resultDate, 'fr' ) )
 				.replace( '%[highlightedExcerpt]', highlightedExcerpt );
 
 			const interactiveResult = buildInteractiveResult(
