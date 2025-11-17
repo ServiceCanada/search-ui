@@ -399,7 +399,7 @@ function initTpl() {
 					<div class="smart-snippet-answer brdr-bttm brdr-tp" id="smart-snippet-answer" aria-live="polite">
 						<div class="smart-snippet-answer-full">
 							%[answer]
-							<div class="smart-snippet-ai-disclaimer">%[smart_snippet_answer_ai_disclaimer]</div>
+							<div class="smart-snippet-ai-disclaimer mrgn-tp-lg small mrgn-bttm-0">%[smart_snippet_answer_ai_disclaimer]</div>
 						</div>
 						<div class="smart-snippet-answer-truncated">
 							%[answer_truncated]
@@ -412,7 +412,7 @@ function initTpl() {
 						</button>
 					</div>
 					<div class="smart-snippet-source">
-						<div><a class="smart-snippet-source-link" tabindex="0" aria-label="%[source.title]" title="%[source.title]" href="%[source.uri]">%[source.title]</a></div>
+						<div class="mrgn-tp-md"><a class="smart-snippet-source-link" tabindex="0" aria-label="%[source.title]" title="%[source.title]" href="%[source.uri]">%[source.title]</a></div>
 						<ol class="smart-snippet-source-breadcrumbs location"><li>%[source.raw.displaynavlabel]</li></ol> 
 					</div>
 			</div>`;
@@ -422,7 +422,7 @@ function initTpl() {
 			smartSnippetHTML = smartSnippetHTML.replace( '%[smart_snippet_answer_ai_disclaimer]', "Information récupérée en utilisant l'intelligence artificielle." );
 			smartSnippetHTML = smartSnippetHTML.replace( '%[smart_snippet_toggle_more]', "Afficher plus" );
 		} else {
-			smartSnippetHTML = smartSnippetHTML.replace( '%[smart_snippet_answer_ai_disclaimer]', 'The information was retrieved by Artificial Intelligence' );
+			smartSnippetHTML = smartSnippetHTML.replace( '%[smart_snippet_answer_ai_disclaimer]', 'Information retrieved by artificial intelligence.' );
 			smartSnippetHTML = smartSnippetHTML.replace( '%[smart_snippet_toggle_more]', "Show more" );
 		}
 	}
@@ -499,7 +499,7 @@ function initTpl() {
 							</div>
 							<hr>
 							<div class="smart-snippet-source">
-								<div><a class="smart-snippet-source-link" tabindex="0" aria-label="%[source.title]" title="%[source.title]" href="%[source.uri]">%[source.title]</a></div>
+								<div class="mrgn-tp-md"><a class="smart-snippet-source-link" tabindex="0" aria-label="%[source.title]" title="%[source.title]" href="%[source.uri]">%[source.title]</a></div>
 								<ol class="smart-snippet-source-breadcrumbs location"><li>%[source.raw.displaynavlabel]</li></ol> 
 							</div>
 						</div>
@@ -508,7 +508,7 @@ function initTpl() {
 
 		// Localize 
 		if ( lang === "fr" ) {			
-			smartSnippetQuestionListHTML = smartSnippetQuestionListHTML.replace( '%[smart_snippet_answer_ai_disclaimer]', "Les informations ont été récupérées par l'intelligence artificielle" );
+			smartSnippetQuestionListHTML = smartSnippetQuestionListHTML.replace( '%[smart_snippet_answer_ai_disclaimer]', "Information récupérée en utilisant l'intelligence artificielle." );
 		} else {
 			smartSnippetQuestionListHTML = smartSnippetQuestionListHTML.replace( '%[smart_snippet_answer_ai_disclaimer]', 'Information retrieved by artificial intelligence.' );
 		}
