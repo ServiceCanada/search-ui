@@ -399,7 +399,7 @@ function initTpl() {
 					<div class="smart-snippet-answer brdr-bttm brdr-tp" id="smart-snippet-answer" aria-live="polite">
 						<div class="smart-snippet-answer-full">
 							%[answer]
-							<div class="smart-snippet-ai-disclaimer mrgn-tp-lg small mrgn-bttm-0">%[smart_snippet_answer_ai_disclaimer]</div>
+							<div class="text-muted mrgn-tp-lg small mrgn-bttm-0">%[smart_snippet_answer_ai_disclaimer]</div>
 						</div>
 						<div class="smart-snippet-answer-truncated">
 							%[answer_truncated]
