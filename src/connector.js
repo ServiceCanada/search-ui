@@ -493,11 +493,10 @@ function initTpl() {
 					<details>
 						<summary class="smart-snippet-question">%[question]</summary>
 						<div>
-							<div class="smart-snippet-answer mrgn-tp-xl">
+							<div class="smart-snippet-answer mrgn-tp-md brdr-bttm">
 								%[answer]
-								<div class="smart-snippet-ai-disclaimer mrgn-tp-xl small mrgn-bttm-0">%[smart_snippet_answer_ai_disclaimer]</div>
+								<div class="mrgn-tp-lg small mrgn-bttm-md text-muted">%[smart_snippet_answer_ai_disclaimer]</div>
 							</div>
-							<hr>
 							<div class="smart-snippet-source">
 								<div class="mrgn-tp-md"><a class="smart-snippet-source-link" tabindex="0" aria-label="%[source.title]" title="%[source.title]" href="%[source.uri]">%[source.title]</a></div>
 								<ol class="smart-snippet-source-breadcrumbs location"><li>%[source.raw.displaynavlabel]</li></ol> 
