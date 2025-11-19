@@ -111,3 +111,30 @@
 	content: "\e092";
 	margin-left: .5em;
 }
+.smart-snippet-container {
+	border: 1px solid #ddd; 
+	border-radius: 4px;
+	padding: 10px 20px 20px 20px;
+}
+.smart-snippet-container .smart-snippet-answer {
+	padding: 30px 20px 20px 20px;
+	position: relative;
+	overflow: hidden;
+}
+.smart-snippet-container .smart-snippet-toggle-height {
+	text-align: center;
+}
+.smart-snippet-container .smart-snippet-answer .smart-snippet-answer-truncated,
+.smart-snippet-container.smart-snippet-height-limiter .smart-snippet-answer .smart-snippet-answer-full {
+  display: none;
+}
+.smart-snippet-container .smart-snippet-answer .smart-snippet-answer-full,
+.smart-snippet-container.smart-snippet-height-limiter .smart-snippet-answer .smart-snippet-answer-truncated {
+  display: block;
+}
+.smart-snippet-ai-disclaimer {
+	font-style: italic;
+	font-size: .85em;
+	border-top: 1px solid #eee; 
+	padding-top: .85em;
+}

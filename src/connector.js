@@ -6,6 +6,8 @@ import {
 	buildPager,
 	buildResultsPerPage,
 	buildSearchStatus,
+	buildSmartSnippet,
+	buildSmartSnippetQuestionsList,
 	buildUrlManager,
 	buildDidYouMean,
 	buildContext,
@@ -35,6 +37,8 @@ const defaults = {
 	"numberOfSuggestions": 5,
 	"minimumCharsForSuggestions": 3,
 	"enableHistoryPush": true,
+	"enableSmartSnippets": false,
+	"smartSnippetToggleLimit": 250,
 	"isContextSearch": false,
 	"isAdvancedSearch": false,
 	"originLevel3": originPath,
@@ -58,6 +62,8 @@ let resultListController;
 let querySummaryController;
 let didYouMeanController;
 let pagerController;
+let smartSnippetController;
+let smartSnippetQuestionListController;
 let statusController;
 let urlManager;
 let unsubscribeManager;
@@ -66,6 +72,8 @@ let unsubscribeResultListController;
 let unsubscribeQuerySummaryController;
 let unsubscribeDidYouMeanController;
 let unsubscribePagerController;
+let unsubscribeSmartSnippetController;
+let unsubscribeSmartSnippetQuestionListController;
 
 // UI states
 let updateSearchBoxFromState = false;
@@ -74,6 +82,8 @@ let resultListState;
 let querySummaryState;
 let didYouMeanState;
 let pagerState;
+let smartSnippetState;
+let smartSnippetQuestionListState;
 let lastCharKeyUp;
 let activeSuggestion = 0;
 let pagerManuallyCleared = false;
@@ -92,6 +102,8 @@ let querySummaryElement = document.querySelector( '#query-summary' );
 let pagerElement = document.querySelector( '#pager' );
 let suggestionsElement = document.querySelector( '#suggestions' );
 let didYouMeanElement = document.querySelector( '#did-you-mean' );
+let smartSnippetsElement = document.querySelector( '#smart-snippet' );
+let smartSnippetQuestionListContainerElement = document.querySelector( '#smart-snippet-question-list' );
 
 // UI templates
 let resultTemplateHTML = document.getElementById( 'sr-single' )?.innerHTML;
@@ -105,6 +117,9 @@ let pageTemplateHTML = document.getElementById( 'sr-pager-page' )?.innerHTML;
 let nextPageTemplateHTML = document.getElementById( 'sr-pager-next' )?.innerHTML;
 let pagerContainerTemplateHTML = document.getElementById( 'sr-pager-container' )?.innerHTML;
 let qsA11yHintHTML = document.getElementById( 'sr-qs-hint' )?.innerHTML;
+let smartSnippetHTML = document.getElementById( 'sr-smart-snippet-container' )?.innerHTML;
+let smartSnippetQuestionListHTML = document.getElementById( 'sr-smart-snippet-question-list-container' )?.innerHTML;
+let smartSnippetQuestionListContainerHTML = document.getElementById( 'sr-smart-snippet-question-list-container' )?.innerHTML;
 
 // Init parameters and UI
 function initSearchUI() {
@@ -374,6 +389,76 @@ function initTpl() {
 		resultsSection.append( querySummaryElement );
 	}
 
+	// Smart snippet - Featured SS
+	if ( params.enableSmartSnippets && !smartSnippetHTML ) {
+		smartSnippetHTML = 
+			`<div class="smart-snippet-container" id="smart-snippet-container">
+					<div class="smart-snippet-featured-label-container">
+						<h3 class="smart-snippet-question mrgn-tp-md" id="smart-snippet-question">%[question]</h3>
+					</div>
+					<div class="smart-snippet-answer brdr-bttm brdr-tp" id="smart-snippet-answer" aria-live="polite">
+						<div class="smart-snippet-answer-full">
+							%[answer]
+							<div class="text-muted mrgn-tp-lg small mrgn-bttm-0">%[smart_snippet_answer_ai_disclaimer]</div>
+						</div>
+						<div class="smart-snippet-answer-truncated">
+							%[answer_truncated]
+						</div>
+					</div>
+					<div class="smart-snippet-toggle-height mrgn-tp-lg">
+						<button class="smart-snippet-toggle btn btn-link" id="smart-snippet-toggle" aria-expanded="false" aria-controls="smart-snippet-container" role="button">
+							<span id="smart-snippet-toggle-label">%[smart_snippet_toggle_more]</span>
+							<span id="smart-snippet-toggle-icon" class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+						</button>
+					</div>
+					<div class="smart-snippet-source">
+						<div class="mrgn-tp-md"><a class="smart-snippet-source-link" tabindex="0" aria-label="%[source.title]" title="%[source.title]" href="%[source.uri]">%[source.title]</a></div>
+						<ol class="smart-snippet-source-breadcrumbs location"><li>%[source.raw.displaynavlabel]</li></ol> 
+					</div>
+			</div>`;
+
+		// Localize 
+		if ( lang === "fr" ) {			
+			smartSnippetHTML = smartSnippetHTML.replace( '%[smart_snippet_answer_ai_disclaimer]', "Information récupérée en utilisant l'intelligence artificielle." );
+			smartSnippetHTML = smartSnippetHTML.replace( '%[smart_snippet_toggle_more]', "Afficher plus" );
+		} else {
+			smartSnippetHTML = smartSnippetHTML.replace( '%[smart_snippet_answer_ai_disclaimer]', 'Information retrieved by artificial intelligence.' );
+			smartSnippetHTML = smartSnippetHTML.replace( '%[smart_snippet_toggle_more]', "Show more" );
+		}
+	}
+
+	// Smart snippet - Question list container
+	if ( params.enableSmartSnippets && !smartSnippetQuestionListContainerHTML ) {
+		smartSnippetQuestionListContainerHTML = 
+				`<aside>
+					<section class="panel panel-default">
+						<header class="panel-heading">
+								<h2 class="panel-title">%[smart_snippet_question_list_title]</h2>
+						</header>
+						<div class="panel-body">
+								<ul class="list-unstyled">
+									%[smart_snippet_question_list]
+								</ul>
+						</div>
+					</section>
+				</aside>`;
+		
+		// Localize 
+		if ( lang === "fr" ) {			
+			smartSnippetQuestionListContainerHTML = smartSnippetQuestionListContainerHTML.replace( '%[smart_snippet_question_list_title]', 'Les gens demandent aussi' );
+		} else {
+			smartSnippetQuestionListContainerHTML = smartSnippetQuestionListContainerHTML.replace( '%[smart_snippet_question_list_title]', 'People also ask' );
+		}
+	}
+
+	// Smart snippets - Featured SS
+	if ( params.enableSmartSnippets && !smartSnippetsElement ) {
+		smartSnippetsElement = document.createElement( "div" );
+		smartSnippetsElement.id = "smart-snippets";
+
+		resultsSection.append( smartSnippetsElement );
+	}
+
 	// auto-create did you mean element
 	if ( !didYouMeanElement ) {
 		didYouMeanElement = document.createElement( "div" );
@@ -398,6 +483,43 @@ function initTpl() {
 
 		resultsSection.append( newPagerElement );
 		pagerElement = newPagerElement;
+	}
+
+
+	// Smart snippet - Question list item
+	if( params.enableSmartSnippets && !smartSnippetQuestionListHTML ) {
+		smartSnippetQuestionListHTML = 
+			`<li>
+					<details>
+						<summary class="smart-snippet-question">%[question]</summary>
+						<div>
+							<div class="smart-snippet-answer mrgn-tp-md brdr-bttm">
+								%[answer]
+								<div class="mrgn-tp-lg small mrgn-bttm-md text-muted">%[smart_snippet_answer_ai_disclaimer]</div>
+							</div>
+							<div class="smart-snippet-source">
+								<div class="mrgn-tp-md"><a class="smart-snippet-source-link" tabindex="0" aria-label="%[source.title]" title="%[source.title]" href="%[source.uri]">%[source.title]</a></div>
+								<ol class="smart-snippet-source-breadcrumbs location"><li>%[source.raw.displaynavlabel]</li></ol> 
+							</div>
+						</div>
+					</details>
+			</li>`;		
+
+		// Localize 
+		if ( lang === "fr" ) {			
+			smartSnippetQuestionListHTML = smartSnippetQuestionListHTML.replace( '%[smart_snippet_answer_ai_disclaimer]', "Information récupérée en utilisant l'intelligence artificielle." );
+		} else {
+			smartSnippetQuestionListHTML = smartSnippetQuestionListHTML.replace( '%[smart_snippet_answer_ai_disclaimer]', 'Information retrieved by artificial intelligence.' );
+		}
+	}
+
+	// Smart snippets - Questions list container
+	if ( params.enableSmartSnippets && !smartSnippetQuestionListContainerElement ) {
+		smartSnippetQuestionListContainerElement = document.createElement( "div" );
+		smartSnippetQuestionListContainerElement.id = "smart-snippets-question-list";
+
+		// Add it after the results list element (after the results, before the paging)
+		resultListElement.after( smartSnippetQuestionListContainerElement );
 	}
 
 	// initialize the search box
@@ -510,6 +632,97 @@ function stripHtml(html) {
 	let tmp = document.createElement( "DIV" );
 	tmp.innerHTML = html;
 	return tmp.textContent || tmp.innerText || "";
+}
+
+// Calculates the length of the text for a block of HTML
+function getTextLength( content ){
+	var elem;
+
+	// If a string is passed in, convert it to an element
+	if( !( content instanceof Element ) ){
+		elem = document.createElement( 'div' );
+		elem.innerHTML = String( content );
+	} else {
+		elem = content;
+	}
+
+	// Get the inside content
+	var fullText = elem.textContent || '';
+
+	// Strip out extra whitespace, like indenting
+	fullText = fullText.replace( /[\n\r]+|[\s]{2,}/g, ' ' ).trim();
+	return fullText.length;
+
+}
+
+// Truncate an HTML string to a given text length, preserving tag structure.
+function truncateHtml( html, maxLength ) {
+
+	// Put into a temp div element, so we can work with it
+	const container = document.createElement( "div" );
+	container.innerHTML = html;
+
+	// If content is less than maxLength, return it as-is
+	if ( maxLength < 0 || getTextLength( container ) <= maxLength ) {
+		return html;
+	}
+
+	let remaining = maxLength;
+
+	// Recursive function that goes through the HTML tree, rebuilding it to the 
+	// point where we reach `maxLength`
+	function cloneWithLimit( node ) {
+		if ( remaining <= 0 ) return null;
+
+		// If this node is just text, we're at the deepest point of this part of the tree. 
+		// If we're below the limit, return as-is. If we hit the limit, truncate here and add the ellipsis.
+		if ( node.nodeType === Node.TEXT_NODE ) {
+			const text = node.nodeValue || '';
+			if ( text.length <= remaining ) {
+				remaining -= text.length; 
+				return document.createTextNode( text );
+			} else {
+				const truncatedText = text.slice( 0, remaining ) + '…';
+				remaining = 0;
+				return document.createTextNode( truncatedText );
+			}
+		}
+
+		// If it's a tag, we go inside and recursively iterate through the children until we hit the length limit
+		if ( node.nodeType === Node.ELEMENT_NODE ) {
+			// Create a copy of the current tag
+			const clone = node.cloneNode( false ); 
+
+			// Iterate through the children of the original node
+			for ( let child of node.childNodes ) {
+				if ( remaining <= 0 ) break; // If we hit the limit, stop here.
+				const childClone = cloneWithLimit( child );
+				if ( childClone ) clone.appendChild( childClone );
+			}
+
+			// Drop empty elements (except self-closing ones)
+			if ( !clone.hasChildNodes() && !['BR', 'IMG'].includes( clone.tagName ) ) {
+				return null;
+			}
+			return clone;
+		}
+
+		// Drop comments and other node types
+		return null;
+	}
+
+	// Build a truncated copy of the HTML structure
+	const truncatedHtml = document.createDocumentFragment();
+	for ( let child of container.childNodes ) {
+		if ( remaining <= 0 ) break;
+		const chunk = cloneWithLimit( child );
+		if ( chunk ) truncatedHtml.appendChild( chunk );
+	}
+
+	// Serialize back to HTML
+	const wrapper = document.createElement( 'div' );
+	wrapper.appendChild( truncatedHtml );
+	return wrapper.innerHTML;
 }
 
 // Focus to H2 heading in results section
@@ -658,6 +871,11 @@ function initEngine() {
 	didYouMeanController = buildDidYouMean( headlessEngine, { options: { automaticallyCorrectQuery: params.automaticallyCorrectQuery } } );
 	pagerController = buildPager( headlessEngine, { options: { numberOfPages: params.numberOfPages } } );
 	statusController = buildSearchStatus( headlessEngine );
+	
+	if( params.enableSmartSnippets ){
+		smartSnippetController = buildSmartSnippet( headlessEngine );
+		smartSnippetQuestionListController = buildSmartSnippetQuestionsList( headlessEngine );	
+	} 
 
 	// Refine search based on URL parameters for filters, mostly used in Advanced Search to trigger only one search per page load
 	if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site || urlParams.year || urlParams.declaredtype || urlParams.startdate || urlParams.enddate || urlParams.dprtmnt ) { 
@@ -892,6 +1110,10 @@ function initEngine() {
 	unsubscribeQuerySummaryController = querySummaryController.subscribe( () => updateQuerySummaryState( querySummaryController.state ) );
 	unsubscribeDidYouMeanController = didYouMeanController.subscribe( () => updateDidYouMeanState( didYouMeanController.state ) );
 	unsubscribePagerController = pagerController.subscribe( () => updatePagerState( pagerController.state ) );
+	if( params.enableSmartSnippets ) {
+		unsubscribeSmartSnippetController = smartSnippetController.subscribe( () => updateSmartSnippetState( smartSnippetController.state ) );
+		unsubscribeSmartSnippetQuestionListController = smartSnippetQuestionListController.subscribe( () => updateSmartSnippetQuestionListState( smartSnippetQuestionListController.state ) );
+	}
 
 	// Clear event tracking, for legacy browsers
 	const onUnload = () => { 
@@ -902,6 +1124,8 @@ function initEngine() {
 		unsubscribeQuerySummaryController?.();
 		unsubscribeDidYouMeanController?.();
 		unsubscribePagerController?.();
+		unsubscribeSmartSnippetController?.();
+		unsubscribeSmartSnippetQuestionListController?.();
 	};
 
 	// Listen to URL change (hash)
@@ -990,6 +1214,14 @@ function initEngine() {
 				didYouMeanElement.textContent = "";
 				pagerElement.textContent = "";
 				pagerManuallyCleared = true;
+				if( params.enableSmartSnippets ) {
+					if( smartSnippetsElement && smartSnippetsElement.textContent ) {
+						smartSnippetsElement.textContent = "";
+					}
+					if( smartSnippetQuestionListContainerElement && smartSnippetQuestionListContainerElement.textContent ) {
+						smartSnippetQuestionListContainerElement.textContent = "";
+					}
+				}
 
 				// Show no results message in Query Summary if no query entered
 				querySummaryElement.innerHTML = noResultTemplateHTML;
@@ -1412,6 +1644,111 @@ function updatePagerUrlParam( currentPage ) {
 
 	const newSearch = urlParams.toString();
 	window.history.replaceState( {}, '', `${winPath}?${newSearch}${winLoc.hash}` );
+}
+
+// Function in insert values into smart snippet HTML templates
+function insertSmartSnippetValues ( smartSnippetState, standalone = false, truncateLimit = -1) {
+	const { question, answer, source } = smartSnippetState;
+
+	var snippetHTML = (standalone ? smartSnippetHTML : smartSnippetQuestionListHTML);
+	snippetHTML = snippetHTML
+		.replace( '%[question]', DOMPurify.sanitize( question ) )
+		.replace( '%[answer]', DOMPurify.sanitize( answer ) )
+		.replace( '%[answer_truncated]', truncateHtml( DOMPurify.sanitize( answer ), truncateLimit ) );
+
+	if(source) {
+		var displaynavlabel = source?.raw?.displaynavlabel ? source.raw.displaynavlabel.split( '>' ).join( '&nbsp;</li><li>' ) : source.uri;
+		snippetHTML = snippetHTML.replace( '%[source.raw.displaynavlabel]', displaynavlabel )
+			.split( '%[source.title]' ).join ( source.title )
+			.split( '%[source.uri]' ).join ( source.uri );
+	}
+
+	return snippetHTML;
+}
+
+// Update the "featured" Smart Snippets section
+function updateSmartSnippetState ( newState ) {
+
+	smartSnippetState = newState;
+	smartSnippetsElement.innerHTML = ''; // Clear contents of SM
+
+	// We don't get the full smart snippet state past the first page, so don't render anything
+	if( pagerState.currentPage > 1 ) return;
+
+	if( smartSnippetState.answerFound ) {
+		smartSnippetsElement.innerHTML = insertSmartSnippetValues( smartSnippetState, true, params.smartSnippetToggleLimit );
+
+		// If the length of the answer is less that params.smartSnippetToggleLimit, remove toggle controls
+		if( getTextLength( smartSnippetState.answer ) <= params.smartSnippetToggleLimit ) {
+
+			document.querySelector( '.smart-snippet-toggle-height' ).remove();
+			document.querySelector( '.smart-snippet-answer-truncated' ).remove();
+
+		} else {
+
+			// Add height toggle stuff
+			const smartSnippetsContainerElement = document.getElementById( 'smart-snippet-container' );
+			smartSnippetsContainerElement.classList.add( 'smart-snippet-height-limiter' ); // Collapse by default
+			const smartSnippetToggleButton = document.getElementById( 'smart-snippet-toggle' );
+			const smartSnippetAnswer = document.getElementById( 'smart-snippet-answer' );
+			smartSnippetAnswer.querySelectorAll( "a, link, button, input" ).forEach( ( el ) => {
+				el.setAttribute( 'disabled', 'true' );
+				el.setAttribute( 'tabindex', '-1' );
+			} );
+
+			// Handle the 
+			smartSnippetToggleButton.addEventListener( 'click', () => {
+
+				// Expand the container
+				if(smartSnippetsContainerElement.classList.contains( 'smart-snippet-height-limiter' )){
+					smartSnippetsContainerElement.classList.remove( 'smart-snippet-height-limiter' );
+					smartSnippetAnswer.setAttribute( "aria-hidden", "false" );
+					smartSnippetAnswer.querySelectorAll( "a, link, button, input" ).forEach( ( el ) => {
+						el.removeAttribute( 'disabled' );
+						el.removeAttribute( 'tabindex' );
+					} );
+					smartSnippetToggleButton.setAttribute( "aria-expanded", "true" );
+					smartSnippetToggleButton.querySelector( '#smart-snippet-toggle-label' ).innerText = lang === "fr" ? "Afficher moins": "Show less"; 
+					smartSnippetToggleButton.querySelector( '#smart-snippet-toggle-icon' ).classList.remove( 'glyphicon-chevron-down' );
+					smartSnippetToggleButton.querySelector( '#smart-snippet-toggle-icon' ).classList.add( 'glyphicon-chevron-up' );
+					
+				// Collapse the container
+				} else {
+					smartSnippetsContainerElement.classList.add( 'smart-snippet-height-limiter' );
+					smartSnippetAnswer.setAttribute( "aria-hidden", "true" );
+					smartSnippetToggleButton.setAttribute( "aria-expanded", "false" );
+					smartSnippetAnswer.querySelectorAll( "a, link, button, input" ).forEach( ( el ) => {
+						el.setAttribute( 'disabled', 'true' );
+						el.setAttribute( 'tabindex', '-1' );
+					} );
+					smartSnippetToggleButton.querySelector( '#smart-snippet-toggle-label' ).innerText = lang === "fr" ? "Afficher plus": "Show more";
+					smartSnippetToggleButton.querySelector( '#smart-snippet-toggle-icon' ).classList.add( 'glyphicon-chevron-down' );
+					smartSnippetToggleButton.querySelector( '#smart-snippet-toggle-icon' ).classList.remove( 'glyphicon-chevron-up' );
+					smartSnippetToggleButton.focus();
+				}
+			} );
+
+		}
+	}
+}
+
+// Update the Smart Snippets questions section
+function updateSmartSnippetQuestionListState ( newState ) {
+	smartSnippetQuestionListState = newState;
+	smartSnippetQuestionListContainerElement.innerHTML = ''; // Clear contents of SS question list container
+
+	// We don't get the full smart snippet state past the first page, so don't render anything
+	if( pagerState.currentPage > 1 ) return;
+
+	// If there are questions, populate smartSnippetQuestionListItemsHTML
+	if( smartSnippetQuestionListState?.questions && smartSnippetQuestionListState?.questions.length > 0 ) {
+		let smartSnippetQuestionListItemsHTML = '';
+		for ( const i in smartSnippetQuestionListState.questions ) {
+			smartSnippetQuestionListItemsHTML += insertSmartSnippetValues( smartSnippetQuestionListState.questions[i], false );
+		}
+		smartSnippetQuestionListContainerElement.innerHTML = smartSnippetQuestionListContainerHTML.split( '%[smart_snippet_question_list]' ).join( smartSnippetQuestionListItemsHTML );
+	}
+
 }
 
 // Run Search UI
