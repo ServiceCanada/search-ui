@@ -1228,6 +1228,7 @@ function updateResultListState( newState ) {
 				.replaceAll( '%[short-date-fr]', isEmptyDate(resultDate) ? '' : getShortDateFormat( resultDate ) )
 				.replace( '%[long-date-en]', isEmptyDate(resultDate) ? '' : getLongDateFormat( resultDate, 'en' ) )
 				.replace( '%[long-date-fr]', isEmptyDate(resultDate) ? '' : getLongDateFormat( resultDate, 'fr' ) )
+				.replace('<time datetime="" class="text-muted"></time> -','')
 				.replace( '%[highlightedExcerpt]', highlightedExcerpt );
 
 			const interactiveResult = buildInteractiveResult(
