@@ -163,6 +163,16 @@ function initSearchUI() {
 	if (urlParams.sort) {
 		params.sort = urlParams.sort;
 	}						 
+	// set the custom action cause for the initial search 
+	if ( urlParams.actionCause ) {
+		params.actionCause = urlParams.actionCause;
+
+		// changing the URL without reloading the page to remove actionCause
+		if ( window.history.pushState ) {
+			var newurl = winLoc.href.replace( '&actionCause=' + urlParams.actionCause, '' );
+			window.history.pushState( { path : newurl }, '', newurl );
+		}
+	}
 	
 	// Auto detect relative path from originLevel3
 	if( !params.originLevel3.startsWith( "/" ) && /http|www/.test( params.originLevel3 ) ) {
@@ -585,6 +595,12 @@ function initEngine() {
 						// filter user sensitive content
 						requestContent.originLevel3 = params.originLevel3;
 
+						// override actionCause if present
+						if ( params.actionCause ) {
+							requestContent.actionCause = params.actionCause;
+							params.actionCause = ""; // reset the parameter to avoid polluting future searches with the same action cause
+						}
+
 						// documentAuthor cannot be longer than 128 chars based on search platform
 						if ( requestContent.documentAuthor ) {
 							requestContent.documentAuthor = requestContent.documentAuthor.substring( 0, 128 );
@@ -610,6 +626,11 @@ function initEngine() {
 
 						if ( requestContent.analytics ) {
 							requestContent.analytics.originLevel3 = params.originLevel3;
+						}
+
+						// override actionCause if present
+						if ( params.actionCause ) {
+							requestContent.analytics.actionCause = params.actionCause;
 						}
 
 						let q = requestContent.q;
