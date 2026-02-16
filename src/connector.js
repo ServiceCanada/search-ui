@@ -1284,6 +1284,7 @@ function updateNotifyTriggerState ( newState ) {
 
 	if ( notificationState.notifications?.length ) {
 		notificationTriggerElement.innerHTML = notificationTriggerTemplateHTML.replace( DOMPurify.sanitize( "%[notification]" ), notificationState.notifications[0] );
+		focusToView();
 	}
 	else {
 		notificationTriggerElement.textContent = "";
