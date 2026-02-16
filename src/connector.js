@@ -169,7 +169,7 @@ function initSearchUI() {
 
 		// changing the URL without reloading the page to remove actionCause
 		if ( window.history.pushState ) {
-			var newurl = winLoc.href.replace( '&actionCause=' + urlParams.actionCause, '' );
+			var newurl = winLoc.href.replace( '&actionCause=' + params.actionCause, '' );
 			window.history.pushState( { path : newurl }, '', newurl );
 		}
 	}
