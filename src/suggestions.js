@@ -147,6 +147,7 @@ function initTpl() {
 		if ( params.numberOfSuggestions > 0 && !suggestionsElement ) {
 			searchBoxElement.setAttribute( 'type', 'text' );
 			searchBoxElement.role = "combobox";
+			searchBoxElement.setAttribute( 'autocomplete', 'off' );
 			searchBoxElement.setAttribute( 'aria-expanded', 'false' );
 			searchBoxElement.setAttribute( 'aria-autocomplete', 'list' );
 
