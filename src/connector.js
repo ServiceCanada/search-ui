@@ -1632,6 +1632,14 @@ function updateFacetState( index, newState ) {
 	// <summary> acts as the facet label / collapse toggle
 	const summaryEl = document.createElement( 'summary' );
 	summaryEl.textContent = config.label;
+	if ( newState.hasActiveValues ) {
+		const clearBtn = document.createElement( 'button' );
+		clearBtn.type = 'button';
+		clearBtn.className = 'btn btn-link btn-sm pull-right';
+		clearBtn.textContent = lang === 'fr' ? 'Effacer le filtre' : 'Clear filter';
+		clearBtn.onclick = ( e ) => { e.stopPropagation(); facetControllers[ index ].deselectAll(); };
+		summaryEl.appendChild( clearBtn );
+	}
 	facetEl.appendChild( summaryEl );
 
 	// Values list
@@ -1731,6 +1739,18 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 
 	const summaryEl = document.createElement( 'summary' );
 	summaryEl.textContent = config.label;
+	if ( dateFacetState.hasActiveValues || dateFilterState.range ) {
+		const clearBtn = document.createElement( 'button' );
+		clearBtn.type = 'button';
+		clearBtn.className = 'btn btn-link btn-sm pull-right';
+		clearBtn.textContent = isFr ? 'Effacer le filtre' : 'Clear filter';
+		clearBtn.onclick = ( e ) => {
+			e.stopPropagation();
+			facetControllers[ index ].deselectAll();
+			dateFilterControllers[ index ].clear();
+		};
+		summaryEl.appendChild( clearBtn );
+	}
 	facetEl.appendChild( summaryEl );
 
 	// --- Custom date pickers (above the list) ---
@@ -1750,7 +1770,8 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 			<label for="${endId}">${isFr ? 'Date de fin' : 'End date'}<span class="datepicker-format"> (<abbr title="${isFr ? 'Quatre chiffres pour l\'année, tiret, deux chiffres pour le mois, tiret, deux chiffres pour le jour' : 'Four digits year, dash, two digits month, dash, two digits day'}">YYYY-MM-DD</abbr>)</span></label>
 			<input class="form-control" type="date" id="${endId}" name="${endId}" max="${todayStr}" />
 		</div>
-		<button type="button" class="btn btn-default btn-sm mrgn-bttm-md gc-date-apply">${isFr ? 'Appliquer' : 'Apply'}</button>`
+		<button type="button" class="btn btn-default btn-sm mrgn-rght-sm mrgn-bttm-md gc-date-apply">${isFr ? 'Appliquer' : 'Apply'}</button>
+		<button type="button" class="btn btn-link btn-sm mrgn-bttm-md gc-date-clear"${dateFilterState.range ? '' : ' hidden'}>${isFr ? 'Effacer' : 'Clear'}</button>`
 	);
 
 	const startInput = datePickerContainer.querySelector( '#' + startId );
@@ -1784,6 +1805,14 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 				end: inputDateToCoveoDate( endVal, true ),
 			} );
 		}
+	};
+
+	datePickerContainer.querySelector( '.gc-date-clear' ).onclick = () => {
+		startInput.value = '';
+		endInput.value = '';
+		startInput.max = todayStr;
+		endInput.min = '';
+		dateFilterControllers[ index ].clear();
 	};
 
 	facetEl.appendChild( datePickerContainer );

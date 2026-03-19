@@ -65,6 +65,7 @@
 }
 
 .gc-facet-values li {
+	overflow-wrap: break-word;
 	position: relative;
 }
 
@@ -76,4 +77,8 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
+}
+
+.gc-date-pickers .form-control {
+	width: 100%;
 }
