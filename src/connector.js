@@ -10,6 +10,7 @@ import {
 	buildDidYouMean,
 	buildContext,
 	buildInteractiveResult,
+	buildFacet,
 	loadAdvancedSearchQueryActions,
 	loadSortCriteriaActions,
 	HighlightUtils,
@@ -40,7 +41,8 @@ const defaults = {
 	"originLevel3": originPath,
 	"pipeline": "",
 	"automaticallyCorrectQuery": false,
-	"numberOfPages": 9
+	"numberOfPages": 9,
+	"facets": []
 };
 let lang = document.querySelector( "html" )?.lang;
 let paramsOverride = baseElement ? JSON.parse( baseElement.dataset.gcSearch ) : {};
@@ -66,6 +68,12 @@ let unsubscribeResultListController;
 let unsubscribeQuerySummaryController;
 let unsubscribeDidYouMeanController;
 let unsubscribePagerController;
+let unsubscribeFacetControllers = [];
+
+// Facet configs and controllers
+let facetNormalizedConfigs = [];
+let facetControllers = [];
+let facetStates = [];
 
 // UI states
 let updateSearchBoxFromState = false;
@@ -92,6 +100,8 @@ let querySummaryElement = document.querySelector( '#query-summary' );
 let pagerElement = document.querySelector( '#pager' );
 let suggestionsElement = document.querySelector( '#suggestions' );
 let didYouMeanElement = document.querySelector( '#did-you-mean' );
+let facetSidebarElement = document.querySelector( '#gc-facet-sidebar' );
+let facetPanelElement = document.querySelector( '#gc-facet-panel' );
 
 // UI templates
 let resultTemplateHTML = document.getElementById( 'sr-single' )?.innerHTML;
@@ -371,6 +381,47 @@ function initTpl() {
 		}	
 	}
 
+	// Normalize facet configs from the HTML attribute
+	facetNormalizedConfigs = Array.isArray( params.facets )
+		? params.facets.map( normalizeFacetConfig ).filter( Boolean )
+		: [];
+
+	// Auto-create two-column facet layout when valid facets are configured
+	if ( facetNormalizedConfigs.length > 0 && !facetPanelElement ) {
+		const isFr = lang === 'fr';
+		const facetPlaceholders = facetNormalizedConfigs.map( ( config, index ) =>
+			`<details id="gc-facet-${config.facetId}" class="gc-facet${index > 0 ? ' mrgn-tp-md' : ''}" open></details>`
+		).join( '' );
+
+		baseElement.insertAdjacentHTML( 'beforeend',
+			`<button type="button" id="gc-facet-toggle" class="btn btn-default gc-facet-toggle" aria-expanded="true" aria-controls="gc-facet-panel">
+				<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> ${isFr ? 'Filtres' : 'Filters'}
+			</button>
+			<div class="row" id="gc-search-facet-layout">
+				<div id="gc-facet-sidebar" class="col-md-4 gc-facet-sidebar mrgn-tp-lg">
+					<section id="gc-facet-panel">
+						<h3 class="wb-inv">${isFr ? 'Filtres' : 'Filters'}</h3>
+						<div id="gc-facet-clear-all-container" class="text-right" hidden>
+							<button type="button" class="btn btn-link">${isFr ? 'Effacer tout' : 'Clear all'}</button>
+						</div>
+						${facetPlaceholders}
+					</section>
+				</div>
+				<div id="gc-results-col" class="col-md-8 gc-results-col">
+					<section id="${resultSectionID}"></section>
+				</div>
+			</div>`
+		);
+
+		// Store references and attach event handlers after insertion
+		facetSidebarElement = document.getElementById( 'gc-facet-sidebar' );
+		facetPanelElement = document.getElementById( 'gc-facet-panel' );
+		resultsSection = document.getElementById( resultSectionID );
+		document.getElementById( 'gc-facet-toggle' ).onclick = toggleFacetSidebar;
+		document.querySelector( '#gc-facet-clear-all-container .btn-link' ).onclick =
+			() => { facetControllers.forEach( ( c ) => c.deselectAll() ); };
+	}
+
 	// auto-create results
 	if ( !resultsSection ) {
 		resultsSection = document.createElement( "section" );
@@ -490,6 +541,38 @@ function saveCoveoAnalyticsHistory( actionsHistory ) {
 // Sanitize query to remove HTML tags
 function sanitizeQuery(q) {
 	return q.replace(/<[^>]*>?/gm, '');
+}
+
+// Normalize a single raw facet config entry from the HTML attribute.
+// Accepts { field, label|title, facetId, numberOfValues, sortCriteria }.
+// Returns a clean config object, or null if the entry is invalid.
+function normalizeFacetConfig( raw ) {
+	if ( !raw || typeof raw !== 'object' || Array.isArray( raw ) ) {
+		return null;
+	}
+
+	const field = typeof raw.field === 'string' ? raw.field.trim() : '';
+	if ( !field ) {
+		return null;
+	}
+
+	const labelRaw = typeof raw.label === 'string' ? raw.label.trim() : '';
+	const titleRaw = typeof raw.title === 'string' ? raw.title.trim() : '';
+	const label = labelRaw || titleRaw || field;
+
+	const facetId = ( typeof raw.facetId === 'string' && raw.facetId.trim() )
+		? raw.facetId.trim()
+		: field;
+
+	const numberOfValues = ( Number.isInteger( raw.numberOfValues ) && raw.numberOfValues > 0 )
+		? raw.numberOfValues
+		: 8;
+
+	const sortCriteria = ( raw.sortCriteria === 'alphanumeric' || raw.sortCriteria === 'occurrences' )
+		? raw.sortCriteria
+		: 'occurrences';
+
+	return { field, label, facetId, numberOfValues, sortCriteria };
 }
 
 // rebuild a clean query string out of a JSON object
@@ -680,6 +763,23 @@ function initEngine() {
 	didYouMeanController = buildDidYouMean( headlessEngine, { options: { automaticallyCorrectQuery: params.automaticallyCorrectQuery } } );
 	pagerController = buildPager( headlessEngine, { options: { numberOfPages: params.numberOfPages } } );
 	statusController = buildSearchStatus( headlessEngine );
+
+	// Build a regular facet controller for each normalized facet config
+	facetNormalizedConfigs.forEach( ( config, index ) => {
+		const controller = buildFacet( headlessEngine, {
+			options: {
+				field: config.field,
+				facetId: config.facetId,
+				numberOfValues: config.numberOfValues,
+				sortCriteria: config.sortCriteria,
+			}
+		} );
+		facetControllers[ index ] = controller;
+		facetStates[ index ] = controller.state;
+		unsubscribeFacetControllers[ index ] = controller.subscribe(
+			() => updateFacetState( index, controller.state )
+		);
+	} );
 
 	// Refine search based on URL parameters for filters, mostly used in Advanced Search to trigger only one search per page load
 	if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site || urlParams.year || urlParams.declaredtype || urlParams.startdate || urlParams.enddate || urlParams.dprtmnt ) { 
@@ -924,6 +1024,7 @@ function initEngine() {
 		unsubscribeQuerySummaryController?.();
 		unsubscribeDidYouMeanController?.();
 		unsubscribePagerController?.();
+		unsubscribeFacetControllers.forEach( ( unsub ) => unsub?.() );
 	};
 
 	// Listen to URL change (hash)
@@ -1080,7 +1181,7 @@ function openSuggestionsBox() {
 	searchBoxElement.setAttribute( 'aria-expanded', 'true' );
 }
 
-// close the suggestions box 
+// close the suggestions box
 function closeSuggestionsBox() {
 	if( !suggestionsElement ) {
 		return;
@@ -1089,6 +1190,29 @@ function closeSuggestionsBox() {
 	activeSuggestion = 0;
 	searchBoxElement.setAttribute( 'aria-expanded', 'false' );
 	searchBoxElement.removeAttribute( 'aria-activedescendant' );
+}
+
+// Toggle the facet sidebar between expanded and collapsed
+function toggleFacetSidebar() {
+	if ( !facetSidebarElement || !facetPanelElement ) {
+		return;
+	}
+
+	const toggleBtn = document.getElementById( 'gc-facet-toggle' );
+	const resultsCol = document.getElementById( 'gc-results-col' );
+	const isExpanded = toggleBtn?.getAttribute( 'aria-expanded' ) === 'true';
+
+	if ( isExpanded ) {
+		facetSidebarElement.hidden = true;
+		toggleBtn?.setAttribute( 'aria-expanded', 'false' );
+		resultsCol?.classList.remove( 'col-md-8' );
+		resultsCol?.classList.add( 'col-md-12' );
+	} else {
+		facetSidebarElement.hidden = false;
+		toggleBtn?.setAttribute( 'aria-expanded', 'true' );
+		resultsCol?.classList.remove( 'col-md-12' );
+		resultsCol?.classList.add( 'col-md-8' );
+	}
 }
 
 // Update the visual selection of the active suggestion
@@ -1416,6 +1540,102 @@ function updatePagerState( newState ) {
 	} );
 
 	pagerComponentElement.appendChild( nextLiNode );
+}
+
+// Rebuild a single facet's DOM inside the facet panel
+function updateFacetState( index, newState ) {
+	facetStates[ index ] = newState;
+
+	if ( !facetPanelElement || newState.isLoading ) {
+		return;
+	}
+
+	const config = facetNormalizedConfigs[ index ];
+	const facetEl = document.getElementById( 'gc-facet-' + config.facetId );
+
+	if ( !facetEl ) {
+		return;
+	}
+
+	// Preserve the open/closed state across re-renders, then clear children
+	const wasOpen = facetEl.open;
+	facetEl.textContent = '';
+	facetEl.open = wasOpen;
+
+	// <summary> acts as the facet label / collapse toggle
+	const summaryEl = document.createElement( 'summary' );
+	summaryEl.textContent = config.label;
+	facetEl.appendChild( summaryEl );
+
+	// Values list
+	const listEl = document.createElement( 'ul' );
+	listEl.className = 'list-unstyled gc-facet-values';
+
+	newState.values.forEach( ( value ) => {
+		const liEl = document.createElement( 'li' );
+		const isSelected = value.state === 'selected';
+		const countFormatted = value.numberOfResults.toLocaleString( params.lang );
+		const valueLabel = stripHtml( value.value );
+
+		if ( isSelected ) {
+			const removeHintEl = document.createElement( 'span' );
+			removeHintEl.className = 'wb-inv';
+			removeHintEl.textContent = lang === 'fr' ? 'Enlever le filtre actif:' : 'Remove active filter:';
+			liEl.appendChild( removeHintEl );
+		}
+
+		const valueLink = document.createElement( 'a' );
+		valueLink.href = '#';
+		valueLink.onclick = ( e ) => { e.preventDefault(); facetControllers[ index ].toggleSelect( value ); };
+
+		if ( isSelected ) {
+			const iconEl = document.createElement( 'span' );
+			iconEl.className = 'glyphicon glyphicon-ok mrgn-rght-sm';
+			iconEl.setAttribute( 'aria-hidden', 'true' );
+			valueLink.appendChild( iconEl );
+			valueLink.appendChild( document.createTextNode( '\u00a0' ) );
+		}
+
+		valueLink.appendChild( document.createTextNode( valueLabel ) );
+
+		// Count sits outside <a> as plain text so only the label looks like a link
+		const countEl = document.createElement( 'span' );
+		countEl.className = 'gc-facet-count';
+		countEl.innerHTML = ' (' + countFormatted
+			+ '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
+
+		liEl.appendChild( valueLink );
+		liEl.appendChild( countEl );
+		listEl.appendChild( liEl );
+	} );
+
+	facetEl.appendChild( listEl );
+
+	// Show more / show less — btn-link with chevron, matching the template
+	const showMoreBtn = document.createElement( 'button' );
+	showMoreBtn.type = 'button';
+	showMoreBtn.className = 'btn btn-link small gc-facet-show-more pl-0';
+	showMoreBtn.hidden = !newState.canShowMoreValues;
+	showMoreBtn.onclick = () => { facetControllers[ index ].showMoreValues(); };
+	showMoreBtn.innerHTML = ( lang === 'fr' ? 'Afficher davantage' : 'Show more' )
+		+ ' <span class="glyphicon glyphicon-chevron-down small" aria-hidden="true"></span>';
+
+	const showLessBtn = document.createElement( 'button' );
+	showLessBtn.type = 'button';
+	showLessBtn.className = 'btn btn-link small gc-facet-show-less pl-0';
+	showLessBtn.hidden = !newState.canShowLessValues;
+	showLessBtn.onclick = () => { facetControllers[ index ].showLessValues(); };
+	showLessBtn.innerHTML = ( lang === 'fr' ? 'Afficher moins' : 'Show less' )
+		+ ' <span class="glyphicon glyphicon-chevron-up small" aria-hidden="true"></span>';
+
+	facetEl.appendChild( showMoreBtn );
+	facetEl.appendChild( showLessBtn );
+
+	// Update the global "Clear all" visibility based on all facet states
+	const clearAllContainer = document.getElementById( 'gc-facet-clear-all-container' );
+	if ( clearAllContainer ) {
+		clearAllContainer.hidden = !facetStates.some( ( s ) => s?.hasActiveValues );
+	}
 }
 
 // Update the URL parameter for pagination in advanced search mode
