@@ -30,11 +30,29 @@ module.exports = function(grunt) {
 			}
 		},
 
+		postcss: {
+			options: {
+				map: false,
+				processors: [
+					require('postcss-preset-env')({
+						stage: 1,
+						features: {
+							'nesting-rules': true
+						}
+					})
+				]
+			},
+			dist: {
+				files: {
+					'dist/connector.css': 'src/connector.css'
+				}
+			}
+		},
+
 		cssmin: {
 			dist: {
 				files: {
-					'dist/connector.min.css': ['src/connector.css'],
-					'dist/suggestions.min.css': ['src/suggestions.css']
+					'dist/connector.min.css': ['dist/connector.css']
 				}
 			}
 		},
@@ -49,7 +67,7 @@ module.exports = function(grunt) {
 					linebreak: true
 				},
 				files: {
-					src: [ 'dist/connector.min.css', 'dist/suggestions.min.css' ]
+					src: [ 'dist/connector.min.css' ]
 				}
 			}
 		},
@@ -92,6 +110,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('@lodder/grunt-postcss');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-banner');
@@ -100,15 +119,10 @@ module.exports = function(grunt) {
 
 	// Task to fix line endings after minification
 	grunt.registerTask('fixLineEndings', function () {
-		let connectorCSS = grunt.file.read('dist/connector.min.css');
-		let suggestionsCSS = grunt.file.read('dist/suggestions.min.css');
-		
-		connectorCSS = connectorCSS.replace(/\r\n?/g, '\n');
-		suggestionsCSS = suggestionsCSS.replace(/\r\n?/g, '\n');
-
-		grunt.file.write('dist/connector.min.css', connectorCSS);
-		grunt.file.write('dist/suggestions.min.css', suggestionsCSS);
+		let content = grunt.file.read('dist/connector.min.css');
+		content = content.replace(/\r\n?/g, '\n');
+		grunt.file.write('dist/connector.min.css', content);
 	});
 
-	grunt.registerTask('default', ['clean', 'htmllint', 'jshint', 'eslint', 'copy', 'uglify', 'cssmin', 'usebanner', 'fixLineEndings']);
+	grunt.registerTask('default', ['clean', 'htmllint', 'jshint', 'eslint', 'copy', 'uglify', 'postcss', 'cssmin', 'usebanner', 'fixLineEndings']);
 };
