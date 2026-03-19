@@ -1207,7 +1207,7 @@ function updateResultListState( newState ) {
 				if( lastBreadcrumb.indexOf(hostname) > -1 ){
 					breadcrumb = '<ol class="location"><li>' + stripHtml( result.raw.hostname ) + '</li></ol>';
 				} else {
-					breadcrumb = '<ol class="location"><li>' + stripHtml( result.raw.hostname ) + 
+					breadcrumb = '<ol class="location"><li>' + hostname + 
 						'&nbsp;</li><li>' + lastBreadcrumb + '</li></ol>';
 				}
 			} else {
