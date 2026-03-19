@@ -1705,6 +1705,11 @@ function updateSmartSnippetState ( newState ) {
 						el.removeAttribute( 'disabled' );
 						el.removeAttribute( 'tabindex' );
 					} );
+					const smartSnippetTitle = document.getElementById( 'smart-snippet-question' );
+					if ( smartSnippetTitle ) {
+						smartSnippetTitle.tabIndex = -1;
+						smartSnippetTitle.focus();
+					}
 					
 				// Collapse the container
 				} else {
