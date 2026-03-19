@@ -24,7 +24,8 @@ module.exports = function(grunt) {
 
 			dist: {
 				files: {
-					'dist/connector.min.js': ['src/connector.js']
+					'dist/connector.min.js': ['src/connector.js'],
+					'dist/suggestions.min.js': ['src/suggestions.js']
 				}
 			}
 		},
@@ -32,7 +33,8 @@ module.exports = function(grunt) {
 		cssmin: {
 			dist: {
 				files: {
-					'dist/connector.min.css': ['src/connector.css']
+					'dist/connector.min.css': ['src/connector.css'],
+					'dist/suggestions.min.css': ['src/suggestions.css']
 				}
 			}
 		},
@@ -47,7 +49,7 @@ module.exports = function(grunt) {
 					linebreak: true
 				},
 				files: {
-					src: [ 'dist/connector.min.css' ]
+					src: [ 'dist/connector.min.css', 'dist/suggestions.min.css' ]
 				}
 			}
 		},
@@ -74,7 +76,7 @@ module.exports = function(grunt) {
 					esversion: 11,
 					'-W067': true	// To ignore Unorthodox function invocation
 				},
-				src: ['Gruntfile.js', 'src/connector.js']
+				src: ['Gruntfile.js', 'src/connector.js', 'src/suggestions.js']
 			}
 		},
 
@@ -83,7 +85,7 @@ module.exports = function(grunt) {
 				overrideConfigFile: ".eslintrc.json",
 				quiet: true
 			},
-			target: ['Gruntfile.js', 'src/connector.js']
+			target: ['Gruntfile.js', 'src/connector.js', 'src/suggestions.js']
 		}
 	});
 
@@ -98,9 +100,14 @@ module.exports = function(grunt) {
 
 	// Task to fix line endings after minification
 	grunt.registerTask('fixLineEndings', function () {
-		let content = grunt.file.read('dist/connector.min.css');
-		content = content.replace(/\r\n?/g, '\n');
-		grunt.file.write('dist/connector.min.css', content);
+		let connectorCSS = grunt.file.read('dist/connector.min.css');
+		let suggestionsCSS = grunt.file.read('dist/suggestions.min.css');
+		
+		connectorCSS = connectorCSS.replace(/\r\n?/g, '\n');
+		suggestionsCSS = suggestionsCSS.replace(/\r\n?/g, '\n');
+
+		grunt.file.write('dist/connector.min.css', connectorCSS);
+		grunt.file.write('dist/suggestions.min.css', suggestionsCSS);
 	});
 
 	grunt.registerTask('default', ['clean', 'htmllint', 'jshint', 'eslint', 'copy', 'uglify', 'cssmin', 'usebanner', 'fixLineEndings']);
