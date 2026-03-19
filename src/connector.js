@@ -1208,7 +1208,7 @@ function updateResultListState( newState ) {
 					breadcrumb = '<ol class="location"><li>' + stripHtml( result.raw.hostname ) + '</li></ol>';
 				} else {
 					breadcrumb = '<ol class="location"><li>' + stripHtml( result.raw.hostname ) + 
-						'&nbsp;</li><li>' + stripHtml( splittedNavLabel[splittedNavLabel.length-1] ) + '</li></ol>';
+						'&nbsp;</li><li>' + lastBreadcrumb + '</li></ol>';
 				}
 			} else {
 				breadcrumb = '<p class="location"><cite><a href="' + clickUri + '">' + printableUri + '</a></cite></p>';
