@@ -11,6 +11,9 @@ import {
 	buildContext,
 	buildInteractiveResult,
 	buildFacet,
+	buildDateFacet,
+	buildDateFilter,
+	buildDateRange,
 	loadAdvancedSearchQueryActions,
 	loadSortCriteriaActions,
 	HighlightUtils,
@@ -69,11 +72,14 @@ let unsubscribeQuerySummaryController;
 let unsubscribeDidYouMeanController;
 let unsubscribePagerController;
 let unsubscribeFacetControllers = [];
+let unsubscribeDateFilterControllers = [];
 
 // Facet configs and controllers
 let facetNormalizedConfigs = [];
 let facetControllers = [];
 let facetStates = [];
+let dateFilterControllers = [];
+let dateFilterStates = [];
 
 // UI states
 let updateSearchBoxFromState = false;
@@ -418,8 +424,10 @@ function initTpl() {
 		facetPanelElement = document.getElementById( 'gc-facet-panel' );
 		resultsSection = document.getElementById( resultSectionID );
 		document.getElementById( 'gc-facet-toggle' ).onclick = toggleFacetSidebar;
-		document.querySelector( '#gc-facet-clear-all-container .btn-link' ).onclick =
-			() => { facetControllers.forEach( ( c ) => c.deselectAll() ); };
+		document.querySelector( '#gc-facet-clear-all-container .btn-link' ).onclick = () => {
+			facetControllers.forEach( ( c ) => c?.deselectAll() );
+			dateFilterControllers.forEach( ( c ) => c?.clear() );
+		};
 	}
 
 	// auto-create results
@@ -572,8 +580,39 @@ function normalizeFacetConfig( raw ) {
 		? raw.sortCriteria
 		: 'occurrences';
 
-	return { field, label, facetId, numberOfValues, sortCriteria };
+	const facetType = raw.facetType === 'dateRange' ? 'dateRange' : 'regular';
+
+	return { field, label, facetId, numberOfValues, sortCriteria, facetType };
 }
+
+// Format a Date as a Coveo date string: YYYY/MM/DD@HH:mm:ss
+function formatCoveoDate( date ) {
+	const pad = ( n ) => String( n ).padStart( 2, '0' );
+	return `${date.getFullYear()}/${pad( date.getMonth() + 1 )}/${pad( date.getDate() )}@${pad( date.getHours() )}:${pad( date.getMinutes() )}:${pad( date.getSeconds() )}`;
+}
+
+// Convert YYYY-MM-DD (date input value) to Coveo date string
+function inputDateToCoveoDate( dateStr, endOfDay ) {
+	if ( !dateStr ) { return ''; }
+	return dateStr.replace( /-/g, '/' ) + ( endOfDay ? '@23:59:59' : '@00:00:00' );
+}
+
+// Convert a Coveo date string to YYYY-MM-DD for a date input
+function coveoDateToInputDate( coveoDate ) {
+	if ( !coveoDate ) { return ''; }
+	return String( coveoDate ).slice( 0, 10 ).replace( /\//g, '-' );
+}
+
+// Predefined relative date periods for the date facet (start is relative, end is fixed at page load)
+const DATE_FACET_PERIODS = ( () => {
+	const end = formatCoveoDate( new Date() );
+	return [
+		{ en: 'Past day',   fr: 'Dernière journée', range: buildDateRange( { start: { period: 'past', unit: 'day',   amount: 1 }, end, endInclusive: true } ) },
+		{ en: 'Past week',  fr: 'Dernière semaine',  range: buildDateRange( { start: { period: 'past', unit: 'week',  amount: 1 }, end, endInclusive: true } ) },
+		{ en: 'Past month', fr: 'Dernier mois',      range: buildDateRange( { start: { period: 'past', unit: 'month', amount: 1 }, end, endInclusive: true } ) },
+		{ en: 'Past year',  fr: 'Dernière année',    range: buildDateRange( { start: { period: 'past', unit: 'year',  amount: 1 }, end, endInclusive: true } ) },
+	];
+} )();
 
 // rebuild a clean query string out of a JSON object
 function buildCleanQueryString( paramsObject ) {
@@ -764,21 +803,48 @@ function initEngine() {
 	pagerController = buildPager( headlessEngine, { options: { numberOfPages: params.numberOfPages } } );
 	statusController = buildSearchStatus( headlessEngine );
 
-	// Build a regular facet controller for each normalized facet config
+	// Build a facet controller for each normalized facet config
 	facetNormalizedConfigs.forEach( ( config, index ) => {
-		const controller = buildFacet( headlessEngine, {
-			options: {
-				field: config.field,
-				facetId: config.facetId,
-				numberOfValues: config.numberOfValues,
-				sortCriteria: config.sortCriteria,
-			}
-		} );
-		facetControllers[ index ] = controller;
-		facetStates[ index ] = controller.state;
-		unsubscribeFacetControllers[ index ] = controller.subscribe(
-			() => updateFacetState( index, controller.state )
-		);
+		if ( config.facetType === 'dateRange' ) {
+			const dateFacetController = buildDateFacet( headlessEngine, {
+				options: {
+					field: config.field,
+					facetId: config.facetId,
+					currentValues: DATE_FACET_PERIODS.map( ( p ) => p.range ),
+					generateAutomaticRanges: false,
+				}
+			} );
+			const dateFilterController = buildDateFilter( headlessEngine, {
+				options: {
+					field: config.field,
+					facetId: config.facetId + '__filter',
+				}
+			} );
+			facetControllers[ index ] = dateFacetController;
+			dateFilterControllers[ index ] = dateFilterController;
+			facetStates[ index ] = dateFacetController.state;
+			dateFilterStates[ index ] = dateFilterController.state;
+			unsubscribeFacetControllers[ index ] = dateFacetController.subscribe(
+				() => updateDateFacetState( index, dateFacetController.state, dateFilterController.state )
+			);
+			unsubscribeDateFilterControllers[ index ] = dateFilterController.subscribe(
+				() => updateDateFacetState( index, dateFacetController.state, dateFilterController.state )
+			);
+		} else {
+			const controller = buildFacet( headlessEngine, {
+				options: {
+					field: config.field,
+					facetId: config.facetId,
+					numberOfValues: config.numberOfValues,
+					sortCriteria: config.sortCriteria,
+				}
+			} );
+			facetControllers[ index ] = controller;
+			facetStates[ index ] = controller.state;
+			unsubscribeFacetControllers[ index ] = controller.subscribe(
+				() => updateFacetState( index, controller.state )
+			);
+		}
 	} );
 
 	// Refine search based on URL parameters for filters, mostly used in Advanced Search to trigger only one search per page load
@@ -1025,6 +1091,7 @@ function initEngine() {
 		unsubscribeDidYouMeanController?.();
 		unsubscribePagerController?.();
 		unsubscribeFacetControllers.forEach( ( unsub ) => unsub?.() );
+		unsubscribeDateFilterControllers.forEach( ( unsub ) => unsub?.() );
 	};
 
 	// Listen to URL change (hash)
@@ -1631,11 +1698,148 @@ function updateFacetState( index, newState ) {
 	facetEl.appendChild( showMoreBtn );
 	facetEl.appendChild( showLessBtn );
 
-	// Update the global "Clear all" visibility based on all facet states
+	updateClearAllVisibility();
+}
+
+function updateClearAllVisibility() {
 	const clearAllContainer = document.getElementById( 'gc-facet-clear-all-container' );
 	if ( clearAllContainer ) {
-		clearAllContainer.hidden = !facetStates.some( ( s ) => s?.hasActiveValues );
+		clearAllContainer.hidden = !facetStates.some( ( s ) => s?.hasActiveValues )
+			&& !dateFilterStates.some( ( s ) => s?.range );
 	}
+}
+
+// Rebuild the DOM for a date range facet (predefined periods + custom date pickers)
+function updateDateFacetState( index, dateFacetState, dateFilterState ) {
+	facetStates[ index ] = dateFacetState;
+	dateFilterStates[ index ] = dateFilterState;
+
+	if ( !facetPanelElement || dateFacetState.isLoading ) {
+		return;
+	}
+
+	const config = facetNormalizedConfigs[ index ];
+	const facetEl = document.getElementById( 'gc-facet-' + config.facetId );
+	if ( !facetEl ) {
+		return;
+	}
+
+	const isFr = lang === 'fr';
+	const wasOpen = facetEl.open;
+	facetEl.textContent = '';
+	facetEl.open = wasOpen;
+
+	const summaryEl = document.createElement( 'summary' );
+	summaryEl.textContent = config.label;
+	facetEl.appendChild( summaryEl );
+
+	// --- Custom date pickers (above the list) ---
+	const startId = 'gc-facet-date-start-' + index;
+	const endId = 'gc-facet-date-end-' + index;
+
+	const datePickerContainer = document.createElement( 'div' );
+	datePickerContainer.className = 'gc-date-pickers';
+	const todayStr = new Date().toISOString().slice( 0, 10 );
+
+	datePickerContainer.insertAdjacentHTML( 'beforeend',
+		`<div class="form-group mrgn-tp-sm">
+			<label for="${startId}">${isFr ? 'Date de début' : 'Start date'}<span class="datepicker-format"> (<abbr title="${isFr ? 'Quatre chiffres pour l\'année, tiret, deux chiffres pour le mois, tiret, deux chiffres pour le jour' : 'Four digits year, dash, two digits month, dash, two digits day'}">YYYY-MM-DD</abbr>)</span></label>
+			<input class="form-control" type="date" id="${startId}" name="${startId}" max="${todayStr}" />
+		</div>
+		<div class="form-group">
+			<label for="${endId}">${isFr ? 'Date de fin' : 'End date'}<span class="datepicker-format"> (<abbr title="${isFr ? 'Quatre chiffres pour l\'année, tiret, deux chiffres pour le mois, tiret, deux chiffres pour le jour' : 'Four digits year, dash, two digits month, dash, two digits day'}">YYYY-MM-DD</abbr>)</span></label>
+			<input class="form-control" type="date" id="${endId}" name="${endId}" max="${todayStr}" />
+		</div>
+		<button type="button" class="btn btn-default btn-sm mrgn-bttm-md gc-date-apply">${isFr ? 'Appliquer' : 'Apply'}</button>`
+	);
+
+	const startInput = datePickerContainer.querySelector( '#' + startId );
+	const endInput = datePickerContainer.querySelector( '#' + endId );
+
+	startInput.onchange = () => { if ( startInput.value ) { endInput.min = startInput.value; } };
+	endInput.onchange = () => { if ( endInput.value ) { startInput.max = endInput.value; } };
+
+	// Pre-populate inputs if a custom filter is already active
+	if ( dateFilterState.range ) {
+		startInput.value = coveoDateToInputDate( dateFilterState.range.start );
+		endInput.value = coveoDateToInputDate( dateFilterState.range.end );
+		endInput.min = startInput.value;
+		startInput.max = endInput.value;
+	}
+
+	datePickerContainer.querySelector( '.gc-date-apply' ).onclick = () => {
+		let startVal = startInput.value;
+		let endVal = endInput.value;
+		if ( startVal && endVal ) {
+			// Swap if end is before start
+			if ( endVal < startVal ) {
+				[ startVal, endVal ] = [ endVal, startVal ];
+				startInput.value = startVal;
+				endInput.value = endVal;
+			}
+			// Clear predefined range selection before applying custom filter
+			facetControllers[ index ].deselectAll();
+			dateFilterControllers[ index ].setRange( {
+				start: inputDateToCoveoDate( startVal, false ),
+				end: inputDateToCoveoDate( endVal, true ),
+			} );
+		}
+	};
+
+	facetEl.appendChild( datePickerContainer );
+
+	// --- Predefined date range list ---
+	const listEl = document.createElement( 'ul' );
+	listEl.className = 'list-unstyled gc-facet-values mrgn-tp-sm';
+
+	dateFacetState.values.forEach( ( value, valueIndex ) => {
+		const period = DATE_FACET_PERIODS[ valueIndex ];
+		if ( !period ) {
+			return;
+		}
+
+		const liEl = document.createElement( 'li' );
+		const isSelected = value.state === 'selected';
+		const countFormatted = value.numberOfResults.toLocaleString( lang );
+		const periodLabel = isFr ? period.fr : period.en;
+
+		if ( isSelected ) {
+			const removeHintEl = document.createElement( 'span' );
+			removeHintEl.className = 'wb-inv';
+			removeHintEl.textContent = isFr ? 'Enlever le filtre actif:' : 'Remove active filter:';
+			liEl.appendChild( removeHintEl );
+		}
+
+		const valueLink = document.createElement( 'a' );
+		valueLink.href = '#';
+		valueLink.onclick = ( e ) => {
+			e.preventDefault();
+			// Clear custom date filter before selecting a predefined range
+			dateFilterControllers[ index ].clear();
+			facetControllers[ index ].toggleSelect( value );
+		};
+
+		if ( isSelected ) {
+			const iconEl = document.createElement( 'span' );
+			iconEl.className = 'glyphicon glyphicon-ok mrgn-rght-sm';
+			iconEl.setAttribute( 'aria-hidden', 'true' );
+			valueLink.appendChild( iconEl );
+		}
+
+		valueLink.appendChild( document.createTextNode( periodLabel ) );
+
+		const countEl = document.createElement( 'span' );
+		countEl.className = 'gc-facet-count';
+		countEl.innerHTML = ' (' + countFormatted
+			+ '<span class="wb-inv"> ' + ( isFr ? 'résultats' : 'results' ) + '</span>)';
+
+		liEl.appendChild( valueLink );
+		liEl.appendChild( countEl );
+		listEl.appendChild( liEl );
+	} );
+
+	facetEl.appendChild( listEl );
+	updateClearAllVisibility();
 }
 
 // Update the URL parameter for pagination in advanced search mode
