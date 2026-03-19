@@ -6,32 +6,47 @@
 	border-left: 1px solid #ccc;
 	border-right: 1px solid #ccc;
 	cursor: pointer;
-	left: 0px;
+	left: 0;
 	list-style-type: none;
 	padding: 0;
 	position: absolute;
 	top: 100%;
 	width: 100%;
 	z-index: 60;
+
+	&:has(li) {
+		border-bottom: 1px solid #ccc;
+	}
+
+	& .suggestion-item {
+		padding: 5px 10px;
+
+		&:hover, &.selected-suggestion {
+			background-color: #ddd;
+		}
+
+		&::before {
+			content: "\e003";
+			font-family: "Glyphicons Halflings";
+			font-size: 0.8em;
+			line-height: 1;
+			margin-right: 12px;
+			position: relative;
+			top: 1px;
+		}
+	}
 }
-.query-suggestions:has(li) {
-    border-bottom: 1px solid #ccc;
+
+/* Top-right query suggestions */
+#wb-bnr .query-suggestions {
+	left: auto;
+	top: auto;
+	width: calc(100% - 30px);
 }
-.query-suggestions li {
-	padding: 5px 10px;
-}
-.query-suggestions li:hover {
-	background-color: #ddd;
-}
-.query-suggestions .suggestion-item::before {
-	content: "\e003";
-	font-family: "Glyphicons Halflings";
-	font-size: 0.8em;
-	line-height: 1;
-	margin-right: 12px;
-	position: relative;
-	top: 1px;
-}
-.query-suggestions .selected-suggestion {
-	background-color: #ddd;
+
+@media screen and (max-width: 991px) {
+	#wb-bnr .query-suggestions {
+		position: relative;
+		width: 100%;
+	}
 }

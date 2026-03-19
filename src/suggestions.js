@@ -1,3 +1,6 @@
+( function( document, window ) {
+"use strict";
+
 // Search UI base
 const baseElement = document.querySelector( '[data-gc-search]' );
 
@@ -17,15 +20,14 @@ const defaults = {
 	"numberOfSuggestions": 5,
 	"minimumCharsForSuggestions": 3,
 	"originLevel3": originPath,
-	"pipeline": ""
+	"pipeline": "",
+	"endpoint": "https://apps.canada.ca/search"
 };
 let lang = document.querySelector( "html" )?.lang;
 let paramsOverride = baseElement ? JSON.parse( baseElement.dataset.gcSearch ) : {};
 let paramsDetect = {};
 let params = {};
 let urlParams;
-let hashParams;
-let visitorId = getVisitorId();
 let originLevel3RelativeUrl = "";
 
 // UI states
@@ -73,37 +75,11 @@ function initSearchUI() {
 	// Final parameters object
 	params = Object.assign( defaults, paramsDetect, paramsOverride );
 
-	// Update the URL params and the hash params on navigation
-	window.onpopstate = () => {
-		var match,
-			pl = /\+/g,	// Regex for replacing addition symbol with a space
-			search = /([^&=]+)=?([^&]*)/g,
-			decode = function ( s ) { return decodeURIComponent( s.replace( pl, " " ) ); },
-			query = winLoc.search.substring( 1 );
-
-		urlParams = {};
-		hashParams = {};
-
-		// Ignore linting errors in regard to affectation instead of condition in the loops
-		// jshint -W084
-		while ( match = search.exec( query ) ) {	// eslint-disable-line no-cond-assign
-			urlParams[ decode(match[ 1 ] ) ] = stripHtml( decode( match[ 2 ] ) );
-		}
-		query = winLoc.hash.substring( 1 );
-
-		while ( match = search.exec( query ) ) {	// eslint-disable-line no-cond-assign
-			hashParams[ decode( match[ 1 ] ) ] = stripHtml( decode( match[ 2 ] ) );
-		}
-		// jshint +W084
-	};
-
-	window.onpopstate();
-
 	// Initialize templates
 	initTpl();
 
 	// override origineLevel3 through query parameters 
-	if ( urlParams.originLevel3 ) {
+	if ( urlParams?.originLevel3 ) {
 		params.originLevel3 = urlParams.originLevel3;
 	}
 	
@@ -119,10 +95,6 @@ function initSearchUI() {
 	}
 	else {
 		originLevel3RelativeUrl = params.originLevel3;
-	}
-
-	if ( !params.endpoints ) {
-		params.endpoints = getOrganizationEndpoints( params.organizationId );
 	}
 
 	// Do nothing if no access token is provided
@@ -173,51 +145,10 @@ function initTpl() {
 	}
 }
 
-function getOrganizationEndpoints( organizationId ) {
-	const endpoints = {
-		analytics: `https://${organizationId}.analytics.org.coveo.com`,
-		search: `https://${organizationId}.org.coveo.com/rest/search/v2`,
-	}
-
-	return endpoints;
-}
-
 function sanitizeQuery(q) {
 	return q.replace(/<[^>]*>?/gm, '');
 }
 
-function getCookie(cname) {
-	let name = cname + "=";
-	let decodedCookie = decodeURIComponent(document.cookie); // Decode URI components
-	let ca = decodedCookie.split(';'); // Split the string into an array of cookies
-
-	for (let i = 0; i < ca.length; i++) {
-		let c = ca[i];
-		// Trim leading spaces from the cookie string
-		while (c.charAt(0) === ' ') {
-			c = c.substring(1);
-		}
-		// If the cookie name matches, return its value
-		if (c.indexOf(name) === 0) {
-			return c.substring(name.length, c.length);
-		}
-	}
-	return ""; // Return an empty string if the cookie is not found
-}
-
-function getVisitorId() {
-	let cookieValue = getCookie("coveo_visitorId");
-	if ( !cookieValue ) {
-		// Generate a new visitor ID (UUID v4)
-		cookieValue = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-			let r = Math.random() * 16 | 0;
-			let v = c === 'x' ? r : (r & 0x3 | 0x8);
-			return v.toString(16);
-		});
-		document.cookie = "coveo_visitorId=" + cookieValue + "; path=/";
-	}
-	return cookieValue;
-}
 // rebuild a clean query string out of a JSON object
 function buildCleanQueryString( paramsObject ) {
 	let urlParam = "";
@@ -317,11 +248,11 @@ function redirectToSearchPage( actionCause ) {
 
 function formatHighlightedSuggestion( highlighted ) {
 	return highlighted.replaceAll( '[', '<strong>' )
-					  .replaceAll( ']', '</strong>' )
-					  .replaceAll( '(', '' )
-					  .replaceAll( ')', '' )
-					  .replaceAll( '{', '' )
-					  .replaceAll( '}', '' );
+		.replaceAll( ']', '</strong>' )
+		.replaceAll( '(', '' )
+		.replaceAll( ')', '' )
+		.replaceAll( '{', '' )
+		.replaceAll( '}', '' );
 }
 
 function updateSearchBoxText( text ) {
@@ -338,16 +269,8 @@ function updateSearchBoxText( text ) {
 			searchPageUrl: params.originLevel3,
 			searchPageRelativeUrl: originLevel3RelativeUrl
 		},
-		searchHub: params.searchHub,
-		visitorId: visitorId,
-		analytics:{
-			clientId: visitorId,
-			clientTimestamp: new Date().toISOString(),
-			documentReferrer: "default",
-			originContext: "Search",
-			capture:false
-		}
-	}
+		searchHub: params.searchHub
+	};
 
 	const options = {
 		method: 'POST',
@@ -358,7 +281,7 @@ function updateSearchBoxText( text ) {
 		body: JSON.stringify( body )
 	};
 
-	fetch(params.endpoints.search + "/querySuggest", options)
+	fetch(params.endpoint + "/querySuggest?organizationId=" + params.organizationId, options)
 		.then((response) => {
 			if (!response.ok) {
 				// Handle HTTP errors, e.g., 404 Not Found
@@ -417,7 +340,7 @@ function selectSuggestion() {
 
 		if ( selectedVal ) {
 			searchBoxElement.value = selectedVal;
-			redirectToSearchPage( 'headerSearchBoxSuggestion' )
+			redirectToSearchPage( 'headerSearchBoxSuggestion' );
 		}
 	}
 }
@@ -457,7 +380,6 @@ function updateSuggestionSelection() {
 
 // Update the search box state after search actions - used for QS
 function updateSearchBoxState( newState ) {
-	const previousState = searchBoxState;
 	searchBoxState = newState;
 
 	// Show query suggestions if a search action was not executed (if enabled)
@@ -513,3 +435,5 @@ function updateSearchBoxState( newState ) {
 
 // Run Search UI
 initSearchUI();
+
+} )( document, window );
