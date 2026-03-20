@@ -81,7 +81,6 @@ let facetStates = [];
 let dateFilterControllers = [];
 let dateFilterStates = [];
 let facetSearchTimers = [];
-let facetSearchQueries = [];
 
 // UI states
 let updateSearchBoxFromState = false;
@@ -408,7 +407,7 @@ function initTpl() {
 			<div class="row" id="gc-search-facet-layout">
 				<div id="gc-facet-sidebar" class="col-md-4 gc-facet-sidebar mrgn-tp-lg">
 					<section id="gc-facet-panel">
-						<h3 class="wb-inv">${isFr ? 'Filtres' : 'Filters'}</h3>
+						<h2 class="wb-inv">${isFr ? 'Filtres' : 'Filters'}</h2>
 						<div id="gc-facet-clear-all-container" class="text-right" hidden>
 							<button type="button" class="btn btn-link">${isFr ? 'Effacer tout' : 'Clear all'}</button>
 						</div>
@@ -583,8 +582,9 @@ function normalizeFacetConfig( raw ) {
 		: 'occurrences';
 
 	const facetType = raw.facetType === 'dateRange' ? 'dateRange' : 'regular';
+	const enableSearch = raw.enableSearch === true;
 
-	return { field, label, facetId, numberOfValues, sortCriteria, facetType };
+	return { field, label, facetId, numberOfValues, sortCriteria, facetType, enableSearch };
 }
 
 // Format a Date as a Coveo date string: YYYY/MM/DD@HH:mm:ss
@@ -1636,6 +1636,7 @@ function updateFacetState( index, newState ) {
 	// Preserve search focus and open/closed state across re-renders
 	const searchInputId = 'gc-facet-search-' + index;
 	const wasSearchFocused = document.activeElement?.id === searchInputId;
+	const preservedSearchValue = document.getElementById( searchInputId )?.value ?? '';
 	const wasOpen = facetEl.open;
 	facetEl.textContent = '';
 	facetEl.open = wasOpen;
@@ -1659,18 +1660,17 @@ function updateFacetState( index, newState ) {
 	const facetSearchState = newState.facetSearch;
 	const isSearching = ( facetSearchState?.query?.length ?? 0 ) > 0;
 
-	if ( facetSearchState ) {
+	if ( config.enableSearch && facetSearchState ) {
 		const searchInput = document.createElement( 'input' );
 		searchInput.type = 'search';
 		searchInput.id = searchInputId;
-		searchInput.className = 'form-control input-sm mrgn-tp-sm mrgn-bttm-sm gc-facet-search';
+		searchInput.className = 'form-control input-sm mrgn-tp-md mrgn-bttm-md gc-facet-search';
 		searchInput.placeholder = lang === 'fr' ? 'Filtrer...' : 'Filter...';
 		searchInput.setAttribute( 'aria-label', ( lang === 'fr' ? 'Filtrer ' : 'Filter ' ) + config.label );
-		searchInput.value = facetSearchQueries[ index ] ?? '';
+		searchInput.value = preservedSearchValue;
 		searchInput.oninput = () => {
 			clearTimeout( facetSearchTimers[ index ] );
 			const query = searchInput.value;
-			facetSearchQueries[ index ] = query;
 			if ( query.length >= 2 ) {
 				facetSearchTimers[ index ] = setTimeout( () => {
 					facetSearch.updateText( query );
@@ -1693,7 +1693,7 @@ function updateFacetState( index, newState ) {
 			const liEl = document.createElement( 'li' );
 			const valueLink = document.createElement( 'a' );
 			valueLink.href = '#';
-			valueLink.onclick = ( e ) => { e.preventDefault(); facetSearchQueries[ index ] = ''; facetSearch.select( result ); };
+			valueLink.onclick = ( e ) => { e.preventDefault(); facetSearch.select( result ); };
 			valueLink.appendChild( document.createTextNode( stripHtml( result.displayValue ) ) );
 
 			const countEl = document.createElement( 'span' );
