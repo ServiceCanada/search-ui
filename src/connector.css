@@ -79,6 +79,7 @@
 	left: 0;
 }
 
-.gc-date-pickers .form-control {
+.gc-date-pickers .form-control,
+.gc-facet-search {
 	width: 100%;
 }

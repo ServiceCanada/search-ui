@@ -80,6 +80,8 @@ let facetControllers = [];
 let facetStates = [];
 let dateFilterControllers = [];
 let dateFilterStates = [];
+let facetSearchTimers = [];
+let facetSearchQueries = [];
 
 // UI states
 let updateSearchBoxFromState = false;
@@ -1180,6 +1182,7 @@ function initEngine() {
 				didYouMeanElement.textContent = "";
 				pagerElement.textContent = "";
 				pagerManuallyCleared = true;
+				updateFacetLayoutVisibility(true)
 
 				// Show no results message in Query Summary if no query entered
 				querySummaryElement.innerHTML = noResultTemplateHTML;
@@ -1624,7 +1627,15 @@ function updateFacetState( index, newState ) {
 		return;
 	}
 
-	// Preserve the open/closed state across re-renders, then clear children
+	facetEl.hidden = newState.values.length === 0;
+	if ( facetEl.hidden ) {
+		updateFacetLayoutVisibility();
+		return;
+	}
+
+	// Preserve search focus and open/closed state across re-renders
+	const searchInputId = 'gc-facet-search-' + index;
+	const wasSearchFocused = document.activeElement?.id === searchInputId;
 	const wasOpen = facetEl.open;
 	facetEl.textContent = '';
 	facetEl.open = wasOpen;
@@ -1642,55 +1653,104 @@ function updateFacetState( index, newState ) {
 	}
 	facetEl.appendChild( summaryEl );
 
-	// Values list
+	// Facet search input (only if the controller exposes facetSearch)
+	// facetSearch methods live on the sub-controller; state is nested in newState.facetSearch
+	const facetSearch = facetControllers[ index ].facetSearch;
+	const facetSearchState = newState.facetSearch;
+	const isSearching = ( facetSearchState?.query?.length ?? 0 ) > 0;
+
+	if ( facetSearchState ) {
+		const searchInput = document.createElement( 'input' );
+		searchInput.type = 'search';
+		searchInput.id = searchInputId;
+		searchInput.className = 'form-control input-sm mrgn-tp-sm mrgn-bttm-sm gc-facet-search';
+		searchInput.placeholder = lang === 'fr' ? 'Filtrer...' : 'Filter...';
+		searchInput.setAttribute( 'aria-label', ( lang === 'fr' ? 'Filtrer ' : 'Filter ' ) + config.label );
+		searchInput.value = facetSearchQueries[ index ] ?? '';
+		searchInput.oninput = () => {
+			clearTimeout( facetSearchTimers[ index ] );
+			const query = searchInput.value;
+			facetSearchQueries[ index ] = query;
+			if ( query.length >= 2 ) {
+				facetSearchTimers[ index ] = setTimeout( () => {
+					facetSearch.updateText( query );
+					facetSearch.search();
+				}, 300 );
+			} else {
+				facetSearch.updateText( '' );
+			}
+		};
+		facetEl.appendChild( searchInput );
+		if ( wasSearchFocused ) { searchInput.focus(); }
+	}
+
+	// Values list — show facet search results when a query is active, otherwise regular values
 	const listEl = document.createElement( 'ul' );
 	listEl.className = 'list-unstyled gc-facet-values';
 
-	newState.values.forEach( ( value ) => {
-		const liEl = document.createElement( 'li' );
-		const isSelected = value.state === 'selected';
-		const countFormatted = value.numberOfResults.toLocaleString( params.lang );
-		const valueLabel = stripHtml( value.value );
+	if ( isSearching ) {
+		facetSearchState.values.forEach( ( result ) => {
+			const liEl = document.createElement( 'li' );
+			const valueLink = document.createElement( 'a' );
+			valueLink.href = '#';
+			valueLink.onclick = ( e ) => { e.preventDefault(); facetSearchQueries[ index ] = ''; facetSearch.select( result ); };
+			valueLink.appendChild( document.createTextNode( stripHtml( result.displayValue ) ) );
 
-		if ( isSelected ) {
-			const removeHintEl = document.createElement( 'span' );
-			removeHintEl.className = 'wb-inv';
-			removeHintEl.textContent = lang === 'fr' ? 'Enlever le filtre actif:' : 'Remove active filter:';
-			liEl.appendChild( removeHintEl );
-		}
+			const countEl = document.createElement( 'span' );
+			countEl.className = 'gc-facet-count';
+			countEl.innerHTML = ' (' + result.count.toLocaleString( lang )
+				+ '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
 
-		const valueLink = document.createElement( 'a' );
-		valueLink.href = '#';
-		valueLink.onclick = ( e ) => { e.preventDefault(); facetControllers[ index ].toggleSelect( value ); };
+			liEl.appendChild( valueLink );
+			liEl.appendChild( countEl );
+			listEl.appendChild( liEl );
+		} );
+	} else {
+		newState.values.forEach( ( value ) => {
+			const liEl = document.createElement( 'li' );
+			const isSelected = value.state === 'selected';
+			const countFormatted = value.numberOfResults.toLocaleString( params.lang );
+			const valueLabel = stripHtml( value.value );
 
-		if ( isSelected ) {
-			const iconEl = document.createElement( 'span' );
-			iconEl.className = 'glyphicon glyphicon-ok mrgn-rght-sm';
-			iconEl.setAttribute( 'aria-hidden', 'true' );
-			valueLink.appendChild( iconEl );
-			valueLink.appendChild( document.createTextNode( '\u00a0' ) );
-		}
+			if ( isSelected ) {
+				const removeHintEl = document.createElement( 'span' );
+				removeHintEl.className = 'wb-inv';
+				removeHintEl.textContent = lang === 'fr' ? 'Enlever le filtre actif:' : 'Remove active filter:';
+				liEl.appendChild( removeHintEl );
+			}
 
-		valueLink.appendChild( document.createTextNode( valueLabel ) );
+			const valueLink = document.createElement( 'a' );
+			valueLink.href = '#';
+			valueLink.onclick = ( e ) => { e.preventDefault(); facetControllers[ index ].toggleSelect( value ); };
 
-		// Count sits outside <a> as plain text so only the label looks like a link
-		const countEl = document.createElement( 'span' );
-		countEl.className = 'gc-facet-count';
-		countEl.innerHTML = ' (' + countFormatted
-			+ '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
+			if ( isSelected ) {
+				const iconEl = document.createElement( 'span' );
+				iconEl.className = 'glyphicon glyphicon-ok mrgn-rght-sm';
+				iconEl.setAttribute( 'aria-hidden', 'true' );
+				valueLink.appendChild( iconEl );
+				valueLink.appendChild( document.createTextNode( '\u00a0' ) );
+			}
 
-		liEl.appendChild( valueLink );
-		liEl.appendChild( countEl );
-		listEl.appendChild( liEl );
-	} );
+			valueLink.appendChild( document.createTextNode( valueLabel ) );
+
+			const countEl = document.createElement( 'span' );
+			countEl.className = 'gc-facet-count';
+			countEl.innerHTML = ' (' + countFormatted
+				+ '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
+
+			liEl.appendChild( valueLink );
+			liEl.appendChild( countEl );
+			listEl.appendChild( liEl );
+		} );
+	}
 
 	facetEl.appendChild( listEl );
 
-	// Show more / show less — btn-link with chevron, matching the template
+	// Show more / show less — hidden while searching (search has its own pagination)
 	const showMoreBtn = document.createElement( 'button' );
 	showMoreBtn.type = 'button';
 	showMoreBtn.className = 'btn btn-link small gc-facet-show-more pl-0';
-	showMoreBtn.hidden = !newState.canShowMoreValues;
+	showMoreBtn.hidden = isSearching || !newState.canShowMoreValues;
 	showMoreBtn.onclick = () => { facetControllers[ index ].showMoreValues(); };
 	showMoreBtn.innerHTML = ( lang === 'fr' ? 'Afficher davantage' : 'Show more' )
 		+ ' <span class="glyphicon glyphicon-chevron-down small" aria-hidden="true"></span>';
@@ -1698,7 +1758,7 @@ function updateFacetState( index, newState ) {
 	const showLessBtn = document.createElement( 'button' );
 	showLessBtn.type = 'button';
 	showLessBtn.className = 'btn btn-link small gc-facet-show-less pl-0';
-	showLessBtn.hidden = !newState.canShowLessValues;
+	showLessBtn.hidden = isSearching || !newState.canShowLessValues;
 	showLessBtn.onclick = () => { facetControllers[ index ].showLessValues(); };
 	showLessBtn.innerHTML = ( lang === 'fr' ? 'Afficher moins' : 'Show less' )
 		+ ' <span class="glyphicon glyphicon-chevron-up small" aria-hidden="true"></span>';
@@ -1706,7 +1766,31 @@ function updateFacetState( index, newState ) {
 	facetEl.appendChild( showMoreBtn );
 	facetEl.appendChild( showLessBtn );
 
+	updateFacetLayoutVisibility();
 	updateClearAllVisibility();
+}
+
+function updateFacetLayoutVisibility(forceHidden = false) {
+	const toggleBtn = document.getElementById( 'gc-facet-toggle' );
+	const resultsCol = document.getElementById( 'gc-results-col' );
+	if ( !toggleBtn || !facetSidebarElement || !resultsCol ) { return; }
+
+	const hasFacetContent = facetStates.some( ( s ) => s?.values?.length > 0 );
+
+	if ( !hasFacetContent || forceHidden ) {
+		toggleBtn.hidden = true;
+		facetSidebarElement.hidden = true;
+		resultsCol.classList.remove( 'col-md-8' );
+		resultsCol.classList.add( 'col-md-12' );
+	} else {
+		toggleBtn.hidden = false;
+		const isExpanded = toggleBtn.getAttribute( 'aria-expanded' ) === 'true';
+		facetSidebarElement.hidden = !isExpanded;
+		if ( isExpanded ) {
+			resultsCol.classList.remove( 'col-md-12' );
+			resultsCol.classList.add( 'col-md-8' );
+		}
+	}
 }
 
 function updateClearAllVisibility() {
@@ -1729,6 +1813,12 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 	const config = facetNormalizedConfigs[ index ];
 	const facetEl = document.getElementById( 'gc-facet-' + config.facetId );
 	if ( !facetEl ) {
+		return;
+	}
+
+	facetEl.hidden = dateFacetState.values.length === 0;
+	if ( facetEl.hidden ) {
+		updateFacetLayoutVisibility();
 		return;
 	}
 
@@ -1868,6 +1958,7 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 	} );
 
 	facetEl.appendChild( listEl );
+	updateFacetLayoutVisibility();
 	updateClearAllVisibility();
 }
 
