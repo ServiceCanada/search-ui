@@ -389,9 +389,7 @@ function initTpl() {
 	}
 
 	// Normalize facet configs from the HTML attribute
-	facetNormalizedConfigs = Array.isArray( params.facets )
-		? params.facets.map( normalizeFacetConfig ).filter( Boolean )
-		: [];
+	facetNormalizedConfigs = Array.isArray( params.facets )	? params.facets.map( normalizeFacetConfig ).filter( Boolean )	: [];
 
 	// Auto-create two-column facet layout when valid facets are configured
 	if ( facetNormalizedConfigs.length > 0 && !facetPanelElement ) {
@@ -569,17 +567,11 @@ function normalizeFacetConfig( raw ) {
 	const titleRaw = typeof raw.title === 'string' ? raw.title.trim() : '';
 	const label = labelRaw || titleRaw || field;
 
-	const facetId = ( typeof raw.facetId === 'string' && raw.facetId.trim() )
-		? raw.facetId.trim()
-		: field;
+	const facetId = ( typeof raw.facetId === 'string' && raw.facetId.trim() )	? raw.facetId.trim() : field;
 
-	const numberOfValues = ( Number.isInteger( raw.numberOfValues ) && raw.numberOfValues > 0 )
-		? raw.numberOfValues
-		: 8;
+	const numberOfValues = ( Number.isInteger( raw.numberOfValues ) && raw.numberOfValues > 0 ) ? raw.numberOfValues : 8;
 
-	const sortCriteria = ( raw.sortCriteria === 'alphanumeric' || raw.sortCriteria === 'occurrences' )
-		? raw.sortCriteria
-		: 'occurrences';
+	const sortCriteria = ( raw.sortCriteria === 'alphanumeric' || raw.sortCriteria === 'occurrences' ) ? raw.sortCriteria : 'occurrences';
 
 	const facetType = raw.facetType === 'dateRange' ? 'dateRange' : 'regular';
 	const enableSearch = raw.enableSearch === true;
@@ -606,15 +598,56 @@ function coveoDateToInputDate( coveoDate ) {
 }
 
 // Predefined relative date periods for the date facet (start is relative, end is fixed at page load)
-const DATE_FACET_PERIODS = ( () => {
-	const end = formatCoveoDate( new Date() );
+function getDateFacetFields () {
+	const end = formatCoveoDate(new Date());
 	return [
-		{ en: 'Past day',   fr: 'Dernière journée', range: buildDateRange( { start: { period: 'past', unit: 'day',   amount: 1 }, end, endInclusive: true } ) },
-		{ en: 'Past week',  fr: 'Dernière semaine',  range: buildDateRange( { start: { period: 'past', unit: 'week',  amount: 1 }, end, endInclusive: true } ) },
-		{ en: 'Past month', fr: 'Dernier mois',      range: buildDateRange( { start: { period: 'past', unit: 'month', amount: 1 }, end, endInclusive: true } ) },
-		{ en: 'Past year',  fr: 'Dernière année',    range: buildDateRange( { start: { period: 'past', unit: 'year',  amount: 1 }, end, endInclusive: true } ) },
+		{
+			en: "Past day",
+			fr: "Dernière journée",
+			range: buildDateRange({
+				start: { period: "past", unit: "day", amount: 1 },
+				end,
+				endInclusive: true,
+			}),
+		},
+		{
+			en: "Past week",
+			fr: "Dernière semaine",
+			range: buildDateRange({
+				start: { period: "past", unit: "week", amount: 1 },
+				end,
+				endInclusive: true,
+			}),
+		},
+		{
+			en: "Past month",
+			fr: "Dernier mois",
+			range: buildDateRange({
+				start: { period: "past", unit: "month", amount: 1 },
+				end,
+				endInclusive: true,
+			}),
+		},
+		{
+			en: "Past year",
+			fr: "Dernière année",
+			range: buildDateRange({
+				start: { period: "past", unit: "year", amount: 1 },
+				end,
+				endInclusive: true,
+			}),
+		},
+		{
+			en: "Older",
+			fr: "Plus ancien",
+			range: buildDateRange({
+				start: "1970/01/01@00:00:00",
+				end: { period: "past", unit: "year", amount: 1 },
+				endInclusive: false,
+			}),
+		},
 	];
-} )();
+}
 
 // rebuild a clean query string out of a JSON object
 function buildCleanQueryString( paramsObject ) {
@@ -812,7 +845,7 @@ function initEngine() {
 				options: {
 					field: config.field,
 					facetId: config.facetId,
-					currentValues: DATE_FACET_PERIODS.map( ( p ) => p.range ),
+					currentValues: getDateFacetFields().map( ( p ) => p.range ),
 					generateAutomaticRanges: false,
 				}
 			} );
@@ -1182,7 +1215,7 @@ function initEngine() {
 				didYouMeanElement.textContent = "";
 				pagerElement.textContent = "";
 				pagerManuallyCleared = true;
-				updateFacetLayoutVisibility(true)
+				updateFacetLayoutVisibility(true);
 
 				// Show no results message in Query Summary if no query entered
 				querySummaryElement.innerHTML = noResultTemplateHTML;
@@ -1698,8 +1731,7 @@ function updateFacetState( index, newState ) {
 
 			const countEl = document.createElement( 'span' );
 			countEl.className = 'gc-facet-count';
-			countEl.innerHTML = ' (' + result.count.toLocaleString( lang )
-				+ '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
+			countEl.innerHTML = ' (' + result.count.toLocaleString( lang ) + '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
 
 			liEl.appendChild( valueLink );
 			liEl.appendChild( countEl );
@@ -1735,8 +1767,7 @@ function updateFacetState( index, newState ) {
 
 			const countEl = document.createElement( 'span' );
 			countEl.className = 'gc-facet-count';
-			countEl.innerHTML = ' (' + countFormatted
-				+ '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
+			countEl.innerHTML = ' (' + countFormatted + '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
 
 			liEl.appendChild( valueLink );
 			liEl.appendChild( countEl );
@@ -1752,16 +1783,14 @@ function updateFacetState( index, newState ) {
 	showMoreBtn.className = 'btn btn-link small gc-facet-show-more pl-0';
 	showMoreBtn.hidden = isSearching || !newState.canShowMoreValues;
 	showMoreBtn.onclick = () => { facetControllers[ index ].showMoreValues(); };
-	showMoreBtn.innerHTML = ( lang === 'fr' ? 'Afficher davantage' : 'Show more' )
-		+ ' <span class="glyphicon glyphicon-chevron-down small" aria-hidden="true"></span>';
+	showMoreBtn.innerHTML = ( lang === 'fr' ? 'Afficher davantage' : 'Show more' ) + ' <span class="glyphicon glyphicon-chevron-down small" aria-hidden="true"></span>';
 
 	const showLessBtn = document.createElement( 'button' );
 	showLessBtn.type = 'button';
 	showLessBtn.className = 'btn btn-link small gc-facet-show-less pl-0';
 	showLessBtn.hidden = isSearching || !newState.canShowLessValues;
 	showLessBtn.onclick = () => { facetControllers[ index ].showLessValues(); };
-	showLessBtn.innerHTML = ( lang === 'fr' ? 'Afficher moins' : 'Show less' )
-		+ ' <span class="glyphicon glyphicon-chevron-up small" aria-hidden="true"></span>';
+	showLessBtn.innerHTML = ( lang === 'fr' ? 'Afficher moins' : 'Show less' ) + ' <span class="glyphicon glyphicon-chevron-up small" aria-hidden="true"></span>';
 
 	facetEl.appendChild( showMoreBtn );
 	facetEl.appendChild( showLessBtn );
@@ -1796,8 +1825,7 @@ function updateFacetLayoutVisibility(forceHidden = false) {
 function updateClearAllVisibility() {
 	const clearAllContainer = document.getElementById( 'gc-facet-clear-all-container' );
 	if ( clearAllContainer ) {
-		clearAllContainer.hidden = !facetStates.some( ( s ) => s?.hasActiveValues )
-			&& !dateFilterStates.some( ( s ) => s?.range );
+		clearAllContainer.hidden = !facetStates.some( ( s ) => s?.hasActiveValues ) && !dateFilterStates.some( ( s ) => s?.range );
 	}
 }
 
@@ -1911,8 +1939,8 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 	const listEl = document.createElement( 'ul' );
 	listEl.className = 'list-unstyled gc-facet-values mrgn-tp-sm';
 
-	dateFacetState.values.forEach( ( value, valueIndex ) => {
-		const period = DATE_FACET_PERIODS[ valueIndex ];
+	[ ...dateFacetState.values ].reverse().forEach( ( value, valueIndex ) => {
+		const period = getDateFacetFields()[ valueIndex ];
 		if ( !period ) {
 			return;
 		}
@@ -1949,8 +1977,7 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 
 		const countEl = document.createElement( 'span' );
 		countEl.className = 'gc-facet-count';
-		countEl.innerHTML = ' (' + countFormatted
-			+ '<span class="wb-inv"> ' + ( isFr ? 'résultats' : 'results' ) + '</span>)';
+		countEl.innerHTML = ' (' + countFormatted + '<span class="wb-inv"> ' + ( isFr ? 'résultats' : 'results' ) + '</span>)';
 
 		liEl.appendChild( valueLink );
 		liEl.appendChild( countEl );
