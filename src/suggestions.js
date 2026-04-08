@@ -235,7 +235,7 @@ function initEngine() {
 	if ( formElement ) {
 		formElement.onsubmit = ( e ) => {
 			e.preventDefault();
-			redirectToSearchPage( 'headerSearchBoxSubmit' );
+			redirectToSearchPage( 'searchFromLink' );
 		};
 	}
 }
@@ -340,7 +340,7 @@ function selectSuggestion() {
 
 		if ( selectedVal ) {
 			searchBoxElement.value = selectedVal;
-			redirectToSearchPage( 'headerSearchBoxSuggestion' );
+			redirectToSearchPage( 'omniboxFromLink' );
 		}
 	}
 }
@@ -418,7 +418,7 @@ function updateSearchBoxState( newState ) {
 			};
 			node.onclick = ( e ) => {
 				searchBoxElement.value = stripHtml( e.currentTarget.innerText );
-				redirectToSearchPage( 'headerSearchBoxSuggestion' );
+				redirectToSearchPage( 'omniboxFromLink' );
 			};
 			node.innerHTML = DOMPurify.sanitize( suggestion.highlightedValue );
 			suggestionsElement.appendChild( node );
