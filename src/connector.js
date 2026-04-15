@@ -1206,7 +1206,7 @@ function updateResultListState( newState ) {
 				// If the hostname is already part of the breadcrumb, just show the hostname
 				breadcrumb = '<ol class="location">';
 				if ( lastBreadcrumb.indexOf(hostname) > -1 ){
-					breadcrumb += '<li>' + stripHtml( result.raw.hostname ) + '</li>';
+					breadcrumb += '<li>' + hostname + '</li>';
 				} else {
 					breadcrumb += '<li>' + hostname + '&nbsp;</li><li>' + lastBreadcrumb + '</li>';
 				}
