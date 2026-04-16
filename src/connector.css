@@ -44,9 +44,9 @@
 	width: calc(100% - 30px);
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 767px) {
 	#wb-bnr .query-suggestions {
-		position: relative;
+		position: static;
 		width: 100%;
 	}
 }
