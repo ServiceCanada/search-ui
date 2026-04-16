@@ -116,9 +116,7 @@ function initTpl() {
 		searchBoxElement.setAttribute( 'type', 'search' ); // default, when query suggestions are disabled
 
 		// remove legacy list attribute if exists
-		if ( searchBoxElement.hasAttribute( 'list' ) ) {
-			searchBoxElement.removeAttribute( 'list' );
-		}
+		searchBoxElement.removeAttribute( 'list' );
 
 		// if query suggestions are enabled and not advanced search, auto-create suggestions element and update searchbox attributes
 		if ( params.numberOfSuggestions > 0 && !suggestionsElement ) {
