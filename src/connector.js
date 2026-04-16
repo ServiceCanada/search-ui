@@ -1222,8 +1222,17 @@ function updateResultListState( newState ) {
 
 			if ( result.raw.hostname && result.raw.displaynavlabel ) {
 				const splittedNavLabel = ( Array.isArray( result.raw.displaynavlabel ) ? result.raw.displaynavlabel[0] : result.raw.displaynavlabel).split( '>' );
-				breadcrumb = '<ol class="location"><li>' + stripHtml( result.raw.hostname ) + 
-					'&nbsp;</li><li>' + stripHtml( splittedNavLabel[splittedNavLabel.length-1] ) + '</li></ol>';
+				const hostname = stripHtml( result.raw.hostname );
+				const lastBreadcrumb = stripHtml( splittedNavLabel[splittedNavLabel.length-1] );
+
+				// If the hostname is already part of the breadcrumb, just show the hostname
+				breadcrumb = '<ol class="location">';
+				if ( lastBreadcrumb.indexOf(hostname) > -1 ){
+					breadcrumb += '<li>' + hostname + '</li>';
+				} else {
+					breadcrumb += '<li>' + hostname + '&nbsp;</li><li>' + lastBreadcrumb + '</li>';
+				}
+				breadcrumb += '</ol>';
 			} else {
 				breadcrumb = '<p class="location"><cite><a href="' + clickUri + '">' + printableUri + '</a></cite></p>';
 			}
