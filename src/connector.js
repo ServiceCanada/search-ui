@@ -271,14 +271,8 @@ function initTpl() {
 	}
 
 	if ( !notificationTriggerTemplateHTML ) {
-		if ( lang === "fr" ) {
-			notificationTriggerTemplateHTML = 
-				`<section class="alert alert-info">%[notification]</section>`;
-		}
-		else {
-			notificationTriggerTemplateHTML = 
-				`<section class="alert alert-info">%[notification]</section>`;
-		}
+		notificationTriggerTemplateHTML = 
+			`<section class="alert alert-info">%[notification]</section>`;
 	}
 
 	if ( !querySummaryTemplateHTML ) {
@@ -1283,7 +1277,7 @@ function updateNotifyTriggerState ( newState ) {
 	notificationState = newState;
 
 	if ( notificationState.notifications?.length ) {
-		notificationTriggerElement.innerHTML = notificationTriggerTemplateHTML.replace( DOMPurify.sanitize( "%[notification]" ), notificationState.notifications[0] );
+		notificationTriggerElement.innerHTML = notificationTriggerTemplateHTML.replace( "%[notification]", DOMPurify.sanitize( notificationState.notifications[0] ) );
 		focusToView();
 	}
 	else {
