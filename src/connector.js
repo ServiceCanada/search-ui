@@ -10,6 +10,7 @@ import {
 	buildDidYouMean,
 	buildContext,
 	buildInteractiveResult,
+	buildNotifyTrigger,
 	loadAdvancedSearchQueryActions,
 	loadSortCriteriaActions,
 	HighlightUtils,
@@ -59,6 +60,7 @@ let querySummaryController;
 let didYouMeanController;
 let pagerController;
 let statusController;
+let notifyTriggerController;
 let urlManager;
 let unsubscribeManager;
 let unsubscribeSearchBoxController;
@@ -66,12 +68,14 @@ let unsubscribeResultListController;
 let unsubscribeQuerySummaryController;
 let unsubscribeDidYouMeanController;
 let unsubscribePagerController;
+let unsubscribeNotifyTriggerController;
 
 // UI states
 let updateSearchBoxFromState = false;
 let searchBoxState;
 let resultListState;
 let querySummaryState;
+let notificationState;
 let didYouMeanState;
 let pagerState;
 let lastCharKeyUp;
@@ -89,6 +93,7 @@ let formElement = document.querySelector( `.page-type-search main [role=search],
 let resultsSection = document.querySelector( `#${resultSectionID}` );
 let resultListElement = document.querySelector( '#result-list' );
 let querySummaryElement = document.querySelector( '#query-summary' );
+let notificationTriggerElement = document.querySelector( '#notification-trigger' );
 let pagerElement = document.querySelector( '#pager' );
 let suggestionsElement = document.querySelector( '#suggestions' );
 let didYouMeanElement = document.querySelector( '#did-you-mean' );
@@ -97,6 +102,7 @@ let didYouMeanElement = document.querySelector( '#did-you-mean' );
 let resultTemplateHTML = document.getElementById( 'sr-single' )?.innerHTML;
 let noResultTemplateHTML = document.getElementById( 'sr-nores' )?.innerHTML;
 let resultErrorTemplateHTML = document.getElementById( 'sr-error' )?.innerHTML;
+let notificationTriggerTemplateHTML = document.getElementById( 'sr-notification-trigger' )?.innerHTML;
 let querySummaryTemplateHTML = document.getElementById( 'sr-query-summary' )?.innerHTML;
 let didYouMeanTemplateHTML = document.getElementById( 'sr-did-you-mean' )?.innerHTML;
 let noQuerySummaryTemplateHTML = document.getElementById( 'sr-noquery-summary' )?.innerHTML;
@@ -275,6 +281,11 @@ function initTpl() {
 		}
 	}
 
+	if ( !notificationTriggerTemplateHTML ) {
+		notificationTriggerTemplateHTML = 
+			`<section class="alert alert-info">%[notification]</section>`;
+	}
+
 	if ( !querySummaryTemplateHTML ) {
 		if ( lang === "fr" ) {
 			querySummaryTemplateHTML = 
@@ -375,6 +386,14 @@ function initTpl() {
 	if ( !resultsSection ) {
 		resultsSection = document.createElement( "section" );
 		resultsSection.id = resultSectionID;
+	}
+
+	// auto-create notification trigger element
+	if ( !notificationTriggerElement ) {
+		notificationTriggerElement = document.createElement( "div" );
+		notificationTriggerElement.id = "notification-trigger";
+
+		resultsSection.append( notificationTriggerElement );
 	}
 
 	// auto-create query summary element
@@ -680,6 +699,7 @@ function initEngine() {
 	didYouMeanController = buildDidYouMean( headlessEngine, { options: { automaticallyCorrectQuery: params.automaticallyCorrectQuery } } );
 	pagerController = buildPager( headlessEngine, { options: { numberOfPages: params.numberOfPages } } );
 	statusController = buildSearchStatus( headlessEngine );
+	notifyTriggerController = buildNotifyTrigger( headlessEngine );
 
 	// Refine search based on URL parameters for filters, mostly used in Advanced Search to trigger only one search per page load
 	if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site || urlParams.year || urlParams.declaredtype || urlParams.startdate || urlParams.enddate || urlParams.dprtmnt ) { 
@@ -914,6 +934,7 @@ function initEngine() {
 	unsubscribeQuerySummaryController = querySummaryController.subscribe( () => updateQuerySummaryState( querySummaryController.state ) );
 	unsubscribeDidYouMeanController = didYouMeanController.subscribe( () => updateDidYouMeanState( didYouMeanController.state ) );
 	unsubscribePagerController = pagerController.subscribe( () => updatePagerState( pagerController.state ) );
+	unsubscribeNotifyTriggerController = notifyTriggerController.subscribe( () => updateNotifyTriggerState( notifyTriggerController.state ) );
 
 	// Clear event tracking, for legacy browsers
 	const onUnload = () => { 
@@ -924,6 +945,7 @@ function initEngine() {
 		unsubscribeQuerySummaryController?.();
 		unsubscribeDidYouMeanController?.();
 		unsubscribePagerController?.();
+		unsubscribeNotifyTriggerController?.();
 	};
 
 	// Listen to URL change (hash)
@@ -1278,6 +1300,19 @@ function updateResultListState( newState ) {
 
 			resultListElement.appendChild( sectionNode );
 		} );
+	}
+}
+
+// Update notification displayed
+function updateNotifyTriggerState ( newState ) {
+	notificationState = newState;
+
+	if ( notificationState.notifications?.length ) {
+		notificationTriggerElement.innerHTML = notificationTriggerTemplateHTML.replace( "%[notification]", DOMPurify.sanitize( notificationState.notifications[0] ) );
+		focusToView();
+	}
+	else {
+		notificationTriggerElement.textContent = "";
 	}
 }
 
