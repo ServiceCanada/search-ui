@@ -39,27 +39,48 @@ script:
 	"originLevel3": "/en/sr/srf-en.html",
 	"facets": [
     {
+      "facetId": "department",
+      "facetSearch": true,
       "field": "author",
-      "title": "Authors",
-			"enableSearch": true,
+      "filterFacetCount": true,
+      "numberOfValues": 8,
       "sortCriteria": "score",
-      "numberOfValues": 12,
-      "facetId": "author",
-      "facetType": "regular"
+      "title": "Department"
     },
     {
-      "field": "source",
-      "title": "Source",
+      "facetId": "site",
+      "facetSearch": false,
+      "field": "hostname",
+      "filterFacetCount": false,
+      "numberOfValues": 8,
       "sortCriteria": "score",
-      "numberOfValues": 12,
-      "facetId": "source",
-      "facetType": "regular"
+      "title": "Site"
     },
     {
+      "facetId": "audience",
+      "facetSearch": false,
+      "field": "audience",
+      "filterFacetCount": true,
+      "numberOfValues": 8,
+      "sortCriteria": "alphanumericDescending",
+      "title": "Audience"
+    },
+    {
+      "facetId": "type",
+      "facetSearch": true,
+      "facetType": "regular",
+      "field": "filetype",
+      "numberOfValues": 12,
+      "sortCriteria": "alphanumeric",
+      "title": "File Type"
+    },
+    {
+      "facetId": "date",
+      "facetType": "dateRange",
       "field": "date",
       "title": "Date",
-      "facetId": "date",
-      "facetType": "dateRange"
+      "withDatePicker": true,
+      "withDateRanges": true
     }
   ]
 }'></div>
