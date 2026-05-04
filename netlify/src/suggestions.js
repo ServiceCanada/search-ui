@@ -115,6 +115,9 @@ function initTpl() {
 		// default searchbox attributes
 		searchBoxElement.setAttribute( 'type', 'search' ); // default, when query suggestions are disabled
 
+		// remove legacy list attribute if exists
+		searchBoxElement.removeAttribute( 'list' );
+
 		// if query suggestions are enabled and not advanced search, auto-create suggestions element and update searchbox attributes
 		if ( params.numberOfSuggestions > 0 && !suggestionsElement ) {
 			searchBoxElement.setAttribute( 'type', 'text' );
@@ -235,7 +238,7 @@ function initEngine() {
 	if ( formElement ) {
 		formElement.onsubmit = ( e ) => {
 			e.preventDefault();
-			redirectToSearchPage( 'headerSearchBoxSubmit' );
+			redirectToSearchPage( 'searchFromLink' );
 		};
 	}
 }
@@ -340,7 +343,7 @@ function selectSuggestion() {
 
 		if ( selectedVal ) {
 			searchBoxElement.value = selectedVal;
-			redirectToSearchPage( 'headerSearchBoxSuggestion' );
+			redirectToSearchPage( 'omniboxFromLink' );
 		}
 	}
 }
@@ -418,7 +421,7 @@ function updateSearchBoxState( newState ) {
 			};
 			node.onclick = ( e ) => {
 				searchBoxElement.value = stripHtml( e.currentTarget.innerText );
-				redirectToSearchPage( 'headerSearchBoxSuggestion' );
+				redirectToSearchPage( 'omniboxFromLink' );
 			};
 			node.innerHTML = DOMPurify.sanitize( suggestion.highlightedValue );
 			suggestionsElement.appendChild( node );

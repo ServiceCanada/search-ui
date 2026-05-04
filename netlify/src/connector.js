@@ -71,16 +71,25 @@ let unsubscribeResultListController;
 let unsubscribeQuerySummaryController;
 let unsubscribeDidYouMeanController;
 let unsubscribePagerController;
-let unsubscribeFacetControllers = [];
-let unsubscribeDateFilterControllers = [];
 
 // Facet configs and controllers
-let facetNormalizedConfigs = [];
-let facetControllers = [];
-let facetStates = [];
+const baseFacetConfig = {
+	facetId: "", // Required
+	facetSearch: true,
+	field: "", // Required
+	filterFacetCount: true,
+	numberOfValues: 8,
+	sortCriteria: "score",
+	title: ""
+}
 let dateFilterControllers = [];
 let dateFilterStates = [];
+let facetControllers = [];
+let facetNormalizedConfigs = [];
 let facetSearchTimers = [];
+let facetStates = [];
+let unsubscribeDateFilterControllers = [];
+let unsubscribeFacetControllers = [];
 
 // UI states
 let updateSearchBoxFromState = false;
@@ -389,7 +398,14 @@ function initTpl() {
 	}
 
 	// Normalize facet configs from the HTML attribute
-	facetNormalizedConfigs = Array.isArray( params.facets )	? params.facets.map( normalizeFacetConfig ).filter( Boolean )	: [];
+	const facetConfigMap = new Map();
+	if ( Array.isArray( params.facets ) ) {
+		params.facets.forEach( ( raw ) => {
+			const config = normalizeFacetConfig( raw );
+			if ( config ) facetConfigMap.set( config.facetId, config );
+		} );
+	}
+	facetNormalizedConfigs = [ ...facetConfigMap.values() ];
 
 	// Auto-create two-column facet layout when valid facets are configured
 	if ( facetNormalizedConfigs.length > 0 && !facetPanelElement ) {
@@ -571,19 +587,17 @@ function normalizeFacetConfig( raw ) {
 
 	const numberOfValues = ( Number.isInteger( raw.numberOfValues ) && raw.numberOfValues > 0 ) ? raw.numberOfValues : 8;
 
-	const sortCriteria = ( raw.sortCriteria === 'alphanumeric' || raw.sortCriteria === 'occurrences' ) ? raw.sortCriteria : 'occurrences';
+	const sortCriteria = raw.sortCriteria !== '' ? raw.sortCriteria : 'occurrences';
 
 	const facetType = raw.facetType === 'dateRange' ? 'dateRange' : 'regular';
-	const enableSearch = raw.enableSearch === true;
+	const facetSearch = raw.facetSearch !== false;
+	const filterFacetCount = raw.filterFacetCount !== false;
+	const withDatePicker = raw.withDatePicker !== false;
+	const withDateRanges = raw.withDateRanges !== false;
 
-	return { field, label, facetId, numberOfValues, sortCriteria, facetType, enableSearch };
+	return { field, label, facetId, numberOfValues, sortCriteria, facetType, facetSearch, filterFacetCount, withDatePicker, withDateRanges };
 }
 
-// Format a Date as a Coveo date string: YYYY/MM/DD@HH:mm:ss
-function formatCoveoDate( date ) {
-	const pad = ( n ) => String( n ).padStart( 2, '0' );
-	return `${date.getFullYear()}/${pad( date.getMonth() + 1 )}/${pad( date.getDate() )}@${pad( date.getHours() )}:${pad( date.getMinutes() )}:${pad( date.getSeconds() )}`;
-}
 
 // Convert YYYY-MM-DD (date input value) to Coveo date string
 function inputDateToCoveoDate( dateStr, endOfDay ) {
@@ -597,9 +611,25 @@ function coveoDateToInputDate( coveoDate ) {
 	return String( coveoDate ).slice( 0, 10 ).replace( /\//g, '-' );
 }
 
+// Resolve a Coveo range endpoint (string or relative object) to a YYYY-MM-DD input date string
+function resolveRangeEndpointToInputDate( endpoint ) {
+	if ( typeof endpoint === 'string' ) {
+		return coveoDateToInputDate( endpoint );
+	}
+	if ( endpoint && endpoint.period === 'past' ) {
+		const d = new Date();
+		if ( endpoint.unit === 'day' ) { d.setDate( d.getDate() - endpoint.amount ); }
+		else if ( endpoint.unit === 'week' ) { d.setDate( d.getDate() - endpoint.amount * 7 ); }
+		else if ( endpoint.unit === 'month' ) { d.setMonth( d.getMonth() - endpoint.amount ); }
+		else if ( endpoint.unit === 'year' ) { d.setFullYear( d.getFullYear() - endpoint.amount ); }
+		return d.toISOString().slice( 0, 10 );
+	}
+	return '';
+}
+
 // Predefined relative date periods for the date facet (start is relative, end is fixed at page load)
 function getDateFacetFields () {
-	const end = formatCoveoDate(new Date());
+	const end = getCoveoDateFormat(new Date());
 	return [
 		{
 			en: "Past day",
@@ -708,6 +738,12 @@ function getLongDateFormat( date, lang ){
 	let langCA = lang + "-CA";
 
 	return currentTZDate.toLocaleDateString( langCA, { year: 'numeric', month: 'short', day: 'numeric' } );
+}
+
+// Format a Date as a Coveo date string: YYYY/MM/DD@HH:mm:ss
+function getCoveoDateFormat( date ) {
+	const pad = ( n ) => String( n ).padStart( 2, '0' );
+	return `${date.getFullYear()}/${pad( date.getMonth() + 1 )}/${pad( date.getDate() )}@${pad( date.getHours() )}:${pad( date.getMinutes() )}:${pad( date.getSeconds() )}`;
 }
 
 // checking for default date , Jan 1st, 1970
@@ -1449,8 +1485,17 @@ function updateResultListState( newState ) {
 
 			if ( result.raw.hostname && result.raw.displaynavlabel ) {
 				const splittedNavLabel = ( Array.isArray( result.raw.displaynavlabel ) ? result.raw.displaynavlabel[0] : result.raw.displaynavlabel).split( '>' );
-				breadcrumb = '<ol class="location"><li>' + stripHtml( result.raw.hostname ) + 
-					'&nbsp;</li><li>' + stripHtml( splittedNavLabel[splittedNavLabel.length-1] ) + '</li></ol>';
+				const hostname = stripHtml( result.raw.hostname );
+				const lastBreadcrumb = stripHtml( splittedNavLabel[splittedNavLabel.length-1] );
+
+				// If the hostname is already part of the breadcrumb, just show the hostname
+				breadcrumb = '<ol class="location">';
+				if ( lastBreadcrumb.indexOf(hostname) > -1 ){
+					breadcrumb += '<li>' + hostname + '</li>';
+				} else {
+					breadcrumb += '<li>' + hostname + '&nbsp;</li><li>' + lastBreadcrumb + '</li>';
+				}
+				breadcrumb += '</ol>';
 			} else {
 				breadcrumb = '<p class="location"><cite><a href="' + clickUri + '">' + printableUri + '</a></cite></p>';
 			}
@@ -1646,6 +1691,49 @@ function updatePagerState( newState ) {
 }
 
 // Rebuild a single facet's DOM inside the facet panel
+function renderFacetSummary( label, hasActive, onClear ) {
+	const summaryEl = document.createElement( 'summary' );
+	summaryEl.textContent = label;
+	if ( hasActive ) {
+		summaryEl.insertAdjacentHTML( 'beforeend', `<button type="button" class="btn btn-link btn-sm pull-right">${ lang === 'fr' ? 'Effacer le filtre' : 'Clear filter' }</button>` );
+		summaryEl.querySelector( 'button' ).onclick = ( e ) => { e.stopPropagation(); onClear(); };
+	}
+	return summaryEl;
+}
+
+// Builds a single facet value <li>.
+function renderFacetItem( label, count, isSelected, onSelect ) {
+	const liEl = document.createElement( 'li' );
+
+	if ( isSelected ) {
+		const hintEl = document.createElement( 'span' );
+		hintEl.className = 'wb-inv';
+		hintEl.textContent = lang === 'fr' ? 'Enlever le filtre actif:' : 'Remove active filter:';
+		liEl.appendChild( hintEl );
+	}
+
+	const linkEl = document.createElement( 'a' );
+	linkEl.href = '#';
+	linkEl.onclick = ( e ) => { e.preventDefault(); onSelect(); };
+
+	if ( isSelected ) {
+		const iconEl = document.createElement( 'span' );
+		iconEl.className = 'glyphicon glyphicon-ok mrgn-rght-sm';
+		iconEl.setAttribute( 'aria-hidden', 'true' );
+		linkEl.appendChild( iconEl );
+	}
+
+	const countEl = document.createElement( 'span' );
+	countEl.className = 'gc-facet-count';
+	countEl.innerHTML = ' (' + count.toLocaleString( lang ) + '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
+
+	linkEl.appendChild( document.createTextNode( label ) );
+	liEl.appendChild( linkEl );
+	liEl.appendChild( countEl );
+
+	return liEl;
+}
+
 function updateFacetState( index, newState ) {
 	facetStates[ index ] = newState;
 
@@ -1674,18 +1762,7 @@ function updateFacetState( index, newState ) {
 	facetEl.textContent = '';
 	facetEl.open = wasOpen;
 
-	// <summary> acts as the facet label / collapse toggle
-	const summaryEl = document.createElement( 'summary' );
-	summaryEl.textContent = config.label;
-	if ( newState.hasActiveValues ) {
-		const clearBtn = document.createElement( 'button' );
-		clearBtn.type = 'button';
-		clearBtn.className = 'btn btn-link btn-sm pull-right';
-		clearBtn.textContent = lang === 'fr' ? 'Effacer le filtre' : 'Clear filter';
-		clearBtn.onclick = ( e ) => { e.stopPropagation(); facetControllers[ index ].deselectAll(); };
-		summaryEl.appendChild( clearBtn );
-	}
-	facetEl.appendChild( summaryEl );
+	facetEl.appendChild( renderFacetSummary( config.label, newState.hasActiveValues, () => facetControllers[ index ].deselectAll() ) );
 
 	// Facet search input (only if the controller exposes facetSearch)
 	// facetSearch methods live on the sub-controller; state is nested in newState.facetSearch
@@ -1693,7 +1770,7 @@ function updateFacetState( index, newState ) {
 	const facetSearchState = newState.facetSearch;
 	const isSearching = ( facetSearchState?.query?.length ?? 0 ) > 0;
 
-	if ( config.enableSearch && facetSearchState ) {
+	if ( config.facetSearch && facetSearchState ) {
 		const searchInput = document.createElement( 'input' );
 		searchInput.type = 'search';
 		searchInput.id = searchInputId;
@@ -1723,77 +1800,23 @@ function updateFacetState( index, newState ) {
 
 	if ( isSearching ) {
 		facetSearchState.values.forEach( ( result ) => {
-			const liEl = document.createElement( 'li' );
-			const valueLink = document.createElement( 'a' );
-			valueLink.href = '#';
-			valueLink.onclick = ( e ) => { e.preventDefault(); facetSearch.select( result ); };
-			valueLink.appendChild( document.createTextNode( stripHtml( result.displayValue ) ) );
-
-			const countEl = document.createElement( 'span' );
-			countEl.className = 'gc-facet-count';
-			countEl.innerHTML = ' (' + result.count.toLocaleString( lang ) + '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
-
-			liEl.appendChild( valueLink );
-			liEl.appendChild( countEl );
-			listEl.appendChild( liEl );
+			listEl.appendChild( renderFacetItem( stripHtml( result.displayValue ), result.count, false, () => facetSearch.select( result ) ) );
 		} );
 	} else {
 		newState.values.forEach( ( value ) => {
-			const liEl = document.createElement( 'li' );
-			const isSelected = value.state === 'selected';
-			const countFormatted = value.numberOfResults.toLocaleString( params.lang );
-			const valueLabel = stripHtml( value.value );
-
-			if ( isSelected ) {
-				const removeHintEl = document.createElement( 'span' );
-				removeHintEl.className = 'wb-inv';
-				removeHintEl.textContent = lang === 'fr' ? 'Enlever le filtre actif:' : 'Remove active filter:';
-				liEl.appendChild( removeHintEl );
-			}
-
-			const valueLink = document.createElement( 'a' );
-			valueLink.href = '#';
-			valueLink.onclick = ( e ) => { e.preventDefault(); facetControllers[ index ].toggleSelect( value ); };
-
-			if ( isSelected ) {
-				const iconEl = document.createElement( 'span' );
-				iconEl.className = 'glyphicon glyphicon-ok mrgn-rght-sm';
-				iconEl.setAttribute( 'aria-hidden', 'true' );
-				valueLink.appendChild( iconEl );
-				valueLink.appendChild( document.createTextNode( '\u00a0' ) );
-			}
-
-			valueLink.appendChild( document.createTextNode( valueLabel ) );
-
-			const countEl = document.createElement( 'span' );
-			countEl.className = 'gc-facet-count';
-			countEl.innerHTML = ' (' + countFormatted + '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
-
-			liEl.appendChild( valueLink );
-			liEl.appendChild( countEl );
-			listEl.appendChild( liEl );
+			listEl.appendChild( renderFacetItem( stripHtml( value.value ), value.numberOfResults, value.state === 'selected', () => facetControllers[ index ].toggleSelect( value ) ) );
 		} );
 	}
 
 	facetEl.appendChild( listEl );
 
 	// Show more / show less — hidden while searching (search has its own pagination)
-	const showMoreBtn = document.createElement( 'button' );
-	showMoreBtn.type = 'button';
-	showMoreBtn.className = 'btn btn-link small gc-facet-show-more pl-0';
-	showMoreBtn.hidden = isSearching || !newState.canShowMoreValues;
-	showMoreBtn.onclick = () => { facetControllers[ index ].showMoreValues(); };
-	showMoreBtn.innerHTML = ( lang === 'fr' ? 'Afficher davantage' : 'Show more' ) + ' <span class="glyphicon glyphicon-chevron-down small" aria-hidden="true"></span>';
-
-	const showLessBtn = document.createElement( 'button' );
-	showLessBtn.type = 'button';
-	showLessBtn.className = 'btn btn-link small gc-facet-show-less pl-0';
-	showLessBtn.hidden = isSearching || !newState.canShowLessValues;
-	showLessBtn.onclick = () => { facetControllers[ index ].showLessValues(); };
-	showLessBtn.innerHTML = ( lang === 'fr' ? 'Afficher moins' : 'Show less' ) + ' <span class="glyphicon glyphicon-chevron-up small" aria-hidden="true"></span>';
-
-	facetEl.appendChild( showMoreBtn );
-	facetEl.appendChild( showLessBtn );
+	const isFr = lang === 'fr';
+	facetEl.insertAdjacentHTML( 'beforeend',
+		`<button type="button" class="btn btn-link small gc-facet-show-more pl-0"${ isSearching || !newState.canShowMoreValues ? ' hidden' : '' }>${ isFr ? 'Afficher davantage' : 'Show more' } <span class="glyphicon glyphicon-chevron-down small" aria-hidden="true"></span></button>
+		<button type="button" class="btn btn-link small gc-facet-show-less pl-0"${ isSearching || !newState.canShowLessValues ? ' hidden' : '' }>${ isFr ? 'Afficher moins' : 'Show less' } <span class="glyphicon glyphicon-chevron-up small" aria-hidden="true"></span></button>` );
+	facetEl.querySelector( '.gc-facet-show-more' ).onclick = () => { facetControllers[ index ].showMoreValues(); };
+	facetEl.querySelector( '.gc-facet-show-less' ).onclick = () => { facetControllers[ index ].showLessValues(); };
 
 	updateFacetLayoutVisibility();
 	updateClearAllVisibility();
@@ -1844,40 +1867,30 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 		return;
 	}
 
-	facetEl.hidden = dateFacetState.values.length === 0;
+	facetEl.hidden = dateFacetState.values.length === 0 || ( !config.withDatePicker && !config.withDateRanges );
 	if ( facetEl.hidden ) {
 		updateFacetLayoutVisibility();
 		return;
 	}
 
 	const isFr = lang === 'fr';
+	const todayStr = new Date().toISOString().slice( 0, 10 );
 	const wasOpen = facetEl.open;
 	facetEl.textContent = '';
 	facetEl.open = wasOpen;
 
-	const summaryEl = document.createElement( 'summary' );
-	summaryEl.textContent = config.label;
-	if ( dateFacetState.hasActiveValues || dateFilterState.range ) {
-		const clearBtn = document.createElement( 'button' );
-		clearBtn.type = 'button';
-		clearBtn.className = 'btn btn-link btn-sm pull-right';
-		clearBtn.textContent = isFr ? 'Effacer le filtre' : 'Clear filter';
-		clearBtn.onclick = ( e ) => {
-			e.stopPropagation();
-			facetControllers[ index ].deselectAll();
-			dateFilterControllers[ index ].clear();
-		};
-		summaryEl.appendChild( clearBtn );
-	}
-	facetEl.appendChild( summaryEl );
+	facetEl.appendChild( renderFacetSummary( config.label, dateFacetState.hasActiveValues || dateFilterState.range, () => {
+		facetControllers[ index ].deselectAll();
+		dateFilterControllers[ index ].clear();
+	} ) );
 
 	// --- Custom date pickers (above the list) ---
+	if ( config.withDatePicker ) {
 	const startId = 'gc-facet-date-start-' + index;
 	const endId = 'gc-facet-date-end-' + index;
 
 	const datePickerContainer = document.createElement( 'div' );
 	datePickerContainer.className = 'gc-date-pickers';
-	const todayStr = new Date().toISOString().slice( 0, 10 );
 
 	datePickerContainer.insertAdjacentHTML( 'beforeend',
 		`<div class="form-group mrgn-tp-sm">
@@ -1898,20 +1911,26 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 	startInput.onchange = () => { if ( startInput.value ) { endInput.min = startInput.value; } };
 	endInput.onchange = () => { if ( endInput.value ) { startInput.max = endInput.value; } };
 
-	// Pre-populate inputs if a custom filter is already active
+	// Pre-populate inputs if a custom filter is already active, skipping sentinel values
 	if ( dateFilterState.range ) {
-		startInput.value = coveoDateToInputDate( dateFilterState.range.start );
-		endInput.value = coveoDateToInputDate( dateFilterState.range.end );
-		endInput.min = startInput.value;
-		startInput.max = endInput.value;
+		const rangeStart = coveoDateToInputDate( dateFilterState.range.start );
+		const rangeEnd = coveoDateToInputDate( dateFilterState.range.end );
+		if ( rangeStart !== '1970-01-01' ) {
+			startInput.value = rangeStart;
+		}
+		if ( rangeEnd !== todayStr ) {
+			endInput.value = rangeEnd;
+		}
+		if ( startInput.value ) { endInput.min = startInput.value; }
+		if ( endInput.value ) { startInput.max = endInput.value; }
 	}
 
 	datePickerContainer.querySelector( '.gc-date-apply' ).onclick = () => {
 		let startVal = startInput.value;
 		let endVal = endInput.value;
-		if ( startVal && endVal ) {
+		if ( startVal || endVal ) {
 			// Swap if end is before start
-			if ( endVal < startVal ) {
+			if ( startVal && endVal && endVal < startVal ) {
 				[ startVal, endVal ] = [ endVal, startVal ];
 				startInput.value = startVal;
 				endInput.value = endVal;
@@ -1919,8 +1938,8 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 			// Clear predefined range selection before applying custom filter
 			facetControllers[ index ].deselectAll();
 			dateFilterControllers[ index ].setRange( {
-				start: inputDateToCoveoDate( startVal, false ),
-				end: inputDateToCoveoDate( endVal, true ),
+				start: inputDateToCoveoDate( startVal || '1970-01-01', false ),
+				end: inputDateToCoveoDate( endVal || todayStr, true ),
 			} );
 		}
 	};
@@ -1934,57 +1953,36 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 	};
 
 	facetEl.appendChild( datePickerContainer );
+	} // end withDatePicker
 
 	// --- Predefined date range list ---
-	const listEl = document.createElement( 'ul' );
-	listEl.className = 'list-unstyled gc-facet-values mrgn-tp-sm';
+	if ( config.withDateRanges ) {
+		const listEl = document.createElement( 'ul' );
+		listEl.className = 'list-unstyled gc-facet-values mrgn-tp-sm';
 
-	[ ...dateFacetState.values ].reverse().forEach( ( value, valueIndex ) => {
-		const period = getDateFacetFields()[ valueIndex ];
-		if ( !period ) {
-			return;
-		}
+		[ ...dateFacetState.values ].reverse().forEach( ( value, valueIndex ) => {
+			const period = getDateFacetFields()[ valueIndex ];
+			if ( !period ) { return; }
+			const periodLabel = isFr ? period.fr : period.en;
+			const isSelected = value.state === 'selected';
+			if ( config.withDatePicker && isSelected ) {
+				const rangeStart = resolveRangeEndpointToInputDate( period.range.start );
+				const rangeEnd = resolveRangeEndpointToInputDate( period.range.end );
+				const startEl = document.getElementById( 'gc-facet-date-start-' + index );
+				const endEl = document.getElementById( 'gc-facet-date-end-' + index );
+				if ( startEl ) { startEl.value = rangeStart !== '1970-01-01' ? rangeStart : ''; }
+				if ( endEl ) { endEl.value = rangeEnd !== todayStr ? rangeEnd : ''; }
+			}
+			listEl.appendChild( renderFacetItem( periodLabel, value.numberOfResults, isSelected, () => {
+				// Clear custom date filter and any other selected range before selecting
+				dateFilterControllers[ index ].clear();
+				facetControllers[ index ].deselectAll();
+				facetControllers[ index ].toggleSelect( value );
+			} ) );
+		} );
 
-		const liEl = document.createElement( 'li' );
-		const isSelected = value.state === 'selected';
-		const countFormatted = value.numberOfResults.toLocaleString( lang );
-		const periodLabel = isFr ? period.fr : period.en;
-
-		if ( isSelected ) {
-			const removeHintEl = document.createElement( 'span' );
-			removeHintEl.className = 'wb-inv';
-			removeHintEl.textContent = isFr ? 'Enlever le filtre actif:' : 'Remove active filter:';
-			liEl.appendChild( removeHintEl );
-		}
-
-		const valueLink = document.createElement( 'a' );
-		valueLink.href = '#';
-		valueLink.onclick = ( e ) => {
-			e.preventDefault();
-			// Clear custom date filter before selecting a predefined range
-			dateFilterControllers[ index ].clear();
-			facetControllers[ index ].toggleSelect( value );
-		};
-
-		if ( isSelected ) {
-			const iconEl = document.createElement( 'span' );
-			iconEl.className = 'glyphicon glyphicon-ok mrgn-rght-sm';
-			iconEl.setAttribute( 'aria-hidden', 'true' );
-			valueLink.appendChild( iconEl );
-		}
-
-		valueLink.appendChild( document.createTextNode( periodLabel ) );
-
-		const countEl = document.createElement( 'span' );
-		countEl.className = 'gc-facet-count';
-		countEl.innerHTML = ' (' + countFormatted + '<span class="wb-inv"> ' + ( isFr ? 'résultats' : 'results' ) + '</span>)';
-
-		liEl.appendChild( valueLink );
-		liEl.appendChild( countEl );
-		listEl.appendChild( liEl );
-	} );
-
-	facetEl.appendChild( listEl );
+		facetEl.appendChild( listEl );
+	}
 	updateFacetLayoutVisibility();
 	updateClearAllVisibility();
 }
