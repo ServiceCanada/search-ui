@@ -72,16 +72,6 @@ let unsubscribeQuerySummaryController;
 let unsubscribeDidYouMeanController;
 let unsubscribePagerController;
 
-// Facet configs and controllers
-const baseFacetConfig = {
-	facetId: "", // Required
-	facetSearch: true,
-	field: "", // Required
-	filterFacetCount: true,
-	numberOfValues: 8,
-	sortCriteria: "score",
-	title: ""
-}
 let dateFilterControllers = [];
 let dateFilterStates = [];
 let facetControllers = [];
@@ -1886,73 +1876,73 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 
 	// --- Custom date pickers (above the list) ---
 	if ( config.withDatePicker ) {
-	const startId = 'gc-facet-date-start-' + index;
-	const endId = 'gc-facet-date-end-' + index;
+		const startId = 'gc-facet-date-start-' + index;
+		const endId = 'gc-facet-date-end-' + index;
 
-	const datePickerContainer = document.createElement( 'div' );
-	datePickerContainer.className = 'gc-date-pickers';
+		const datePickerContainer = document.createElement( 'div' );
+		datePickerContainer.className = 'gc-date-pickers';
 
-	datePickerContainer.insertAdjacentHTML( 'beforeend',
-		`<div class="form-group mrgn-tp-sm">
-			<label for="${startId}">${isFr ? 'Date de début' : 'Start date'}<span class="datepicker-format"> (<abbr title="${isFr ? 'Quatre chiffres pour l\'année, tiret, deux chiffres pour le mois, tiret, deux chiffres pour le jour' : 'Four digits year, dash, two digits month, dash, two digits day'}">YYYY-MM-DD</abbr>)</span></label>
-			<input class="form-control" type="date" id="${startId}" name="${startId}" max="${todayStr}" />
-		</div>
-		<div class="form-group">
-			<label for="${endId}">${isFr ? 'Date de fin' : 'End date'}<span class="datepicker-format"> (<abbr title="${isFr ? 'Quatre chiffres pour l\'année, tiret, deux chiffres pour le mois, tiret, deux chiffres pour le jour' : 'Four digits year, dash, two digits month, dash, two digits day'}">YYYY-MM-DD</abbr>)</span></label>
-			<input class="form-control" type="date" id="${endId}" name="${endId}" max="${todayStr}" />
-		</div>
-		<button type="button" class="btn btn-default btn-sm mrgn-rght-sm mrgn-bttm-md gc-date-apply">${isFr ? 'Appliquer' : 'Apply'}</button>
-		<button type="button" class="btn btn-link btn-sm mrgn-bttm-md gc-date-clear"${dateFilterState.range ? '' : ' hidden'}>${isFr ? 'Effacer' : 'Clear'}</button>`
-	);
+		datePickerContainer.insertAdjacentHTML( 'beforeend',
+			`<div class="form-group mrgn-tp-sm">
+				<label for="${startId}">${isFr ? 'Date de début' : 'Start date'}<span class="datepicker-format"> (<abbr title="${isFr ? 'Quatre chiffres pour l\'année, tiret, deux chiffres pour le mois, tiret, deux chiffres pour le jour' : 'Four digits year, dash, two digits month, dash, two digits day'}">YYYY-MM-DD</abbr>)</span></label>
+				<input class="form-control" type="date" id="${startId}" name="${startId}" max="${todayStr}" />
+			</div>
+			<div class="form-group">
+				<label for="${endId}">${isFr ? 'Date de fin' : 'End date'}<span class="datepicker-format"> (<abbr title="${isFr ? 'Quatre chiffres pour l\'année, tiret, deux chiffres pour le mois, tiret, deux chiffres pour le jour' : 'Four digits year, dash, two digits month, dash, two digits day'}">YYYY-MM-DD</abbr>)</span></label>
+				<input class="form-control" type="date" id="${endId}" name="${endId}" max="${todayStr}" />
+			</div>
+			<button type="button" class="btn btn-default btn-sm mrgn-rght-sm mrgn-bttm-md gc-date-apply">${isFr ? 'Appliquer' : 'Apply'}</button>
+			<button type="button" class="btn btn-link btn-sm mrgn-bttm-md gc-date-clear"${dateFilterState.range ? '' : ' hidden'}>${isFr ? 'Effacer' : 'Clear'}</button>`
+		);
 
-	const startInput = datePickerContainer.querySelector( '#' + startId );
-	const endInput = datePickerContainer.querySelector( '#' + endId );
+		const startInput = datePickerContainer.querySelector( '#' + startId );
+		const endInput = datePickerContainer.querySelector( '#' + endId );
 
-	startInput.onchange = () => { if ( startInput.value ) { endInput.min = startInput.value; } };
-	endInput.onchange = () => { if ( endInput.value ) { startInput.max = endInput.value; } };
+		startInput.onchange = () => { if ( startInput.value ) { endInput.min = startInput.value; } };
+		endInput.onchange = () => { if ( endInput.value ) { startInput.max = endInput.value; } };
 
-	// Pre-populate inputs if a custom filter is already active, skipping sentinel values
-	if ( dateFilterState.range ) {
-		const rangeStart = coveoDateToInputDate( dateFilterState.range.start );
-		const rangeEnd = coveoDateToInputDate( dateFilterState.range.end );
-		if ( rangeStart !== '1970-01-01' ) {
-			startInput.value = rangeStart;
-		}
-		if ( rangeEnd !== todayStr ) {
-			endInput.value = rangeEnd;
-		}
-		if ( startInput.value ) { endInput.min = startInput.value; }
-		if ( endInput.value ) { startInput.max = endInput.value; }
-	}
-
-	datePickerContainer.querySelector( '.gc-date-apply' ).onclick = () => {
-		let startVal = startInput.value;
-		let endVal = endInput.value;
-		if ( startVal || endVal ) {
-			// Swap if end is before start
-			if ( startVal && endVal && endVal < startVal ) {
-				[ startVal, endVal ] = [ endVal, startVal ];
-				startInput.value = startVal;
-				endInput.value = endVal;
+		// Pre-populate inputs if a custom filter is already active, skipping sentinel values
+		if ( dateFilterState.range ) {
+			const rangeStart = coveoDateToInputDate( dateFilterState.range.start );
+			const rangeEnd = coveoDateToInputDate( dateFilterState.range.end );
+			if ( rangeStart !== '1970-01-01' ) {
+				startInput.value = rangeStart;
 			}
-			// Clear predefined range selection before applying custom filter
-			facetControllers[ index ].deselectAll();
-			dateFilterControllers[ index ].setRange( {
-				start: inputDateToCoveoDate( startVal || '1970-01-01', false ),
-				end: inputDateToCoveoDate( endVal || todayStr, true ),
-			} );
+			if ( rangeEnd !== todayStr ) {
+				endInput.value = rangeEnd;
+			}
+			if ( startInput.value ) { endInput.min = startInput.value; }
+			if ( endInput.value ) { startInput.max = endInput.value; }
 		}
-	};
 
-	datePickerContainer.querySelector( '.gc-date-clear' ).onclick = () => {
-		startInput.value = '';
-		endInput.value = '';
-		startInput.max = todayStr;
-		endInput.min = '';
-		dateFilterControllers[ index ].clear();
-	};
+		datePickerContainer.querySelector( '.gc-date-apply' ).onclick = () => {
+			let startVal = startInput.value;
+			let endVal = endInput.value;
+			if ( startVal || endVal ) {
+				// Swap if end is before start
+				if ( startVal && endVal && endVal < startVal ) {
+					[ startVal, endVal ] = [ endVal, startVal ];
+					startInput.value = startVal;
+					endInput.value = endVal;
+				}
+				// Clear predefined range selection before applying custom filter
+				facetControllers[ index ].deselectAll();
+				dateFilterControllers[ index ].setRange( {
+					start: inputDateToCoveoDate( startVal || '1970-01-01', false ),
+					end: inputDateToCoveoDate( endVal || todayStr, true ),
+				} );
+			}
+		};
 
-	facetEl.appendChild( datePickerContainer );
+		datePickerContainer.querySelector( '.gc-date-clear' ).onclick = () => {
+			startInput.value = '';
+			endInput.value = '';
+			startInput.max = todayStr;
+			endInput.min = '';
+			dateFilterControllers[ index ].clear();
+		};
+
+		facetEl.appendChild( datePickerContainer );
 	} // end withDatePicker
 
 	// --- Predefined date range list ---
