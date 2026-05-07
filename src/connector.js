@@ -434,6 +434,9 @@ function initTpl() {
 			facetControllers.forEach( ( c ) => c?.deselectAll() );
 			dateFilterControllers.forEach( ( c ) => c?.clear() );
 		};
+
+		// Apply mobile defaults (sidebar hidden, facets collapsed) and restore any persisted state
+		applyFacetUIDefaults();
 	}
 
 	// auto-create results
@@ -519,6 +522,111 @@ function hasLocalStorage() {
 		return typeof localStorage !== 'undefined';
 	} catch ( error ) {
 		return false;
+	}
+}
+
+// Detect if sessionStorage is available
+function hasSessionStorage() {
+	try {
+		sessionStorage.setItem( '__test', '1' );
+		sessionStorage.removeItem( '__test' );
+		return true;
+	} catch ( error ) {
+		return false;
+	}
+}
+
+// Returns true if the viewport is mobile (below Bootstrap's col-md breakpoint)
+function isMobileView() {
+	return window.innerWidth < 992;
+}
+
+// Session storage key for facet UI state
+const FACET_UI_STATE_KEY = 'gc-facet-ui-state';
+
+// Load persisted facet UI state from sessionStorage
+function loadFacetUIState() {
+	if ( !hasSessionStorage() ) { return null; }
+	try {
+		const raw = sessionStorage.getItem( FACET_UI_STATE_KEY );
+		return raw ? JSON.parse( raw ) : null;
+	} catch ( error ) {
+		return null;
+	}
+}
+
+// Apply default facet UI state based on viewport, then overlay any persisted sessionStorage state.
+// Desktop defaults: sidebar visible, facets open.
+// Mobile defaults: sidebar hidden, facets collapsed.
+function applyFacetUIDefaults() {
+	const mobile = isMobileView();
+	const toggleBtn = document.getElementById( 'gc-facet-toggle' );
+	const resultsCol = document.getElementById( 'gc-results-col' );
+	const saved = loadFacetUIState();
+
+	// Determine sidebar visibility: prefer saved value, else use viewport default
+	const sidebarVisible = saved?.sidebarVisible !== undefined ? saved.sidebarVisible : !mobile;
+	if ( toggleBtn ) {
+		toggleBtn.setAttribute( 'aria-expanded', String( sidebarVisible ) );
+	}
+	if ( facetSidebarElement ) {
+		facetSidebarElement.hidden = !sidebarVisible;
+	}
+	if ( resultsCol ) {
+		resultsCol.classList.toggle( 'col-md-8', sidebarVisible );
+		resultsCol.classList.toggle( 'col-md-12', !sidebarVisible );
+	}
+
+	// Determine facet open state: default is open on desktop, closed on mobile
+	const defaultFacetsOpen = !mobile;
+	document.querySelectorAll( '.gc-facet' ).forEach( ( el ) => {
+		const savedOpen = saved?.facetsOpen?.[ el.id ];
+		el.open = savedOpen !== undefined ? savedOpen : defaultFacetsOpen;
+
+		// Persist state whenever the user manually toggles a facet
+		el.addEventListener( 'toggle', saveFacetUIState );
+	} );
+}
+
+// Save facet UI state to sessionStorage, only persisting values that differ from the defaults
+// Desktop defaults: sidebar visible, all facets open
+// Mobile defaults: sidebar hidden, all facets closed
+function saveFacetUIState() {
+	if ( !hasSessionStorage() ) { return; }
+
+	const mobile = isMobileView();
+	const defaultSidebarVisible = !mobile;
+	const defaultFacetsOpen = !mobile;
+
+	const toggleBtn = document.getElementById( 'gc-facet-toggle' );
+	const currentSidebarVisible = toggleBtn?.getAttribute( 'aria-expanded' ) === 'true';
+
+	const state = {};
+
+	// Only save sidebar visibility if it differs from the default
+	if ( currentSidebarVisible !== defaultSidebarVisible ) {
+		state.sidebarVisible = currentSidebarVisible;
+	}
+
+	// Only save facet open/closed states that differ from the default
+	const facetEls = document.querySelectorAll( '.gc-facet' );
+	const facetOpenOverrides = {};
+	let hasFacetOverrides = false;
+	facetEls.forEach( ( el ) => {
+		if ( el.open !== defaultFacetsOpen ) {
+			facetOpenOverrides[ el.id ] = el.open;
+			hasFacetOverrides = true;
+		}
+	} );
+	if ( hasFacetOverrides ) {
+		state.facetsOpen = facetOpenOverrides;
+	}
+
+	// If everything matches defaults, clear any saved state
+	if ( Object.keys( state ).length === 0 ) {
+		sessionStorage.removeItem( FACET_UI_STATE_KEY );
+	} else {
+		sessionStorage.setItem( FACET_UI_STATE_KEY, JSON.stringify( state ) );
 	}
 }
 
@@ -1343,6 +1451,8 @@ function toggleFacetSidebar() {
 		resultsCol?.classList.remove( 'col-md-12' );
 		resultsCol?.classList.add( 'col-md-8' );
 	}
+
+	saveFacetUIState();
 }
 
 // Update the visual selection of the active suggestion
