@@ -412,6 +412,7 @@ function initTpl() {
 				<div id="gc-facet-sidebar" class="col-md-4 gc-facet-sidebar mrgn-tp-lg">
 					<section id="gc-facet-panel">
 						<h2 class="wb-inv">${isFr ? 'Filtres' : 'Filters'}</h2>
+						<p id="gc-facet-live" class="wb-inv" aria-live="polite" aria-atomic="true"></p>
 						<div id="gc-facet-clear-all-container" class="text-right" hidden>
 							<button type="button" class="btn btn-link">${isFr ? 'Effacer tout' : 'Clear all'}</button>
 						</div>
@@ -1681,8 +1682,17 @@ function updatePagerState( newState ) {
 }
 
 // Rebuild a single facet's DOM inside the facet panel
+function announceFacetChange( message ) {
+	const liveEl = document.getElementById( 'gc-facet-live' );
+	if ( !liveEl ) { return; }
+	liveEl.textContent = '';
+	// Brief timeout ensures screen readers detect the content change
+	setTimeout( () => { liveEl.textContent = message; }, 50 );
+}
+
 function renderFacetSummary( label, hasActive, onClear ) {
 	const summaryEl = document.createElement( 'summary' );
+	summaryEl.id = 'gc-facet-label-' + label.toLowerCase().replace( /\s+/g, '-' );
 	summaryEl.textContent = label;
 	if ( hasActive ) {
 		summaryEl.insertAdjacentHTML( 'beforeend', `<button type="button" class="btn btn-link btn-sm pull-right">${ lang === 'fr' ? 'Effacer le filtre' : 'Clear filter' }</button>` );
@@ -1694,32 +1704,23 @@ function renderFacetSummary( label, hasActive, onClear ) {
 // Builds a single facet value <li>.
 function renderFacetItem( label, count, isSelected, onSelect ) {
 	const liEl = document.createElement( 'li' );
+	liEl.className = 'checkbox';
 
-	if ( isSelected ) {
-		const hintEl = document.createElement( 'span' );
-		hintEl.className = 'wb-inv';
-		hintEl.textContent = lang === 'fr' ? 'Enlever le filtre actif:' : 'Remove active filter:';
-		liEl.appendChild( hintEl );
-	}
+	const labelEl = document.createElement( 'label' );
 
-	const linkEl = document.createElement( 'a' );
-	linkEl.href = '#';
-	linkEl.onclick = ( e ) => { e.preventDefault(); onSelect(); };
-
-	if ( isSelected ) {
-		const iconEl = document.createElement( 'span' );
-		iconEl.className = 'glyphicon glyphicon-ok mrgn-rght-sm';
-		iconEl.setAttribute( 'aria-hidden', 'true' );
-		linkEl.appendChild( iconEl );
-	}
+	const checkboxEl = document.createElement( 'input' );
+	checkboxEl.type = 'checkbox';
+	checkboxEl.checked = isSelected;
+	checkboxEl.onchange = () => { onSelect(); };
 
 	const countEl = document.createElement( 'span' );
 	countEl.className = 'gc-facet-count';
 	countEl.innerHTML = ' (' + count.toLocaleString( lang ) + '<span class="wb-inv"> ' + ( lang === 'fr' ? 'résultats' : 'results' ) + '</span>)';
 
-	linkEl.appendChild( document.createTextNode( label ) );
-	liEl.appendChild( linkEl );
-	liEl.appendChild( countEl );
+	labelEl.appendChild( checkboxEl );
+	labelEl.appendChild( document.createTextNode( label ) );
+	labelEl.appendChild( countEl );
+	liEl.appendChild( labelEl );
 
 	return liEl;
 }
@@ -1785,8 +1786,12 @@ function updateFacetState( index, newState ) {
 	}
 
 	// Values list — show facet search results when a query is active, otherwise regular values
+	const listId = 'gc-facet-values-' + index;
 	const listEl = document.createElement( 'ul' );
+	listEl.id = listId;
 	listEl.className = 'list-unstyled gc-facet-values';
+	listEl.setAttribute( 'role', 'group' );
+	listEl.setAttribute( 'aria-labelledby', 'gc-facet-label-' + config.label.toLowerCase().replace( /\s+/g, '-' ) );
 
 	if ( isSearching ) {
 		facetSearchState.values.forEach( ( result ) => {
@@ -1803,10 +1808,15 @@ function updateFacetState( index, newState ) {
 	// Show more / show less — hidden while searching (search has its own pagination)
 	const isFr = lang === 'fr';
 	facetEl.insertAdjacentHTML( 'beforeend',
-		`<button type="button" class="btn btn-link small gc-facet-show-more pl-0"${ isSearching || !newState.canShowMoreValues ? ' hidden' : '' }>${ isFr ? 'Afficher davantage' : 'Show more' } <span class="glyphicon glyphicon-chevron-down small" aria-hidden="true"></span></button>
-		<button type="button" class="btn btn-link small gc-facet-show-less pl-0"${ isSearching || !newState.canShowLessValues ? ' hidden' : '' }>${ isFr ? 'Afficher moins' : 'Show less' } <span class="glyphicon glyphicon-chevron-up small" aria-hidden="true"></span></button>` );
+		`<button type="button" class="btn btn-link small gc-facet-show-more pl-0" aria-controls="${ listId }"${ isSearching || !newState.canShowMoreValues ? ' hidden' : '' }>${ isFr ? 'Afficher davantage' : 'Show more' } <span class="glyphicon glyphicon-chevron-down small" aria-hidden="true"></span></button>
+		<button type="button" class="btn btn-link small gc-facet-show-less pl-0" aria-controls="${ listId }"${ isSearching || !newState.canShowLessValues ? ' hidden' : '' }>${ isFr ? 'Afficher moins' : 'Show less' } <span class="glyphicon glyphicon-chevron-up small" aria-hidden="true"></span></button>` );
 	facetEl.querySelector( '.gc-facet-show-more' ).onclick = () => { facetControllers[ index ].showMoreValues(); };
 	facetEl.querySelector( '.gc-facet-show-less' ).onclick = () => { facetControllers[ index ].showLessValues(); };
+
+	if ( newState.hasActiveValues ) {
+		const activeLabels = newState.values.filter( ( v ) => v.state === 'selected' ).map( ( v ) => v.value ).join( ', ' );
+		announceFacetChange( isFr ? `Filtre actif\u00a0: ${activeLabels}` : `Filter active: ${activeLabels}` );
+	}
 
 	updateFacetLayoutVisibility();
 	updateClearAllVisibility();
@@ -1973,6 +1983,12 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 
 		facetEl.appendChild( listEl );
 	}
+
+	if ( dateFacetState.hasActiveValues || dateFilterState.range ) {
+		const isFrAnnounce = lang === 'fr';
+		announceFacetChange( isFrAnnounce ? `Filtre de date actif\u00a0: ${config.label}` : `Date filter active: ${config.label}` );
+	}
+
 	updateFacetLayoutVisibility();
 	updateClearAllVisibility();
 }
