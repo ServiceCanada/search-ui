@@ -715,6 +715,9 @@ function resolveRangeEndpointToInputDate( endpoint ) {
 	if ( typeof endpoint === 'string' ) {
 		return coveoDateToInputDate( endpoint );
 	}
+	if ( endpoint && endpoint.period === 'now' ) {
+		return '';
+	}
 	if ( endpoint && endpoint.period === 'past' ) {
 		const d = new Date();
 		if ( endpoint.unit === 'day' ) { d.setDate( d.getDate() - endpoint.amount ); }
@@ -726,9 +729,9 @@ function resolveRangeEndpointToInputDate( endpoint ) {
 	return '';
 }
 
-// Predefined relative date periods for the date facet (start is relative, end is fixed at page load)
+// Predefined relative date periods for the date facet (start is relative, end is now)
 function getDateFacetFields () {
-	const end = getCoveoDateFormat(new Date());
+	const end = { period: 'now' };
 	return [
 		{
 			en: "Past day",
@@ -770,7 +773,7 @@ function getDateFacetFields () {
 			en: "Older",
 			fr: "Plus ancien",
 			range: buildDateRange({
-				start: "1970/01/01@00:00:00",
+				start: { period: "past", unit: "year", amount: 100 },
 				end: { period: "past", unit: "year", amount: 1 },
 				endInclusive: false,
 			}),
@@ -837,12 +840,6 @@ function getLongDateFormat( date, lang ){
 	let langCA = lang + "-CA";
 
 	return currentTZDate.toLocaleDateString( langCA, { year: 'numeric', month: 'short', day: 'numeric' } );
-}
-
-// Format a Date as a Coveo date string: YYYY/MM/DD@HH:mm:ss
-function getCoveoDateFormat( date ) {
-	const pad = ( n ) => String( n ).padStart( 2, '0' );
-	return `${date.getFullYear()}/${pad( date.getMonth() + 1 )}/${pad( date.getDate() )}@${pad( date.getHours() )}:${pad( date.getMinutes() )}:${pad( date.getSeconds() )}`;
 }
 
 // checking for default date , Jan 1st, 1970
@@ -2048,8 +2045,8 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 				// Clear predefined range selection before applying custom filter
 				facetControllers[ index ].deselectAll();
 				dateFilterControllers[ index ].setRange( {
-					start: inputDateToCoveoDate( startVal || '1970-01-01', false ),
-					end: inputDateToCoveoDate( endVal || todayStr, true ),
+					start: startVal ? inputDateToCoveoDate( startVal, false ) : 'past-100-year',
+					end: endVal ? inputDateToCoveoDate( endVal, true ) : 'now',
 				} );
 			}
 		};
@@ -2087,7 +2084,10 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 				// Clear custom date filter and any other selected range before selecting
 				dateFilterControllers[ index ].clear();
 				facetControllers[ index ].deselectAll();
-				facetControllers[ index ].toggleSelect( value );
+				// Only re-select if it wasn't already selected (deselect = just clear)
+				if ( !isSelected ) {
+					facetControllers[ index ].toggleSelect( value );
+				}
 			} ) );
 		} );
 
