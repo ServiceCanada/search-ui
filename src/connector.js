@@ -14,6 +14,7 @@ import {
 	buildDateFacet,
 	buildDateFilter,
 	buildDateRange,
+	buildBreadcrumbManager,
 	loadAdvancedSearchQueryActions,
 	loadSortCriteriaActions,
 	HighlightUtils,
@@ -71,6 +72,8 @@ let unsubscribeResultListController;
 let unsubscribeQuerySummaryController;
 let unsubscribeDidYouMeanController;
 let unsubscribePagerController;
+let breadcrumbManagerController;
+let unsubscribeBreadcrumbManagerController;
 
 let dateFilterControllers = [];
 let dateFilterStates = [];
@@ -92,7 +95,31 @@ let lastCharKeyUp;
 let activeSuggestion = 0;
 let pagerManuallyCleared = false;
 
-// Firefox patch
+const localizedStrings = {
+	en: new Map(),
+	fr: new Map()
+};
+localizedStrings.en.set( "facets.showMore", "Show more" );
+localizedStrings.en.set( "breadbox.filters", "Filters:" );
+localizedStrings.fr.set( "breadbox.filters", "Filtres\u00a0:" );
+localizedStrings.en.set( "breadbox.clear", "Clear" );
+localizedStrings.fr.set( "breadbox.clear", "Effacer" );
+localizedStrings.en.set( "date-ranges.past-1-day|now", "Past day" );
+localizedStrings.fr.set( "date-ranges.past-1-day|now", "Derni\u00e8re journ\u00e9e" );
+localizedStrings.en.set( "date-ranges.past-1-week|now", "Past week" );
+localizedStrings.fr.set( "date-ranges.past-1-week|now", "Derni\u00e8re semaine" );
+localizedStrings.en.set( "date-ranges.past-1-month|now", "Past month" );
+localizedStrings.fr.set( "date-ranges.past-1-month|now", "Dernier mois" );
+localizedStrings.en.set( "date-ranges.past-1-year|now", "Past year" );
+localizedStrings.fr.set( "date-ranges.past-1-year|now", "Derni\u00e8re ann\u00e9e" );
+localizedStrings.en.set( "date-ranges.past-100-year|past-1-year", "Older" );
+localizedStrings.fr.set( "date-ranges.past-100-year|past-1-year", "Plus ancien" );
+localizedStrings.en.set( "date-ranges.before", "Before {{date}}" );
+localizedStrings.fr.set( "date-ranges.before", "Avant le {{date}}" );
+localizedStrings.en.set( "date-ranges.after", "After {{date}}" );
+localizedStrings.fr.set( "date-ranges.after", "Apr\u00e8s le {{date}}" );
+
+	// Firefox patch
 let isFirefox = navigator.userAgent.indexOf( "Firefox" ) !== -1;
 let waitForkeyUp = false;
 
@@ -106,6 +133,7 @@ let querySummaryElement = document.querySelector( '#query-summary' );
 let pagerElement = document.querySelector( '#pager' );
 let suggestionsElement = document.querySelector( '#suggestions' );
 let didYouMeanElement = document.querySelector( '#did-you-mean' );
+let breadcrumbElement = document.querySelector( '#breadcrumb-manager' );
 let facetSidebarElement = document.querySelector( '#gc-facet-sidebar' );
 let facetPanelElement = document.querySelector( '#gc-facet-panel' );
 
@@ -453,6 +481,15 @@ function initTpl() {
 		resultsSection.append( querySummaryElement );
 	}
 
+	// auto-create breadcrumb element (after query-summary, before did-you-mean)
+	if ( !breadcrumbElement ) {
+		breadcrumbElement = document.createElement( "div" );
+		breadcrumbElement.id = "breadcrumb-manager";
+		breadcrumbElement.hidden = true;
+
+		resultsSection.append( breadcrumbElement );
+	}
+
 	// auto-create did you mean element
 	if ( !didYouMeanElement ) {
 		didYouMeanElement = document.createElement( "div" );
@@ -731,47 +768,41 @@ function resolveRangeEndpointToInputDate( endpoint ) {
 
 // Predefined relative date periods for the date facet (start is relative, end is now)
 function getDateFacetFields () {
-	const end = { period: 'now' };
 	return [
 		{
-			en: "Past day",
-			fr: "Dernière journée",
+			labelKey: "date-ranges.past-1-day|now",
 			range: buildDateRange({
 				start: { period: "past", unit: "day", amount: 1 },
-				end,
+				end: { period: 'now' },
 				endInclusive: true,
 			}),
 		},
 		{
-			en: "Past week",
-			fr: "Dernière semaine",
+			labelKey: "date-ranges.past-1-week|now",
 			range: buildDateRange({
 				start: { period: "past", unit: "week", amount: 1 },
-				end,
+				end: { period: 'now' },
 				endInclusive: true,
 			}),
 		},
 		{
-			en: "Past month",
-			fr: "Dernier mois",
+			labelKey: "date-ranges.past-1-month|now",
 			range: buildDateRange({
 				start: { period: "past", unit: "month", amount: 1 },
-				end,
+				end: { period: 'now' },
 				endInclusive: true,
 			}),
 		},
 		{
-			en: "Past year",
-			fr: "Dernière année",
+			labelKey: "date-ranges.past-1-year|now",
 			range: buildDateRange({
 				start: { period: "past", unit: "year", amount: 1 },
-				end,
+				end: { period: 'now' },
 				endInclusive: true,
 			}),
 		},
 		{
-			en: "Older",
-			fr: "Plus ancien",
+			labelKey: "date-ranges.past-100-year|past-1-year",
 			range: buildDateRange({
 				start: { period: "past", unit: "year", amount: 100 },
 				end: { period: "past", unit: "year", amount: 1 },
@@ -969,6 +1000,7 @@ function initEngine() {
 	didYouMeanController = buildDidYouMean( headlessEngine, { options: { automaticallyCorrectQuery: params.automaticallyCorrectQuery } } );
 	pagerController = buildPager( headlessEngine, { options: { numberOfPages: params.numberOfPages } } );
 	statusController = buildSearchStatus( headlessEngine );
+	breadcrumbManagerController = buildBreadcrumbManager( headlessEngine );
 
 	// Build a facet controller for each normalized facet config
 	facetNormalizedConfigs.forEach( ( config, index ) => {
@@ -981,6 +1013,7 @@ function initEngine() {
 					generateAutomaticRanges: false,
 				}
 			} );
+			console.log('dateFacetController', getDateFacetFields());
 			const dateFilterController = buildDateFilter( headlessEngine, {
 				options: {
 					field: config.field,
@@ -1247,6 +1280,7 @@ function initEngine() {
 	unsubscribeQuerySummaryController = querySummaryController.subscribe( () => updateQuerySummaryState( querySummaryController.state ) );
 	unsubscribeDidYouMeanController = didYouMeanController.subscribe( () => updateDidYouMeanState( didYouMeanController.state ) );
 	unsubscribePagerController = pagerController.subscribe( () => updatePagerState( pagerController.state ) );
+	unsubscribeBreadcrumbManagerController = breadcrumbManagerController.subscribe( () => updateBreadcrumbState( breadcrumbManagerController.state ) );
 
 	// Clear event tracking, for legacy browsers
 	const onUnload = () => { 
@@ -1257,6 +1291,7 @@ function initEngine() {
 		unsubscribeQuerySummaryController?.();
 		unsubscribeDidYouMeanController?.();
 		unsubscribePagerController?.();
+		unsubscribeBreadcrumbManagerController?.();
 		unsubscribeFacetControllers.forEach( ( unsub ) => unsub?.() );
 		unsubscribeDateFilterControllers.forEach( ( unsub ) => unsub?.() );
 	};
@@ -1686,6 +1721,93 @@ function updateQuerySummaryState( newState ) {
 	}
 }
 
+function formatBreadcrumbLabel( breadcrumb ) {
+	const { start, end, value } = breadcrumb.value ?? {};
+	const formatCoveoDate = ( coveoDate ) => coveoDate ? coveoDate.split( '@' )[ 0 ].replace( /\//g, '-' ) : "";
+
+	if ( start !== undefined && end !== undefined ) {
+		const rangeLabel = localizedStrings[ params.lang ].get( `date-ranges.${ start }|${ end }` );
+		if ( rangeLabel ) {
+			return rangeLabel;
+		} else if ( start === 'past-100-year' ) {
+			return localizedStrings[ params.lang ].get( "date-ranges.before" ).replace( '{{date}}', formatCoveoDate( end ) );
+		} else if ( end === 'now' ) {
+			return localizedStrings[ params.lang ].get( "date-ranges.after" ).replace( '{{date}}', formatCoveoDate( start ) );
+		} else {
+			return `${ formatCoveoDate( start ) } - ${ formatCoveoDate( end ) }`;
+		}
+	}
+	return value ?? "";
+}
+
+function renderBreadcrumbItem( facetLabel, breadcrumb ) {
+	const displayValue = formatBreadcrumbLabel( breadcrumb );
+
+	const btnEl = document.createElement( "button" );
+	btnEl.type = "button";
+	btnEl.classList = "btn btn-default";
+	btnEl.setAttribute( "aria-label", `${ facetLabel }: ${ displayValue }` );
+
+	const chipEl = document.createElement( "span" );
+	chipEl.setAttribute( "aria-hidden", "true" );
+	chipEl.textContent = `${ facetLabel }: ${ displayValue } `;
+
+	const iconEl = document.createElement( "span" );
+	iconEl.className = "glyphicon glyphicon-remove";
+	iconEl.setAttribute( "aria-hidden", "true" );
+
+	chipEl.appendChild( iconEl );
+	btnEl.appendChild( chipEl );
+	btnEl.onclick = () => { breadcrumb.deselect(); };
+
+	const liEl = document.createElement( "li" );
+	liEl.appendChild( btnEl );
+	return liEl;
+}
+
+// Update breadcrumb (active filter) display
+function updateBreadcrumbState( newState ) {
+	if ( !breadcrumbElement ) return;
+
+	const facetBreadcrumbs = newState.facetBreadcrumbs || [];
+	const dateFacetBreadcrumbs = newState.dateFacetBreadcrumbs || [];
+	const allBreadcrumbs = [ ...facetBreadcrumbs, ...dateFacetBreadcrumbs ];
+
+	if ( allBreadcrumbs.length === 0 ) {
+		breadcrumbElement.hidden = true;
+		breadcrumbElement.textContent = "";
+		return;
+	}
+
+	breadcrumbElement.hidden = false;
+	breadcrumbElement.textContent = "";
+
+	const wrapperEl = document.createElement( "ul" );
+	wrapperEl.classList = "list-inline";
+
+	const labelEl = document.createElement( "li" );
+	labelEl.classList = "bold-content";
+	labelEl.textContent = localizedStrings[ params.lang ].get( "breadbox.filters" );
+	wrapperEl.appendChild( labelEl );
+
+	allBreadcrumbs.forEach( ( facet ) => {
+		const configMatch = facetNormalizedConfigs.find( ( c ) => c.facetId === facet.facetId || c.field === facet.field );
+		const facetLabel = configMatch?.label || facet.facetDisplayName || facet.field;
+		facet.values.forEach( ( breadcrumb ) => {
+			wrapperEl.appendChild( renderBreadcrumbItem( facetLabel, breadcrumb ) );
+		} );
+	} );
+
+	const clearAllEl = document.createElement( "button" );
+	clearAllEl.type = "button";
+	clearAllEl.classList = ( "btn btn-link" );
+	clearAllEl.textContent = localizedStrings[ params.lang ].get( "breadbox.clear" ); 
+	clearAllEl.onclick = () => { breadcrumbManagerController.deselectAll(); };
+	wrapperEl.appendChild( clearAllEl );
+
+	breadcrumbElement.appendChild( wrapperEl );
+}
+
 // update "Did you mean" recommendation
 function updateDidYouMeanState( newState ) {
 	didYouMeanState = newState;
@@ -2070,7 +2192,7 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 		[ ...dateFacetState.values ].reverse().forEach( ( value, valueIndex ) => {
 			const period = getDateFacetFields()[ valueIndex ];
 			if ( !period ) { return; }
-			const periodLabel = isFr ? period.fr : period.en;
+			const periodLabel = localizedStrings[ lang ].get( period.labelKey );
 			const isSelected = value.state === 'selected';
 			if ( config.withDatePicker && isSelected ) {
 				const rangeStart = resolveRangeEndpointToInputDate( period.range.start );
@@ -2081,7 +2203,6 @@ function updateDateFacetState( index, dateFacetState, dateFilterState ) {
 				if ( endEl ) { endEl.value = rangeEnd !== todayStr ? rangeEnd : ''; }
 			}
 			listEl.appendChild( renderFacetItem( periodLabel, value.numberOfResults, isSelected, () => {
-				// Clear custom date filter and any other selected range before selecting
 				dateFilterControllers[ index ].clear();
 				facetControllers[ index ].deselectAll();
 				// Only re-select if it wasn't already selected (deselect = just clear)
