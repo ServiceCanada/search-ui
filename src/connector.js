@@ -10,6 +10,7 @@ import {
 	buildDidYouMean,
 	buildContext,
 	buildInteractiveResult,
+	buildNotifyTrigger,
 	buildFacet,
 	buildDateFacet,
 	buildDateFilter,
@@ -65,6 +66,7 @@ let querySummaryController;
 let didYouMeanController;
 let pagerController;
 let statusController;
+let notifyTriggerController;
 let urlManager;
 let unsubscribeManager;
 let unsubscribeSearchBoxController;
@@ -72,6 +74,7 @@ let unsubscribeResultListController;
 let unsubscribeQuerySummaryController;
 let unsubscribeDidYouMeanController;
 let unsubscribePagerController;
+let unsubscribeNotifyTriggerController;
 let breadcrumbManagerController;
 let unsubscribeBreadcrumbManagerController;
 
@@ -89,6 +92,7 @@ let updateSearchBoxFromState = false;
 let searchBoxState;
 let resultListState;
 let querySummaryState;
+let notificationState;
 let didYouMeanState;
 let pagerState;
 let lastCharKeyUp;
@@ -130,6 +134,7 @@ let formElement = document.querySelector( `.page-type-search main [role=search],
 let resultsSection = document.querySelector( `#${resultSectionID}` );
 let resultListElement = document.querySelector( '#result-list' );
 let querySummaryElement = document.querySelector( '#query-summary' );
+let notificationTriggerElement = document.querySelector( '#notification-trigger' );
 let pagerElement = document.querySelector( '#pager' );
 let suggestionsElement = document.querySelector( '#suggestions' );
 let didYouMeanElement = document.querySelector( '#did-you-mean' );
@@ -141,6 +146,7 @@ let facetPanelElement = document.querySelector( '#gc-facet-panel' );
 let resultTemplateHTML = document.getElementById( 'sr-single' )?.innerHTML;
 let noResultTemplateHTML = document.getElementById( 'sr-nores' )?.innerHTML;
 let resultErrorTemplateHTML = document.getElementById( 'sr-error' )?.innerHTML;
+let notificationTriggerTemplateHTML = document.getElementById( 'sr-notification-trigger' )?.innerHTML;
 let querySummaryTemplateHTML = document.getElementById( 'sr-query-summary' )?.innerHTML;
 let didYouMeanTemplateHTML = document.getElementById( 'sr-did-you-mean' )?.innerHTML;
 let noQuerySummaryTemplateHTML = document.getElementById( 'sr-noquery-summary' )?.innerHTML;
@@ -329,6 +335,11 @@ function initTpl() {
 					<p>A resolution for the restoration is presently being worked.	We apologize for any inconvenience.</p>
 				</div>`;
 		}
+	}
+
+	if ( !notificationTriggerTemplateHTML ) {
+		notificationTriggerTemplateHTML = 
+			`<section class="alert alert-info">%[notification]</section>`;
 	}
 
 	if ( !querySummaryTemplateHTML ) {
@@ -582,6 +593,14 @@ function initTpl() {
 		resultsSection = document.createElement( "section" );
 		resultsSection.id = resultSectionID;
 		baseElement.append( resultsSection );
+	}
+
+	// auto-create notification trigger element
+	if ( !notificationTriggerElement ) {
+		notificationTriggerElement = document.createElement( "div" );
+		notificationTriggerElement.id = "notification-trigger";
+
+		resultsSection.append( notificationTriggerElement );
 	}
 
 	// auto-create query summary element
@@ -1150,6 +1169,7 @@ function initEngine() {
 	didYouMeanController = buildDidYouMean( headlessEngine, { options: { automaticallyCorrectQuery: params.automaticallyCorrectQuery } } );
 	pagerController = buildPager( headlessEngine, { options: { numberOfPages: params.numberOfPages } } );
 	statusController = buildSearchStatus( headlessEngine );
+	notifyTriggerController = buildNotifyTrigger( headlessEngine );
 
 	if( params.facets?.length ) {
 
@@ -1434,6 +1454,7 @@ function initEngine() {
 	unsubscribeQuerySummaryController = querySummaryController.subscribe( () => updateQuerySummaryState( querySummaryController.state ) );
 	unsubscribeDidYouMeanController = didYouMeanController.subscribe( () => updateDidYouMeanState( didYouMeanController.state ) );
 	unsubscribePagerController = pagerController.subscribe( () => updatePagerState( pagerController.state ) );
+	unsubscribeNotifyTriggerController = notifyTriggerController.subscribe( () => updateNotifyTriggerState( notifyTriggerController.state ) );
 	if( params.facets?.length ) {
 		unsubscribeBreadcrumbManagerController = breadcrumbManagerController.subscribe( () => updateBreadcrumbState( breadcrumbManagerController.state ) );
 	}
@@ -1447,6 +1468,7 @@ function initEngine() {
 		unsubscribeQuerySummaryController?.();
 		unsubscribeDidYouMeanController?.();
 		unsubscribePagerController?.();
+		unsubscribeNotifyTriggerController?.();
 		if( params.facets?.length ) {
 			unsubscribeFacetControllers.forEach( ( unsub ) => unsub?.() );
 			unsubscribeDateFilterControllers.forEach( ( unsub ) => unsub?.() );
@@ -1832,6 +1854,19 @@ function updateResultListState( newState ) {
 
 			resultListElement.appendChild( sectionNode );
 		} );
+	}
+}
+
+// Update notification displayed
+function updateNotifyTriggerState ( newState ) {
+	notificationState = newState;
+
+	if ( notificationState.notifications?.length ) {
+		notificationTriggerElement.innerHTML = notificationTriggerTemplateHTML.replace( "%[notification]", DOMPurify.sanitize( notificationState.notifications[0] ) );
+		focusToView();
+	}
+	else {
+		notificationTriggerElement.textContent = "";
 	}
 }
 
