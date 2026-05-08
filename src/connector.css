@@ -50,3 +50,36 @@
 		width: 100%;
 	}
 }
+
+/*
+ * Facet sidebar layout
+ */
+.gc-facet-toggle .glyphicon-chevron-left {
+	display: inline-block;
+	transition: transform 0.2s ease;
+}
+
+/* Rotate chevron to point right when the panel is collapsed */
+.gc-facet-toggle[aria-expanded="false"] .glyphicon-chevron-left {
+	transform: rotate(180deg);
+}
+
+.gc-facet-values li {
+	overflow-wrap: break-word;
+	position: relative;
+}
+
+/* Stretch the link click area to the full row without affecting its visual appearance */
+.gc-facet-values a::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+.gc-date-pickers .form-control,
+.gc-facet-search {
+	width: 100%;
+}

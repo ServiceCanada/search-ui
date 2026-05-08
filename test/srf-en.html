@@ -1,0 +1,105 @@
+---
+title: Search facets/filters results
+description: Demo page for the search with facets
+lang: en
+altLangPage: srf-fr.html
+nositesearch: true
+pageclass: page-type-search
+pageType: search
+share: false
+deptfeature: false
+dateModified: 2026-03-19
+breadcrumbs:
+- title: "GC Search UI"
+  link: "../index.html"
+css: "../src/connector.css"
+script:
+- src: "assets/token.js"
+- src: "../src/connector.js"
+  type: module
+---
+
+<!--FORM-->
+<form class="mrgn-tp-sm" role="search">
+	<div class="input-group mrgn-tp-lg">
+		<label class="wb-inv" for="sch-inp-ac">Search Government of Canada websites</label>
+		<input id="sch-inp-ac" class="form-control" value="" name="q" autocomplete="off" spellcheck="false" type="search" aria-describedby="gc-pi">
+		<span class="input-group-btn">
+		<button class="btn btn-primary btn-small" type="submit"> <span class="glyphicon-search glyphicon" aria-hidden="true"></span> <span class="wb-inv">Search</span> </button>
+		</span>
+	</div>
+	<p id="gc-pi" class="mrgn-tp-md">Don't include personal information (telephone, email, SIN, financial, medical, or work details).</p>
+</form>
+
+<!--RESULTS-->
+<div data-gc-search='{
+	"searchHub": "canada-gouv-public-websites",
+	"organizationId": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry",
+	"accessToken":"{{ site.data.token.API_KEY }}",
+	"originLevel3": "/en/sr/srf-en.html",
+	"facets": [
+    {
+      "facetId": "department",
+      "facetSearch": true,
+      "field": "author",
+      "filterFacetCount": true,
+      "numberOfValues": 8,
+      "sortCriteria": "score",
+      "title": "Department"
+    },
+    {
+      "facetId": "site",
+      "facetSearch": false,
+      "field": "hostname",
+      "filterFacetCount": false,
+      "numberOfValues": 8,
+      "sortCriteria": "score",
+      "title": "Site"
+    },
+    {
+      "facetId": "audience",
+      "facetSearch": false,
+      "field": "audience",
+      "filterFacetCount": true,
+      "numberOfValues": 8,
+      "sortCriteria": "alphanumericDescending",
+      "title": "Audience"
+    },
+    {
+      "facetId": "type",
+      "facetSearch": true,
+      "facetType": "regular",
+      "field": "filetype",
+      "numberOfValues": 12,
+      "sortCriteria": "alphanumeric",
+      "title": "File Type"
+    },
+    {
+      "facetId": "date",
+      "facetType": "dateRange",
+      "field": "date",
+      "title": "Date",
+      "withDatePicker": true,
+      "withDateRanges": true
+    }
+  ]
+}'></div>
+
+<div class="row mrgn-tp-md">
+	<div class="col-md-2">
+		<a href="srb-en.html">Basic search</a>
+	</div>
+	<div class="col-md-2">
+		<a href="sra-en.html">Advanced search</a>
+	</div>
+	<div class="col-md-2">
+		<a href="https://www.canada.ca/en/sr/st.html">Search tips</a>
+	</div>
+</div>
+
+<!--DEMO-EXPECTATIONS-->
+<h2>Expected output for the result section</h2>
+<details>
+	<summary>Output for Results section</summary>
+	[To be completed, see Connector.js for reference until then]
+</details>
