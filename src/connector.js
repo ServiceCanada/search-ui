@@ -630,7 +630,7 @@ function initEngine() {
 
 						// Event used to expose a data layer when search events occur; useful for analytics
 						const searchEvent = new CustomEvent( "searchEvent", { detail: requestContent } );
-						document.dispatchEvent( searchEvent );
+						baseElement.dispatchEvent( searchEvent );
 					}
 					if ( clientOrigin === 'searchApiFetch' ) {
 						let requestContent = JSON.parse( request.body );
