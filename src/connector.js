@@ -13,8 +13,7 @@ import {
 	buildNotifyTrigger,
 	loadAdvancedSearchQueryActions,
 	loadSortCriteriaActions,
-	HighlightUtils,
-	getOrganizationEndpoints
+	HighlightUtils
 } from './headless.esm.js';
 
 // Search UI base
@@ -193,10 +192,6 @@ function initSearchUI() {
 	}
 	else {
 		originLevel3RelativeUrl = params.originLevel3;
-	}
-
-	if ( !params.endpoints ) {
-		params.endpoints = getOrganizationEndpoints( params.organizationId, 'prod' );
 	}
 
 	// Show error on load if no access token is provided
@@ -599,13 +594,21 @@ function getGMTDate( date ) {
 function initEngine() {
 	headlessEngine = buildSearchEngine( {
 		configuration: {
-			organizationEndpoints: params.endpoints,
 			organizationId: params.organizationId,
 			accessToken: params.accessToken,
 			search: {
 				locale: params.lang,
 				searchHub: params.searchHub,
-				pipeline: params.pipeline
+				pipeline: params.pipeline,
+				...(params.endpoints?.search && { 
+					proxyBaseUrl: params.endpoints.search, 
+				}),
+			},
+			analytics: {
+				analyticsMode: "legacy",
+				...(params.endpoints?.analytics && { 
+					proxyBaseUrl: params.endpoints.analytics, 
+				}),
 			},
 			preprocessRequest: ( request, clientOrigin ) => {
 				try {
@@ -657,16 +660,18 @@ function initEngine() {
 						requestContent.q = sanitizeQuery( q );
 
 						// Filters out actions history items older than 7 days
-						const actionsHistory = limitCoveoAnalyticsHistory( requestContent.actionsHistory );
-						if ( actionsHistory.length !== requestContent.actionsHistory.length ) {
-							requestContent.actionsHistory = actionsHistory;
-							saveCoveoAnalyticsHistory( actionsHistory );
+						if ( requestContent.actionsHistory ) {
+							const actionsHistory = limitCoveoAnalyticsHistory( requestContent.actionsHistory );
+							if ( actionsHistory.length !== requestContent.actionsHistory.length ) {
+								requestContent.actionsHistory = actionsHistory;
+								saveCoveoAnalyticsHistory( actionsHistory );
+							}
 						}
 						
 						request.body = JSON.stringify( requestContent );
 					}
-				} catch {
-					console.warn( "No Headless Engine Loaded." );
+				} catch ( error ) {
+					console.warn( "preprocessRequest error : " + error.message );
 				}
 
 				return request;
