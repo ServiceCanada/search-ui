@@ -164,3 +164,7 @@ vendor
 Gemfile.lock
 
 _data/token.yml
+
+# Output from automated tests
+/playwright-report
+/test-results

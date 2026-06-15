@@ -15,7 +15,14 @@
 	"author": "ServiceCanada",
 	"license": "(MIT AND Apache-2.0)",
 	"homepage": "https://servicecanada.github.io/search-ui/",
+	"scripts": {
+		"test": "playwright test",
+		"test:ui": "playwright test --ui",
+		"test:report": "playwright show-report"
+	},
 	"devDependencies": {
+		"@lodder/grunt-postcss": "^3.0.1",
+		"@playwright/test": "^1.60.0",
 		"grunt": "^1.6.1",
 		"grunt-banner": "^0.6.0",
 		"grunt-contrib-clean": "^2.0.1",
@@ -26,7 +33,6 @@
 		"grunt-eslint": "^24.3.0",
 		"grunt-htmllint": "^0.3.0",
 		"postcss": "^8.5.8",
-		"postcss-preset-env": "^11.2.0",
-		"@lodder/grunt-postcss": "^3.0.1"
+		"postcss-preset-env": "^11.2.0"
 	}
 }
