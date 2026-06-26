@@ -73,4 +73,42 @@ test.describe('SRB EN page', () => {
 
     await expect(page.locator('#sch-inp-ac')).toHaveValue('Canada');
   });
+
+  test('no results message is shown for an unmatched query', async ({ page }) => {
+    await page.locator('#sch-inp-ac').focus();
+    await page.keyboard.type('sdfsafasdfsdfsdfsdfsdfsdf');
+    await page.keyboard.press('Enter');
+
+    const summary = page.locator('#wb-land h2');
+    await expect(summary).toBeFocused();
+    await expect(summary).toBeVisible();
+    await expect(summary).toContainText('No results');
+
+    // After keyboard interaction, the browser shows a visible focus ring (:focus-visible is true).
+    const hasFocusRing = await summary.evaluate(el => el.matches(':focus-visible'));
+    expect(hasFocusRing, 'focus ring should be visible after keyboard submit').toBe(true);
+  });
+
+  test('no results message is shown for an empty query', async ({ page }) => {
+    // First perform a successful search so the search box has a value to clear.
+    await page.locator('#sch-inp-ac').focus();
+    await page.keyboard.type('benefits');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#wb-land h2')).toBeVisible();
+    await expect(page.locator('#wb-land h2')).toContainText('benefits');
+
+    // Return to the search box and clear the query one character at a time.
+    await page.locator('#sch-inp-ac').focus();
+    await page.keyboard.press('End');
+    for (let i = 0; i < 'benefits'.length; i++) {
+      await page.keyboard.press('Backspace');
+    }
+    await page.keyboard.press('Enter');
+
+    const summary = page.locator('#wb-land h2');
+    await expect(summary).toBeFocused();
+    await expect(summary).toBeVisible();
+    await expect(summary).toContainText('No results');
+  });
+
 });

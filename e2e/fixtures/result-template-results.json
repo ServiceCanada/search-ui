@@ -1,0 +1,1140 @@
+{
+  "advancedExpression": null,
+  "apiVersion": 2,
+  "basicExpression": "benefits",
+  "categoryFacets": [],
+  "constantExpression": "@declared_language==(eng,en,en-CA) OR (NOT @declared_language @language=english)",
+  "disjunctionExpression": "@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb OR @permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a OR @permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94 OR @permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc",
+  "duration": 100,
+  "extendedResults": {},
+  "facets": [],
+  "groupByResults": [],
+  "index": "employmentandsocialdevelopmentcanadanonproduction14o5d9wry-9di7prgj-Indexer-2-q4pnjkhqqifygbugofmiod2b5a",
+  "indexDuration": 51,
+  "indexRegion": "ca-central-1",
+  "indexToken": "ZW1wbG95bWVudGFuZHNvY2lhbGRldmVsb3BtZW50Y2FuYWRhbm9ucHJvZHVjdGlvbjE0bzVkOXdyeS05ZGk3cHJnai1JbmRleGVyLTItcTRwbmpraHFxaWZ5Z2J1Z29mbWlvZDJiNWE=",
+  "largeExpression": null,
+  "logicalIndex": "default",
+  "mandatoryExpression": null,
+  "phrasesToHighlight": {},
+  "pipeline": "Canada public websites - Generic",
+  "queryCorrections": [],
+  "questionAnswer": {
+    "answerFound": false,
+    "answerSnippet": "",
+    "documentId": {
+      "contentIdKey": "",
+      "contentIdValue": ""
+    },
+    "question": "",
+    "relatedQuestions": [],
+    "score": 0
+  },
+  "rankingExpressions": [
+    {
+      "applyToEveryResult": true,
+      "expression": "@generator==gcnews ((@declared_type=\"media advisories\" @date<today-7d) OR (@declared_type=\"avis aux médias\" @date<today-7d))",
+      "isConstant": true,
+      "modifier": -500
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@generator==gcnews ((@declared_type=backgrounders @date<today-180d) OR (@declared_type=\"documents d&#39;information\" @date<today-180d))",
+      "isConstant": true,
+      "modifier": -500
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@generator==gcnews ((@declared_type=readouts @date<today-365d) OR (@declared_type=\"comptes rendus\" @date<today-365d))",
+      "isConstant": true,
+      "modifier": -500
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@generator==gcnews ((@declared_type=speeches @date<today-730d) OR (@declared_type=discours @date<today-730d))",
+      "isConstant": true,
+      "modifier": -500
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@generator==gcnews ((@declared_type=statements @date<today-730d) OR (@declared_type=déclarations @date<today-730d))",
+      "isConstant": true,
+      "modifier": -500
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@hostname==canada.ca",
+      "isConstant": true,
+      "modifier": 100
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb",
+      "isConstant": false,
+      "modifier": 250
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc",
+      "isConstant": false,
+      "modifier": 159
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94",
+      "isConstant": false,
+      "modifier": 250
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a",
+      "isConstant": false,
+      "modifier": 250
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@title=(\"Error 500\",\"Error 404\",archive,archivé,archivée)",
+      "isConstant": true,
+      "modifier": -500
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@uri=(https://www.canada.ca/en/services/,https://www.canada.ca/fr/services/)",
+      "isConstant": true,
+      "modifier": 200
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@uri==(https://www.canada.ca/en/news/archive/2008/06/measles.html,https://www.canada.ca/fr/nouvelles/archive/2008/06/rougeole.html,https://www.canada.ca/fr/sante-publique/services/rapports-publications/releve-maladies-transmissibles-canada-rmtc/numero-mensuel/2009-35/definitions-nosologiques-maladies-transmissibles-surveillance-nationale/rougeole.html)",
+      "isConstant": true,
+      "modifier": -500
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@uri==https://www.canada.ca/en/privy-council/deputy-prime-minister/dpminister.html",
+      "isConstant": true,
+      "modifier": -500
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@uri=canada.ca/en/news/archive/ OR @uri=canada.ca/fr/nouvelles/archive/ OR (@generator==gcnews ((@declared_type=\"news releases\" @date<today-730d) OR (@declared_type=\"communiqués de presse\" @date<today-730d)))",
+      "isConstant": true,
+      "modifier": -500
+    },
+    {
+      "applyToEveryResult": true,
+      "expression": "@uri=veterans.gc.ca @uri=(remembrance/memorials/books/page,remembrance/memorials/canadian-virtual-war-memorial/detail)",
+      "isConstant": true,
+      "modifier": -500
+    }
+  ],
+  "refinedKeywords": [],
+  "requestDuration": 57,
+  "results": [
+    {
+      "ClickUri": "https://www.canada.ca/en/services/benefits.html",
+      "Excerpt": "Benefits Includes Employment Insurance, dental coverage, child benefit, pensions and benefits for housing, student aid, family, ... tax refund program. Family and caregiving benefits Child benefit, dental benefit and GST/HST credit. ... , or personal tax deductions. Benefits by audience Benefits and programs, including eligibility.",
+      "FirstSentences": null,
+      "PrintableUri": "https://www.canada.ca/en/services/benefits.html",
+      "Title": "Benefits",
+      "UniqueId": "42.2001$https://www.canada.ca/en/services/benefits.html",
+      "Uri": "https://www.canada.ca/en/services/benefits.html",
+      "absentTerms": [],
+      "childResults": [],
+      "clickUri": "https://www.canada.ca/en/services/benefits.html",
+      "excerpt": "Benefits Includes Employment Insurance, dental coverage, child benefit, pensions and benefits for housing, student aid, family, ... tax refund program. Family and caregiving benefits Child benefit, dental benefit and GST/HST credit. ... , or personal tax deductions. Benefits by audience Benefits and programs, including eligibility.",
+      "excerptHighlights": [
+        {
+          "length": 7,
+          "offset": 189
+        },
+        {
+          "length": 7,
+          "offset": 205
+        },
+        {
+          "length": 7,
+          "offset": 63
+        },
+        {
+          "length": 8,
+          "offset": 0
+        },
+        {
+          "length": 8,
+          "offset": 174
+        },
+        {
+          "length": 8,
+          "offset": 267
+        },
+        {
+          "length": 8,
+          "offset": 288
+        },
+        {
+          "length": 8,
+          "offset": 85
+        }
+      ],
+      "firstSentences": null,
+      "firstSentencesHighlights": [],
+      "flags": "HasHtmlVersion;HasAllMetaDataStream",
+      "hasHtmlVersion": true,
+      "hasMobileHtmlVersion": false,
+      "isRecommendation": false,
+      "isTopResult": false,
+      "isUserActionView": false,
+      "parentResult": null,
+      "percentScore": 100,
+      "primaryid": "MFHUKMCLYOYTATTPGNHXQMZQJ3B3CLRSGAYDCLTEMVTGC5LMOQ",
+      "printableUri": "https://www.canada.ca/en/services/benefits.html",
+      "printableUriHighlights": [
+        {
+          "length": 8,
+          "offset": 34
+        }
+      ],
+      "rankingInfo": "Document weights:\nTitle: 1120; Quality: 0; Date: 525; Adjacency: 0; Source: 0; Custom: 0; QRE: 3000; Ranking functions: 0; \nQRE:\nExpression: \"@uri=veterans.gc.ca @uri=(remembrance/memorials/books/page,remembrance/memorials/canadian-virtual-war-memorial/detail)\" Score: 0\nExpression: \"@title=(\"Error 500\",\"Error 404\",archive,archivé,archivée)\" Score: 0\nExpression: \"@uri=canada.ca/en/news/archive/ OR @uri=canada.ca/fr/nouvelles/archive/ OR (@generator==gcnews ((@declared_type=\"news releases\" @date<today-730d) OR (@declared_type=\"communiqués de presse\" @date<today-730d)))\" Score: 0\nExpression: \"@uri==(https://www.canada.ca/en/news/archive/2008/06/measles.html,https://www.canada.ca/fr/nouvelles/archive/2008/06/rougeole.html,https://www.canada.ca/fr/sante-publique/services/rapports-publications/releve-maladies-transmissibles-canada-rmtc/numero-mensuel/2009-35/definitions-nosologiques-maladies-transmissibles-surveillance-nationale/rougeole.html)\" Score: 0\nExpression: \"@uri==https://www.canada.ca/en/privy-council/deputy-prime-minister/dpminister.html\" Score: 0\nExpression: \"@hostname==canada.ca\" Score: 1000\nExpression: \"@uri=(https://www.canada.ca/en/services/,https://www.canada.ca/fr/services/)\" Score: 2000\nExpression: \"@generator==gcnews ((@declared_type=\"media advisories\" @date<today-7d) OR (@declared_type=\"avis aux médias\" @date<today-7d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=backgrounders @date<today-180d) OR (@declared_type=\"documents d&#39;information\" @date<today-180d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=readouts @date<today-365d) OR (@declared_type=\"comptes rendus\" @date<today-365d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=speeches @date<today-730d) OR (@declared_type=discours @date<today-730d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=statements @date<today-730d) OR (@declared_type=déclarations @date<today-730d))\" Score: 0\nExpression: \"@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb\" Score: 0\nExpression: \"@permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a\" Score: 0\nExpression: \"@permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94\" Score: 0\nExpression: \"@permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc\" Score: 0\nRanking Functions:\n\nTerms weights:\nbenefits: 100, 23; benefit: 74, 22; \nTitle: 1120; Concept: 0; Summary: 300; URI: 500; Formatted: 200; Casing: 0; Relation: 200; Frequency: 1370; \n\nTotal weight: 8335",
+      "rating": 0,
+      "raw": {
+        "author": [
+          "Employment and Social Development Canada"
+        ],
+        "collection": "default",
+        "date": 1781222400000,
+        "description": "Includes Employment Insurance, pensions and benefits for dental, housing, education, training, family and people with disabilities.",
+        "disp_declared_type": "navigation page - theme landing page",
+        "displaynavlabel": "www.canada.ca",
+        "hostname": "canada.ca",
+        "language": [
+          "English"
+        ],
+        "permanentid": "dd37e218d78cf4aa9e2c403cd2d102325dec39d0a480eef5060a4bcfbe0d",
+        "source": "priority_canada_ca_sitemap",
+        "sourcetype": "Sitemap",
+        "sysauthor": [
+          "Employment and Social Development Canada"
+        ],
+        "syscollection": "default",
+        "sysdate": 1781222400000,
+        "syslanguage": [
+          "English"
+        ],
+        "syssource": "priority_canada_ca_sitemap",
+        "syssourcetype": "Sitemap",
+        "sysurihash": "aOE0Kñ0No3Ox30Nñ",
+        "urihash": "aOE0Kñ0No3Ox30Nñ"
+      },
+      "score": 8335,
+      "summary": null,
+      "summaryHighlights": [],
+      "title": "Benefits",
+      "titleHighlights": [
+        {
+          "length": 8,
+          "offset": 0
+        }
+      ],
+      "totalNumberOfChildResults": 0,
+      "uniqueId": "42.2001$https://www.canada.ca/en/services/benefits.html",
+      "uri": "https://www.canada.ca/en/services/benefits.html"
+    },
+    {
+      "ClickUri": "https://www.canada.ca/en/services/benefits/disability.html",
+      "Excerpt": "Disability benefits Disability benefits Includes the Canada Disability Benefit, disability pensions and children’s benefits, savings plans and a gasoline ... Sign up for direct deposit VAC Benefits Browser My VAC Account (Veterans Affairs Canada) Services and information Canada Disability Benefit Financial support to people with ...",
+      "FirstSentences": null,
+      "PrintableUri": "https://www.canada.ca/en/services/benefits/disability.html",
+      "Title": "Disability benefits",
+      "UniqueId": "42.2001$https://www.canada.ca/en/services/benefits/disability.html",
+      "Uri": "https://www.canada.ca/en/services/benefits/disability.html",
+      "absentTerms": [],
+      "childResults": [],
+      "clickUri": "https://www.canada.ca/en/services/benefits/disability.html",
+      "excerpt": "Disability benefits Disability benefits Includes the Canada Disability Benefit, disability pensions and children’s benefits, savings plans and a gasoline ... Sign up for direct deposit VAC Benefits Browser My VAC Account (Veterans Affairs Canada) Services and information Canada Disability Benefit Financial support to people with ...",
+      "excerptHighlights": [],
+      "firstSentences": null,
+      "firstSentencesHighlights": [],
+      "flags": "HasHtmlVersion;HasAllMetaDataStream",
+      "hasHtmlVersion": true,
+      "hasMobileHtmlVersion": false,
+      "isRecommendation": false,
+      "isTopResult": false,
+      "isUserActionView": false,
+      "parentResult": null,
+      "percentScore": 92.474075,
+      "primaryid": "LBFU2RTYO5VU6Y3XGNSEG2DNKUXDEMBQGEXGIZLGMF2WY5A",
+      "printableUri": "https://www.canada.ca/en/services/benefits/disability.html",
+      "printableUriHighlights": [
+        {
+          "length": 58,
+          "offset": 0
+        }
+      ],
+      "rankingInfo": "Document weights:\nTitle: 454; Quality: 0; Date: 472; Adjacency: 1250; Source: 0; Custom: 0; QRE: 3000; Ranking functions: 0; \nQRE:\nExpression: \"@uri=veterans.gc.ca @uri=(remembrance/memorials/books/page,remembrance/memorials/canadian-virtual-war-memorial/detail)\" Score: 0\nExpression: \"@title=(\"Error 500\",\"Error 404\",archive,archivé,archivée)\" Score: 0\nExpression: \"@uri=canada.ca/en/news/archive/ OR @uri=canada.ca/fr/nouvelles/archive/ OR (@generator==gcnews ((@declared_type=\"news releases\" @date<today-730d) OR (@declared_type=\"communiqués de presse\" @date<today-730d)))\" Score: 0\nExpression: \"@uri==(https://www.canada.ca/en/news/archive/2008/06/measles.html,https://www.canada.ca/fr/nouvelles/archive/2008/06/rougeole.html,https://www.canada.ca/fr/sante-publique/services/rapports-publications/releve-maladies-transmissibles-canada-rmtc/numero-mensuel/2009-35/definitions-nosologiques-maladies-transmissibles-surveillance-nationale/rougeole.html)\" Score: 0\nExpression: \"@uri==https://www.canada.ca/en/privy-council/deputy-prime-minister/dpminister.html\" Score: 0\nExpression: \"@hostname==canada.ca\" Score: 1000\nExpression: \"@uri=(https://www.canada.ca/en/services/,https://www.canada.ca/fr/services/)\" Score: 2000\nExpression: \"@generator==gcnews ((@declared_type=\"media advisories\" @date<today-7d) OR (@declared_type=\"avis aux médias\" @date<today-7d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=backgrounders @date<today-180d) OR (@declared_type=\"documents d&#39;information\" @date<today-180d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=readouts @date<today-365d) OR (@declared_type=\"comptes rendus\" @date<today-365d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=speeches @date<today-730d) OR (@declared_type=discours @date<today-730d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=statements @date<today-730d) OR (@declared_type=déclarations @date<today-730d))\" Score: 0\nExpression: \"@permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc\" Score: 0\nExpression: \"@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb\" Score: 0\nExpression: \"@permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a\" Score: 0\nExpression: \"@permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94\" Score: 0\nExpression: \"@permanentid=09e0330428e1bfb04e180f26ec9e0521bb7fec96231bf66fb47aa2cefcc1\" Score: 0\nRanking Functions:\n\nTerms weights:\ndisability: 100, 29; \nTitle: 378; Concept: 33; Summary: 101; URI: 168; Formatted: 67; Casing: 0; Relation: 67; Frequency: 230; \n\nbenefits: 100, 23; \nTitle: 363; Concept: 32; Summary: 97; URI: 162; Formatted: 64; Casing: 0; Relation: 64; Frequency: 175; \n\nwww: 100, 6; \nTitle: 0; Concept: 0; Summary: 0; URI: 63; Formatted: 0; Casing: 0; Relation: 25; Frequency: 15; \n\nservices: 100, 4; \nTitle: 0; Concept: 0; Summary: 24; URI: 40; Formatted: 16; Casing: 0; Relation: 16; Frequency: 0; \n\nhtml: 100, 4; \nTitle: 0; Concept: 0; Summary: 0; URI: 34; Formatted: 0; Casing: 0; Relation: 13; Frequency: 0; \n\nen: 100, 3; \nTitle: 0; Concept: 0; Summary: 0; URI: 25; Formatted: 0; Casing: 0; Relation: 10; Frequency: 0; \n\nhttps: 100, 0; \nTitle: 0; Concept: 0; Summary: 0; URI: 1; Formatted: 0; Casing: 0; Relation: 0; Frequency: 0; \n\ncanada: 100, 0; \nTitle: 0; Concept: 0; Summary: 1; URI: 1; Formatted: 0; Casing: 0; Relation: 0; Frequency: 0; \n\nca: 100, 0; \nTitle: 0; Concept: 0; Summary: 0; URI: 1; Formatted: 0; Casing: 0; Relation: 0; Frequency: 0; \n\nTotal weight: 7462",
+      "rating": 0,
+      "raw": {
+        "author": [
+          "Employment and Social Development Canada"
+        ],
+        "collection": "default",
+        "date": 1780617600000,
+        "description": "Includes the Canada Disability Benefit, disability pensions and children’s benefits, savings plans and a gasoline tax refund program",
+        "disp_declared_type": "navigation page - topic page",
+        "displaynavlabel": "www.canada.ca > Benefits",
+        "hostname": "canada.ca",
+        "language": [
+          "English"
+        ],
+        "permanentid": "05e65251c3fa3635a1f0d778dd52a84d16f13cdf7cbea1d5283ffdcecffd",
+        "source": "priority_canada_ca_sitemap",
+        "sourcetype": "Sitemap",
+        "sysauthor": [
+          "Employment and Social Development Canada"
+        ],
+        "syscollection": "default",
+        "sysdate": 1780617600000,
+        "syslanguage": [
+          "English"
+        ],
+        "syssource": "priority_canada_ca_sitemap",
+        "syssourcetype": "Sitemap",
+        "sysurihash": "XKMFxwkOcw3dChmU",
+        "urihash": "XKMFxwkOcw3dChmU"
+      },
+      "score": 7462,
+      "summary": null,
+      "summaryHighlights": [],
+      "title": "Disability benefits",
+      "titleHighlights": [],
+      "totalNumberOfChildResults": 0,
+      "uniqueId": "42.2001$https://www.canada.ca/en/services/benefits/disability.html",
+      "uri": "https://www.canada.ca/en/services/benefits/disability.html"
+    },
+    {
+      "ClickUri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "Excerpt": "Canada Disability Benefit Important: Filing your tax return is required ... The Canada Disability Benefit provides direct financial support to people with disabilities who are between 18 and 64 years ... Related links Disability Tax Credit Benefits for people with disabilities Organizations providing disability benefits navigation services",
+      "FirstSentences": null,
+      "PrintableUri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "Title": "Canada Disability Benefit",
+      "UniqueId": "42.2001$https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "Uri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "absentTerms": [],
+      "childResults": [],
+      "clickUri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "excerpt": "Canada Disability Benefit Important: Filing your tax return is required ... The Canada Disability Benefit provides direct financial support to people with disabilities who are between 18 and 64 years ... Related links Disability Tax Credit Benefits for people with disabilities Organizations providing disability benefits navigation services",
+      "excerptHighlights": [],
+      "firstSentences": null,
+      "firstSentencesHighlights": [],
+      "flags": "HasHtmlVersion;HasAllMetaDataStream",
+      "hasHtmlVersion": true,
+      "hasMobileHtmlVersion": false,
+      "isRecommendation": false,
+      "isTopResult": false,
+      "isUserActionView": false,
+      "parentResult": null,
+      "percentScore": 92.63505,
+      "primaryid": "IVQVSWODWA3VGS22JNGGRQ5RGNRGELRSGAYDCLTEMVTGC5LMOQ",
+      "printableUri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "printableUriHighlights": [
+        {
+          "length": 84,
+          "offset": 0
+        }
+      ],
+      "rankingInfo": null,
+      "rating": 0,
+      "raw": {
+        "author": [
+          "Service Canada"
+        ],
+        "collection": "default",
+        "date": 1781827200000,
+        "description": "The Canada Disability Benefit is a monthly payment for working-age persons with disabilities who have low income",
+        "disp_declared_type": "service initiation",
+        "displaynavlabel": "www.canada.ca > Benefits > Disability benefits",
+        "hostname": "canada.ca",
+        "language": [
+          "English"
+        ],
+        "permanentid": "9e54a36d38ac8cf2e6fdf9a525ce9a3ee27e1cdf385bc65b0bbb73d31863",
+        "source": "priority_canada_ca_sitemap",
+        "sourcetype": "Sitemap",
+        "sysauthor": [
+          "Service Canada"
+        ],
+        "syscollection": "default",
+        "sysdate": 1781827200000,
+        "syslanguage": [
+          "English"
+        ],
+        "syssource": "priority_canada_ca_sitemap",
+        "syssourcetype": "Sitemap",
+        "sysurihash": "EaYYð7SKZKLhñ3bb",
+        "urihash": "EaYYð7SKZKLhñ3bb"
+      },
+      "score": 7488,
+      "summary": null,
+      "summaryHighlights": [],
+      "title": "Canada Disability Benefit",
+      "titleHighlights": [],
+      "totalNumberOfChildResults": 0,
+      "uniqueId": "42.2001$https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "uri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html"
+    },
+    {
+      "ClickUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "Excerpt": "Death benefit Death benefit The Canada Pension Plan (CPP) death benefit is a one-time payment, payable to the estate or other eligible individuals, on behalf of a deceased CPP contributor. ... complete the online CPP Death Benefit form ... the individual who receives it, refer to Death benefits - Prepare tax returns for someone who died.",
+      "FirstSentences": null,
+      "PrintableUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "Title": "Death Benefit",
+      "UniqueId": "42.2001$https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "Uri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "absentTerms": [],
+      "childResults": [],
+      "clickUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "excerpt": "Death benefit Death benefit The Canada Pension Plan (CPP) death benefit is a one-time payment, payable to the estate or other eligible individuals, on behalf of a deceased CPP contributor. ... complete the online CPP Death Benefit form ... the individual who receives it, refer to Death benefits - Prepare tax returns for someone who died.",
+      "excerptHighlights": [],
+      "firstSentences": null,
+      "firstSentencesHighlights": [],
+      "flags": "HasHtmlVersion;HasAllMetaDataStream",
+      "hasHtmlVersion": true,
+      "hasMobileHtmlVersion": false,
+      "isRecommendation": false,
+      "isTopResult": false,
+      "isUserActionView": false,
+      "parentResult": null,
+      "percentScore": 91.56495,
+      "primaryid": "JU3VS2RXLBQWQWBWO44G4NLTPAXDEMBQGEXGIZLGMF2WY5A",
+      "printableUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "printableUriHighlights": [
+        {
+          "length": 84,
+          "offset": 0
+        }
+      ],
+      "rankingInfo": "Document weights:\nTitle: 184; Quality: 0; Date: 430; Adjacency: 1214; Source: 0; Custom: 0; QRE: 3000; Ranking functions: 0; \nQRE:\nExpression: \"@uri=veterans.gc.ca @uri=(remembrance/memorials/books/page,remembrance/memorials/canadian-virtual-war-memorial/detail)\" Score: 0\nExpression: \"@title=(\"Error 500\",\"Error 404\",archive,archivé,archivée)\" Score: 0\nExpression: \"@uri=canada.ca/en/news/archive/ OR @uri=canada.ca/fr/nouvelles/archive/ OR (@generator==gcnews ((@declared_type=\"news releases\" @date<today-730d) OR (@declared_type=\"communiqués de presse\" @date<today-730d)))\" Score: 0\nExpression: \"@uri==(https://www.canada.ca/en/news/archive/2008/06/measles.html,https://www.canada.ca/fr/nouvelles/archive/2008/06/rougeole.html,https://www.canada.ca/fr/sante-publique/services/rapports-publications/releve-maladies-transmissibles-canada-rmtc/numero-mensuel/2009-35/definitions-nosologiques-maladies-transmissibles-surveillance-nationale/rougeole.html)\" Score: 0\nExpression: \"@uri==https://www.canada.ca/en/privy-council/deputy-prime-minister/dpminister.html\" Score: 0\nExpression: \"@hostname==canada.ca\" Score: 1000\nExpression: \"@uri=(https://www.canada.ca/en/services/,https://www.canada.ca/fr/services/)\" Score: 2000\nExpression: \"@generator==gcnews ((@declared_type=\"media advisories\" @date<today-7d) OR (@declared_type=\"avis aux médias\" @date<today-7d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=backgrounders @date<today-180d) OR (@declared_type=\"documents d&#39;information\" @date<today-180d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=readouts @date<today-365d) OR (@declared_type=\"comptes rendus\" @date<today-365d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=speeches @date<today-730d) OR (@declared_type=discours @date<today-730d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=statements @date<today-730d) OR (@declared_type=déclarations @date<today-730d))\" Score: 0\nExpression: \"@permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc\" Score: 0\nExpression: \"@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb\" Score: 0\nExpression: \"@permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94\" Score: 0\nExpression: \"@permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a\" Score: 0\nExpression: \"@permanentid=09e0330428e1bfb04e180f26ec9e0521bb7fec96231bf66fb47aa2cefcc1\" Score: 0\nRanking Functions:\n\nTerms weights:\npublicpensions: 100, 67; \nTitle: 0; Concept: 0; Summary: 0; URI: 87; Formatted: 0; Casing: 0; Relation: 35; Frequency: 331; \n\ncpp: 100, 41; \nTitle: 0; Concept: 0; Summary: 52; URI: 87; Formatted: 35; Casing: 0; Relation: 35; Frequency: 311; \n\nbenefits: 100, 23; \nTitle: 0; Concept: 0; Summary: 49; URI: 82; Formatted: 32; Casing: 0; Relation: 32; Frequency: 151; \n\nbenefit: 100, 22; \nTitle: 182; Concept: 16; Summary: 48; URI: 81; Formatted: 32; Casing: 0; Relation: 32; Frequency: 171; \n\ndeath: 100, 17; \nTitle: 166; Concept: 14; Summary: 44; URI: 74; Formatted: 29; Casing: 0; Relation: 29; Frequency: 124; \n\nwww: 100, 6; \nTitle: 0; Concept: 0; Summary: 0; URI: 32; Formatted: 0; Casing: 0; Relation: 12; Frequency: 13; \n\nservices: 100, 4; \nTitle: 0; Concept: 0; Summary: 0; URI: 20; Formatted: 0; Casing: 0; Relation: 8; Frequency: 0; \n\nhtml: 100, 4; \nTitle: 0; Concept: 0; Summary: 0; URI: 18; Formatted: 0; Casing: 0; Relation: 7; Frequency: 0; \n\nen: 100, 3; \nTitle: 0; Concept: 0; Summary: 0; URI: 12; Formatted: 0; Casing: 0; Relation: 5; Frequency: 0; \n\nTotal weight: 7316",
+      "rating": 0,
+      "raw": {
+        "author": [
+          "Employment and Social Development Canada"
+        ],
+        "collection": "default",
+        "date": 1779667200000,
+        "description": "Description to apply for the Canada Pension Plan death benefit",
+        "disp_declared_type": "service initiation",
+        "displaynavlabel": "www.canada.ca > Canada Pension Plan retirement pension",
+        "hostname": "canada.ca",
+        "language": [
+          "English"
+        ],
+        "permanentid": "846f42a8438a599f972379543a1b899d42ce71d8dc8ddeac5e3e21ac1350",
+        "source": "priority_canada_ca_sitemap",
+        "sourcetype": "Sitemap",
+        "sysauthor": [
+          "Employment and Social Development Canada"
+        ],
+        "syscollection": "default",
+        "sysdate": 1779667200000,
+        "syslanguage": [
+          "English"
+        ],
+        "syssource": "priority_canada_ca_sitemap",
+        "syssourcetype": "Sitemap",
+        "sysurihash": "M7Yj7XahX6w8n5sx",
+        "urihash": "M7Yj7XahX6w8n5sx"
+      },
+      "score": 7316,
+      "summary": null,
+      "summaryHighlights": [],
+      "title": "Death Benefit",
+      "titleHighlights": [],
+      "totalNumberOfChildResults": 0,
+      "uniqueId": "42.2001$https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "uri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html"
+    },
+    {
+      "ClickUri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "Excerpt": "Canada Disability Benefit Important: Filing your tax return is required ... The Canada Disability Benefit provides direct financial support to people with ... Disability Tax Credit Benefits for people with disabilities Organizations providing disability benefits navigation services ... About the Canada Disability Benefit program",
+      "FirstSentences": null,
+      "PrintableUri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "Title": "Canada Disability Benefit",
+      "UniqueId": "42.2001$https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "Uri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "absentTerms": [],
+      "childResults": [],
+      "clickUri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "excerpt": "Canada Disability Benefit Important: Filing your tax return is required ... The Canada Disability Benefit provides direct financial support to people with ... Disability Tax Credit Benefits for people with disabilities Organizations providing disability benefits navigation services ... About the Canada Disability Benefit program",
+      "excerptHighlights": [
+        {
+          "length": 7,
+          "offset": 18
+        },
+        {
+          "length": 7,
+          "offset": 315
+        },
+        {
+          "length": 7,
+          "offset": 98
+        },
+        {
+          "length": 8,
+          "offset": 181
+        },
+        {
+          "length": 8,
+          "offset": 254
+        }
+      ],
+      "firstSentences": null,
+      "firstSentencesHighlights": [],
+      "flags": "HasHtmlVersion;HasAllMetaDataStream",
+      "hasHtmlVersion": true,
+      "hasMobileHtmlVersion": false,
+      "isRecommendation": false,
+      "isTopResult": false,
+      "isUserActionView": false,
+      "parentResult": null,
+      "percentScore": 99.31753,
+      "primaryid": "IVQVSWODWA3VGS22JNGGRQ5RGNRGELRSGAYDCLTEMVTGC5LMOQ",
+      "printableUri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "printableUriHighlights": [
+        {
+          "length": 7,
+          "offset": 72
+        },
+        {
+          "length": 8,
+          "offset": 34
+        }
+      ],
+      "rankingInfo": "Document weights:\nTitle: 646; Quality: 0; Date: 614; Adjacency: 0; Source: 0; Custom: 0; QRE: 3000; Ranking functions: 0; \nQRE:\nExpression: \"@uri=veterans.gc.ca @uri=(remembrance/memorials/books/page,remembrance/memorials/canadian-virtual-war-memorial/detail)\" Score: 0\nExpression: \"@title=(\"Error 500\",\"Error 404\",archive,archivé,archivée)\" Score: 0\nExpression: \"@uri=canada.ca/en/news/archive/ OR @uri=canada.ca/fr/nouvelles/archive/ OR (@generator==gcnews ((@declared_type=\"news releases\" @date<today-730d) OR (@declared_type=\"communiqués de presse\" @date<today-730d)))\" Score: 0\nExpression: \"@uri==(https://www.canada.ca/en/news/archive/2008/06/measles.html,https://www.canada.ca/fr/nouvelles/archive/2008/06/rougeole.html,https://www.canada.ca/fr/sante-publique/services/rapports-publications/releve-maladies-transmissibles-canada-rmtc/numero-mensuel/2009-35/definitions-nosologiques-maladies-transmissibles-surveillance-nationale/rougeole.html)\" Score: 0\nExpression: \"@uri==https://www.canada.ca/en/privy-council/deputy-prime-minister/dpminister.html\" Score: 0\nExpression: \"@hostname==canada.ca\" Score: 1000\nExpression: \"@uri=(https://www.canada.ca/en/services/,https://www.canada.ca/fr/services/)\" Score: 2000\nExpression: \"@generator==gcnews ((@declared_type=\"media advisories\" @date<today-7d) OR (@declared_type=\"avis aux médias\" @date<today-7d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=backgrounders @date<today-180d) OR (@declared_type=\"documents d&#39;information\" @date<today-180d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=readouts @date<today-365d) OR (@declared_type=\"comptes rendus\" @date<today-365d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=speeches @date<today-730d) OR (@declared_type=discours @date<today-730d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=statements @date<today-730d) OR (@declared_type=déclarations @date<today-730d))\" Score: 0\nExpression: \"@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb\" Score: 0\nExpression: \"@permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a\" Score: 0\nExpression: \"@permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94\" Score: 0\nExpression: \"@permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc\" Score: 0\nRanking Functions:\n\nTerms weights:\nbenefits: 100, 23; benefit: 74, 22; \nTitle: 1120; Concept: 100; Summary: 300; URI: 500; Formatted: 200; Casing: 0; Relation: 200; Frequency: 1369; \n\nTotal weight: 8049",
+      "rating": 0,
+      "raw": {
+        "author": [
+          "Service Canada"
+        ],
+        "collection": "default",
+        "date": 1781827200000,
+        "description": "The Canada Disability Benefit is a monthly payment for working-age persons with disabilities who have low income",
+        "disp_declared_type": "service initiation",
+        "displaynavlabel": "",
+        "hostname": "canada.ca",
+        "language": [
+          "English"
+        ],
+        "permanentid": "9e54a36d38ac8cf2e6fdf9a525ce9a3ee27e1cdf385bc65b0bbb73d31863",
+        "source": "priority_canada_ca_sitemap",
+        "sourcetype": "Sitemap",
+        "sysauthor": [
+          "Service Canada"
+        ],
+        "syscollection": "default",
+        "sysdate": 1781827200000,
+        "syslanguage": [
+          "English"
+        ],
+        "syssource": "priority_canada_ca_sitemap",
+        "syssourcetype": "Sitemap",
+        "sysurihash": "EaYYð7SKZKLhñ3bb",
+        "urihash": "EaYYð7SKZKLhñ3bb"
+      },
+      "score": 8049,
+      "summary": null,
+      "summaryHighlights": [],
+      "title": "Canada Disability Benefit",
+      "titleHighlights": [
+        {
+          "length": 7,
+          "offset": 18
+        }
+      ],
+      "totalNumberOfChildResults": 0,
+      "uniqueId": "42.2001$https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html",
+      "uri": "https://www.canada.ca/en/services/benefits/disability/canada-disability-benefit.html"
+    },
+    {
+      "ClickUri": "https://www.canada.ca/en/services/benefits/ei.html",
+      "Excerpt": "Employment Insurance benefits Employment Insurance (EI) benefits information, how to apply and how to submit a ... Review your claim and records of employment EI Benefits Estimator Work-Sharing Program – employers ... EI forms Consult the Benefits Finder Services and information Regular benefits Apply if you have lost your job through no ...",
+      "FirstSentences": null,
+      "PrintableUri": "https://www.canada.ca/en/services/benefits/ei.html",
+      "Title": "Employment Insurance benefits",
+      "UniqueId": "42.2001$https://www.canada.ca/en/services/benefits/ei.html",
+      "Uri": "https://www.canada.ca/en/services/benefits/ei.html",
+      "absentTerms": [],
+      "childResults": [],
+      "clickUri": "https://www.canada.ca/en/services/benefits/ei.html",
+      "excerpt": "Employment Insurance benefits Employment Insurance (EI) benefits information, how to apply and how to submit a ... Review your claim and records of employment EI Benefits Estimator Work-Sharing Program – employers ... EI forms Consult the Benefits Finder Services and information Regular benefits Apply if you have lost your job through no ...",
+      "excerptHighlights": [
+        {
+          "length": 8,
+          "offset": 162
+        },
+        {
+          "length": 8,
+          "offset": 21
+        },
+        {
+          "length": 8,
+          "offset": 239
+        },
+        {
+          "length": 8,
+          "offset": 288
+        },
+        {
+          "length": 8,
+          "offset": 56
+        }
+      ],
+      "firstSentences": null,
+      "firstSentencesHighlights": [],
+      "flags": "HasHtmlVersion;HasAllMetaDataStream",
+      "hasHtmlVersion": true,
+      "hasMobileHtmlVersion": false,
+      "isRecommendation": false,
+      "isTopResult": false,
+      "isUserActionView": false,
+      "parentResult": null,
+      "percentScore": 97.82562,
+      "primaryid": "NU4MHMDLIVQUVQ5RPBHHGVSCLJVWILRSGAYDCLTEMVTGC5LMOQ",
+      "printableUri": "https://www.canada.ca/en/services/benefits/ei.html",
+      "printableUriHighlights": [
+        {
+          "length": 8,
+          "offset": 34
+        }
+      ],
+      "rankingInfo": "Document weights:\nTitle: 646; Quality: 0; Date: 467; Adjacency: 0; Source: 0; Custom: 0; QRE: 3000; Ranking functions: 0; \nQRE:\nExpression: \"@uri=veterans.gc.ca @uri=(remembrance/memorials/books/page,remembrance/memorials/canadian-virtual-war-memorial/detail)\" Score: 0\nExpression: \"@title=(\"Error 500\",\"Error 404\",archive,archivé,archivée)\" Score: 0\nExpression: \"@uri=canada.ca/en/news/archive/ OR @uri=canada.ca/fr/nouvelles/archive/ OR (@generator==gcnews ((@declared_type=\"news releases\" @date<today-730d) OR (@declared_type=\"communiqués de presse\" @date<today-730d)))\" Score: 0\nExpression: \"@uri==(https://www.canada.ca/en/news/archive/2008/06/measles.html,https://www.canada.ca/fr/nouvelles/archive/2008/06/rougeole.html,https://www.canada.ca/fr/sante-publique/services/rapports-publications/releve-maladies-transmissibles-canada-rmtc/numero-mensuel/2009-35/definitions-nosologiques-maladies-transmissibles-surveillance-nationale/rougeole.html)\" Score: 0\nExpression: \"@uri==https://www.canada.ca/en/privy-council/deputy-prime-minister/dpminister.html\" Score: 0\nExpression: \"@hostname==canada.ca\" Score: 1000\nExpression: \"@uri=(https://www.canada.ca/en/services/,https://www.canada.ca/fr/services/)\" Score: 2000\nExpression: \"@generator==gcnews ((@declared_type=\"media advisories\" @date<today-7d) OR (@declared_type=\"avis aux médias\" @date<today-7d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=backgrounders @date<today-180d) OR (@declared_type=\"documents d&#39;information\" @date<today-180d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=readouts @date<today-365d) OR (@declared_type=\"comptes rendus\" @date<today-365d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=speeches @date<today-730d) OR (@declared_type=discours @date<today-730d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=statements @date<today-730d) OR (@declared_type=déclarations @date<today-730d))\" Score: 0\nExpression: \"@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb\" Score: 0\nExpression: \"@permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a\" Score: 0\nExpression: \"@permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94\" Score: 0\nExpression: \"@permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc\" Score: 0\nRanking Functions:\n\nTerms weights:\nbenefits: 100, 23; \nTitle: 1120; Concept: 0; Summary: 300; URI: 500; Formatted: 200; Casing: 0; Relation: 200; Frequency: 1376; \n\nTotal weight: 7809",
+      "rating": 0,
+      "raw": {
+        "author": [
+          "Employment and Social Development Canada"
+        ],
+        "collection": "default",
+        "date": 1780444800000,
+        "description": "Apply for Employment Insurance benefits. Find out the eligibility requirements for workers, self-employed people and Canadians living abroad.",
+        "disp_declared_type": "navigation page - topic page",
+        "displaynavlabel": "www.canada.ca > Benefits",
+        "hostname": "canada.ca",
+        "language": [
+          "English"
+        ],
+        "permanentid": "43f4b25cb874cf7fb3f534fde77f94813f31953ee2fc3afaa79798df289d",
+        "source": "priority_canada_ca_sitemap",
+        "sourcetype": "Sitemap",
+        "sysauthor": [
+          "Employment and Social Development Canada"
+        ],
+        "syscollection": "default",
+        "sysdate": 1780444800000,
+        "syslanguage": [
+          "English"
+        ],
+        "syssource": "priority_canada_ca_sitemap",
+        "syssourcetype": "Sitemap",
+        "sysurihash": "m8ðkEaJñxNsVBZkd",
+        "urihash": "m8ðkEaJñxNsVBZkd"
+      },
+      "score": 7809,
+      "summary": null,
+      "summaryHighlights": [],
+      "title": "Employment Insurance benefits",
+      "titleHighlights": [
+        {
+          "length": 8,
+          "offset": 21
+        }
+      ],
+      "totalNumberOfChildResults": 0,
+      "uniqueId": "42.2001$https://www.canada.ca/en/services/benefits/ei.html",
+      "uri": "https://www.canada.ca/en/services/benefits/ei.html"
+    },
+    {
+      "ClickUri": "https://www.canada.ca/en/services/benefits/ei/ei-critically-ill-children/apply.html",
+      "Excerpt": "The EI program offers 3 types of caregiving benefits: Types of caregiving benefits Benefit name Maximum weeks payable Family caregiver benefit for children up to 35 weeks Family caregiver benefit for adults up to 15 weeks Compassionate care benefits up to 26 weeks Family caregiver benefits for children If you're away from work to ...",
+      "FirstSentences": null,
+      "PrintableUri": "https://www.canada.ca/en/services/benefits/ei/ei-critically-ill-children/apply.html",
+      "Title": "EI caregiving benefits",
+      "UniqueId": "42.2001$https://www.canada.ca/en/services/benefits/ei/ei-critically-ill-children/apply.html",
+      "Uri": "https://www.canada.ca/en/services/benefits/ei/ei-critically-ill-children/apply.html",
+      "absentTerms": [],
+      "childResults": [],
+      "clickUri": "https://www.canada.ca/en/services/benefits/ei/ei-critically-ill-children/apply.html",
+      "excerpt": "The EI program offers 3 types of caregiving benefits: Types of caregiving benefits Benefit name Maximum weeks payable Family caregiver benefit for children up to 35 weeks Family caregiver benefit for adults up to 15 weeks Compassionate care benefits up to 26 weeks Family caregiver benefits for children If you're away from work to ...",
+      "excerptHighlights": [
+        {
+          "length": 7,
+          "offset": 135
+        },
+        {
+          "length": 7,
+          "offset": 188
+        },
+        {
+          "length": 7,
+          "offset": 83
+        },
+        {
+          "length": 8,
+          "offset": 241
+        },
+        {
+          "length": 8,
+          "offset": 282
+        },
+        {
+          "length": 8,
+          "offset": 44
+        },
+        {
+          "length": 8,
+          "offset": 74
+        }
+      ],
+      "firstSentences": null,
+      "firstSentencesHighlights": [],
+      "flags": "HasHtmlVersion;HasAllMetaDataStream",
+      "hasHtmlVersion": true,
+      "hasMobileHtmlVersion": false,
+      "isRecommendation": false,
+      "isTopResult": false,
+      "isUserActionView": false,
+      "parentResult": null,
+      "percentScore": 98.337906,
+      "primaryid": "INMVUMCPIUZHQYSZNRYFIM2POMXDEMBQGEXGIZLGMF2WY5A",
+      "printableUri": "https://www.canada.ca/en/services/benefits/ei/ei-critically-ill-children/apply.html",
+      "printableUriHighlights": [
+        {
+          "length": 8,
+          "offset": 34
+        }
+      ],
+      "rankingInfo": "Document weights:\nTitle: 646; Quality: 0; Date: 462; Adjacency: 0; Source: 0; Custom: 0; QRE: 3000; Ranking functions: 0; \nQRE:\nExpression: \"@uri=veterans.gc.ca @uri=(remembrance/memorials/books/page,remembrance/memorials/canadian-virtual-war-memorial/detail)\" Score: 0\nExpression: \"@title=(\"Error 500\",\"Error 404\",archive,archivé,archivée)\" Score: 0\nExpression: \"@uri=canada.ca/en/news/archive/ OR @uri=canada.ca/fr/nouvelles/archive/ OR (@generator==gcnews ((@declared_type=\"news releases\" @date<today-730d) OR (@declared_type=\"communiqués de presse\" @date<today-730d)))\" Score: 0\nExpression: \"@uri==(https://www.canada.ca/en/news/archive/2008/06/measles.html,https://www.canada.ca/fr/nouvelles/archive/2008/06/rougeole.html,https://www.canada.ca/fr/sante-publique/services/rapports-publications/releve-maladies-transmissibles-canada-rmtc/numero-mensuel/2009-35/definitions-nosologiques-maladies-transmissibles-surveillance-nationale/rougeole.html)\" Score: 0\nExpression: \"@uri==https://www.canada.ca/en/privy-council/deputy-prime-minister/dpminister.html\" Score: 0\nExpression: \"@hostname==canada.ca\" Score: 1000\nExpression: \"@uri=(https://www.canada.ca/en/services/,https://www.canada.ca/fr/services/)\" Score: 2000\nExpression: \"@generator==gcnews ((@declared_type=\"media advisories\" @date<today-7d) OR (@declared_type=\"avis aux médias\" @date<today-7d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=backgrounders @date<today-180d) OR (@declared_type=\"documents d&#39;information\" @date<today-180d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=readouts @date<today-365d) OR (@declared_type=\"comptes rendus\" @date<today-365d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=speeches @date<today-730d) OR (@declared_type=discours @date<today-730d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=statements @date<today-730d) OR (@declared_type=déclarations @date<today-730d))\" Score: 0\nExpression: \"@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb\" Score: 0\nExpression: \"@permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a\" Score: 0\nExpression: \"@permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94\" Score: 0\nExpression: \"@permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc\" Score: 0\nRanking Functions:\n\nTerms weights:\nbenefits: 100, 23; benefit: 74, 22; \nTitle: 1120; Concept: 100; Summary: 300; URI: 500; Formatted: 200; Casing: 0; Relation: 200; Frequency: 1363; \n\nTotal weight: 7891",
+      "rating": 0,
+      "raw": {
+        "author": [
+          "Employment and Social Development Canada"
+        ],
+        "collection": "default",
+        "date": 1780358400000,
+        "description": "Caregiving benefits and leave",
+        "disp_declared_type": "program descriptions",
+        "displaynavlabel": "www.canada.ca > Employment Insurance benefits",
+        "hostname": "canada.ca",
+        "language": [
+          "English"
+        ],
+        "permanentid": "e82e275da90ac399c8d4d0bd228d760f147623a9985035de34fb0650806e",
+        "source": "priority_canada_ca_sitemap",
+        "sourcetype": "Sitemap",
+        "sysauthor": [
+          "Employment and Social Development Canada"
+        ],
+        "syscollection": "default",
+        "sysdate": 1780358400000,
+        "syslanguage": [
+          "English"
+        ],
+        "syssource": "priority_canada_ca_sitemap",
+        "syssourcetype": "Sitemap",
+        "sysurihash": "CYZ0OE2xbYlpT3Os",
+        "urihash": "CYZ0OE2xbYlpT3Os"
+      },
+      "score": 7891,
+      "summary": null,
+      "summaryHighlights": [],
+      "title": "EI caregiving benefits",
+      "titleHighlights": [
+        {
+          "length": 8,
+          "offset": 14
+        }
+      ],
+      "totalNumberOfChildResults": 0,
+      "uniqueId": "42.2001$https://www.canada.ca/en/services/benefits/ei/ei-critically-ill-children/apply.html",
+      "uri": "https://www.canada.ca/en/services/benefits/ei/ei-critically-ill-children/apply.html"
+    },
+    {
+      "ClickUri": "https://www.canada.ca/en/services/benefits/ei/ei-fishing.html",
+      "Excerpt": "EI fishing benefits - Overview What these benefits offer Employment Insurance (EI) provides fishing benefits to qualifying, self-employed ... Unlike regular EI benefits, eligibility for EI fishing benefits is based on earnings, not insurable hours of ... may be eligible to receive regular fishing benefits as well as sickness, maternity, ...",
+      "FirstSentences": null,
+      "PrintableUri": "https://www.canada.ca/en/services/benefits/ei/ei-fishing.html",
+      "Title": "EI Fishing benefits - Overview",
+      "UniqueId": "42.2001$https://www.canada.ca/en/services/benefits/ei/ei-fishing.html",
+      "Uri": "https://www.canada.ca/en/services/benefits/ei/ei-fishing.html",
+      "absentTerms": [],
+      "childResults": [],
+      "clickUri": "https://www.canada.ca/en/services/benefits/ei/ei-fishing.html",
+      "excerpt": "EI fishing benefits - Overview What these benefits offer Employment Insurance (EI) provides fishing benefits to qualifying, self-employed ... Unlike regular EI benefits, eligibility for EI fishing benefits is based on earnings, not insurable hours of ... may be eligible to receive regular fishing benefits as well as sickness, maternity, ...",
+      "excerptHighlights": [
+        {
+          "length": 8,
+          "offset": 100
+        },
+        {
+          "length": 8,
+          "offset": 11
+        },
+        {
+          "length": 8,
+          "offset": 160
+        },
+        {
+          "length": 8,
+          "offset": 197
+        },
+        {
+          "length": 8,
+          "offset": 298
+        },
+        {
+          "length": 8,
+          "offset": 42
+        }
+      ],
+      "firstSentences": null,
+      "firstSentencesHighlights": [],
+      "flags": "HasHtmlVersion;HasAllMetaDataStream",
+      "hasHtmlVersion": true,
+      "hasMobileHtmlVersion": false,
+      "isRecommendation": false,
+      "isTopResult": false,
+      "isUserActionView": false,
+      "parentResult": null,
+      "percentScore": 97.8131,
+      "primaryid": "N5HUW4CGJFHVAQJROFXXQVDWJIXDEMBQGEXGIZLGMF2WY5A",
+      "printableUri": "https://www.canada.ca/en/services/benefits/ei/ei-fishing.html",
+      "printableUriHighlights": [
+        {
+          "length": 8,
+          "offset": 34
+        }
+      ],
+      "rankingInfo": "Document weights:\nTitle: 560; Quality: 0; Date: 462; Adjacency: 0; Source: 0; Custom: 0; QRE: 3000; Ranking functions: 0; \nQRE:\nExpression: \"@uri=veterans.gc.ca @uri=(remembrance/memorials/books/page,remembrance/memorials/canadian-virtual-war-memorial/detail)\" Score: 0\nExpression: \"@title=(\"Error 500\",\"Error 404\",archive,archivé,archivée)\" Score: 0\nExpression: \"@uri=canada.ca/en/news/archive/ OR @uri=canada.ca/fr/nouvelles/archive/ OR (@generator==gcnews ((@declared_type=\"news releases\" @date<today-730d) OR (@declared_type=\"communiqués de presse\" @date<today-730d)))\" Score: 0\nExpression: \"@uri==(https://www.canada.ca/en/news/archive/2008/06/measles.html,https://www.canada.ca/fr/nouvelles/archive/2008/06/rougeole.html,https://www.canada.ca/fr/sante-publique/services/rapports-publications/releve-maladies-transmissibles-canada-rmtc/numero-mensuel/2009-35/definitions-nosologiques-maladies-transmissibles-surveillance-nationale/rougeole.html)\" Score: 0\nExpression: \"@uri==https://www.canada.ca/en/privy-council/deputy-prime-minister/dpminister.html\" Score: 0\nExpression: \"@hostname==canada.ca\" Score: 1000\nExpression: \"@uri=(https://www.canada.ca/en/services/,https://www.canada.ca/fr/services/)\" Score: 2000\nExpression: \"@generator==gcnews ((@declared_type=\"media advisories\" @date<today-7d) OR (@declared_type=\"avis aux médias\" @date<today-7d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=backgrounders @date<today-180d) OR (@declared_type=\"documents d&#39;information\" @date<today-180d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=readouts @date<today-365d) OR (@declared_type=\"comptes rendus\" @date<today-365d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=speeches @date<today-730d) OR (@declared_type=discours @date<today-730d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=statements @date<today-730d) OR (@declared_type=déclarations @date<today-730d))\" Score: 0\nExpression: \"@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb\" Score: 0\nExpression: \"@permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a\" Score: 0\nExpression: \"@permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94\" Score: 0\nExpression: \"@permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc\" Score: 0\nRanking Functions:\n\nTerms weights:\nbenefits: 100, 23; \nTitle: 1120; Concept: 100; Summary: 300; URI: 500; Formatted: 200; Casing: 0; Relation: 200; Frequency: 1365; \n\nTotal weight: 7807",
+      "rating": 0,
+      "raw": {
+        "author": [
+          "Employment and Social Development Canada"
+        ],
+        "collection": "default",
+        "date": 1780358400000,
+        "description": " Learn about and apply for Employment Insurance fishing benefits.",
+        "disp_declared_type": "program descriptions",
+        "displaynavlabel": "www.canada.ca > Employment Insurance benefits",
+        "hostname": "canada.ca",
+        "language": [
+          "English"
+        ],
+        "permanentid": "0bdcf82331c5e443075d8d587061a2717b0372cb209ae41e450f3b38ec08",
+        "source": "priority_canada_ca_sitemap",
+        "sourcetype": "Sitemap",
+        "sysauthor": [
+          "Employment and Social Development Canada"
+        ],
+        "syscollection": "default",
+        "sysdate": 1780358400000,
+        "syslanguage": [
+          "English"
+        ],
+        "syssource": "priority_canada_ca_sitemap",
+        "syssourcetype": "Sitemap",
+        "sysurihash": "oOKpFIOPA1qoxTvJ",
+        "urihash": "oOKpFIOPA1qoxTvJ"
+      },
+      "score": 7807,
+      "summary": null,
+      "summaryHighlights": [],
+      "title": "EI Fishing benefits - Overview",
+      "titleHighlights": [
+        {
+          "length": 8,
+          "offset": 11
+        }
+      ],
+      "totalNumberOfChildResults": 0,
+      "uniqueId": "42.2001$https://www.canada.ca/en/services/benefits/ei/ei-fishing.html",
+      "uri": "https://www.canada.ca/en/services/benefits/ei/ei-fishing.html"
+    },
+    {
+      "ClickUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "Excerpt": "Death benefit Death benefit The Canada Pension Plan (CPP) death benefit is a one-time payment, payable to the ... have never received a disability benefit, post-retirement disability benefit or retirement pension under the CPP or Quebec Pension Plan ( ... Survivor’s pension Benefits for children under 25 Step 2 How much could you receive",
+      "FirstSentences": null,
+      "PrintableUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "Title": "Death Benefit",
+      "UniqueId": "42.2001$https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "Uri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "absentTerms": [],
+      "childResults": [],
+      "clickUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "excerpt": "Death benefit Death benefit The Canada Pension Plan (CPP) death benefit is a one-time payment, payable to the ... have never received a disability benefit, post-retirement disability benefit or retirement pension under the CPP or Quebec Pension Plan ( ... Survivor’s pension Benefits for children under 25 Step 2 How much could you receive",
+      "excerptHighlights": [
+        {
+          "length": 7,
+          "offset": 147
+        },
+        {
+          "length": 7,
+          "offset": 183
+        },
+        {
+          "length": 7,
+          "offset": 20
+        },
+        {
+          "length": 7,
+          "offset": 64
+        },
+        {
+          "length": 7,
+          "offset": 6
+        },
+        {
+          "length": 8,
+          "offset": 275
+        }
+      ],
+      "firstSentences": null,
+      "firstSentencesHighlights": [],
+      "flags": "HasHtmlVersion;HasAllMetaDataStream",
+      "hasHtmlVersion": true,
+      "hasMobileHtmlVersion": false,
+      "isRecommendation": false,
+      "isTopResult": false,
+      "isUserActionView": false,
+      "parentResult": null,
+      "percentScore": 99.00857,
+      "primaryid": "JU3VS2RXLBQWQWBWO44G4NLTPAXDEMBQGEXGIZLGMF2WY5A",
+      "printableUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "printableUriHighlights": [
+        {
+          "length": 7,
+          "offset": 72
+        },
+        {
+          "length": 8,
+          "offset": 34
+        }
+      ],
+      "rankingInfo": "Document weights:\nTitle: 791; Quality: 0; Date: 430; Adjacency: 0; Source: 0; Custom: 0; QRE: 3000; Ranking functions: 0; \nQRE:\nExpression: \"@uri=veterans.gc.ca @uri=(remembrance/memorials/books/page,remembrance/memorials/canadian-virtual-war-memorial/detail)\" Score: 0\nExpression: \"@title=(\"Error 500\",\"Error 404\",archive,archivé,archivée)\" Score: 0\nExpression: \"@uri=canada.ca/en/news/archive/ OR @uri=canada.ca/fr/nouvelles/archive/ OR (@generator==gcnews ((@declared_type=\"news releases\" @date<today-730d) OR (@declared_type=\"communiqués de presse\" @date<today-730d)))\" Score: 0\nExpression: \"@uri==(https://www.canada.ca/en/news/archive/2008/06/measles.html,https://www.canada.ca/fr/nouvelles/archive/2008/06/rougeole.html,https://www.canada.ca/fr/sante-publique/services/rapports-publications/releve-maladies-transmissibles-canada-rmtc/numero-mensuel/2009-35/definitions-nosologiques-maladies-transmissibles-surveillance-nationale/rougeole.html)\" Score: 0\nExpression: \"@uri==https://www.canada.ca/en/privy-council/deputy-prime-minister/dpminister.html\" Score: 0\nExpression: \"@hostname==canada.ca\" Score: 1000\nExpression: \"@uri=(https://www.canada.ca/en/services/,https://www.canada.ca/fr/services/)\" Score: 2000\nExpression: \"@generator==gcnews ((@declared_type=\"media advisories\" @date<today-7d) OR (@declared_type=\"avis aux médias\" @date<today-7d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=backgrounders @date<today-180d) OR (@declared_type=\"documents d&#39;information\" @date<today-180d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=readouts @date<today-365d) OR (@declared_type=\"comptes rendus\" @date<today-365d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=speeches @date<today-730d) OR (@declared_type=discours @date<today-730d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=statements @date<today-730d) OR (@declared_type=déclarations @date<today-730d))\" Score: 0\nExpression: \"@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb\" Score: 0\nExpression: \"@permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a\" Score: 0\nExpression: \"@permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94\" Score: 0\nExpression: \"@permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc\" Score: 0\nRanking Functions:\n\nTerms weights:\nbenefits: 100, 23; benefit: 74, 22; \nTitle: 1120; Concept: 100; Summary: 300; URI: 500; Formatted: 200; Casing: 0; Relation: 200; Frequency: 1358; \n\nTotal weight: 7999",
+      "rating": 0,
+      "raw": {
+        "author": [
+          "Employment and Social Development Canada"
+        ],
+        "collection": "default",
+        "date": 1779667200000,
+        "description": "Description to apply for the Canada Pension Plan death benefit",
+        "disp_declared_type": "service initiation",
+        "displaynavlabel": "www.canada.ca > Canada Pension Plan retirement pension",
+        "hostname": "canada.ca",
+        "language": [
+          "English"
+        ],
+        "permanentid": "846f42a8438a599f972379543a1b899d42ce71d8dc8ddeac5e3e21ac1350",
+        "source": "priority_canada_ca_sitemap",
+        "sourcetype": "Sitemap",
+        "sysauthor": [
+          "Employment and Social Development Canada"
+        ],
+        "syscollection": "default",
+        "sysdate": 1779667200000,
+        "syslanguage": [
+          "English"
+        ],
+        "syssource": "priority_canada_ca_sitemap",
+        "syssourcetype": "Sitemap",
+        "sysurihash": "M7Yj7XahX6w8n5sx",
+        "urihash": "M7Yj7XahX6w8n5sx"
+      },
+      "score": 7999,
+      "summary": null,
+      "summaryHighlights": [],
+      "title": "Death Benefit",
+      "titleHighlights": [
+        {
+          "length": 7,
+          "offset": 6
+        }
+      ],
+      "totalNumberOfChildResults": 0,
+      "uniqueId": "42.2001$https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html",
+      "uri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/cpp-death-benefit.html"
+    },
+    {
+      "ClickUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/receive-benefits.html",
+      "Excerpt": "Receive your benefits On this page ... To cancel your benefit, contact Service Canada. ... Death benefit: A one-time payment on behalf of the deceased contributor ... CPP children's benefit: A monthly benefit for a dependent child of a deceased CPP ... general questions about CPP retirement pension benefits or specific questions about your ...",
+      "FirstSentences": null,
+      "PrintableUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/receive-benefits.html",
+      "Title": "Receive your benefits",
+      "UniqueId": "42.2001$https://www.canada.ca/en/services/benefits/publicpensions/cpp/receive-benefits.html",
+      "Uri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/receive-benefits.html",
+      "absentTerms": [],
+      "childResults": [],
+      "clickUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/receive-benefits.html",
+      "excerpt": "Receive your benefits On this page ... To cancel your benefit, contact Service Canada. ... Death benefit: A one-time payment on behalf of the deceased contributor ... CPP children's benefit: A monthly benefit for a dependent child of a deceased CPP ... general questions about CPP retirement pension benefits or specific questions about your ...",
+      "excerptHighlights": [
+        {
+          "length": 7,
+          "offset": 182
+        },
+        {
+          "length": 7,
+          "offset": 201
+        },
+        {
+          "length": 7,
+          "offset": 54
+        },
+        {
+          "length": 7,
+          "offset": 97
+        },
+        {
+          "length": 8,
+          "offset": 13
+        },
+        {
+          "length": 8,
+          "offset": 300
+        }
+      ],
+      "firstSentences": null,
+      "firstSentencesHighlights": [],
+      "flags": "HasHtmlVersion;HasAllMetaDataStream",
+      "hasHtmlVersion": true,
+      "hasMobileHtmlVersion": false,
+      "isRecommendation": false,
+      "isTopResult": false,
+      "isUserActionView": false,
+      "parentResult": null,
+      "percentScore": 98.44377,
+      "primaryid": "OBEUQODTKVKVENRWKJXWUSLQMQXDEMBQGEXGIZLGMF2WY5A",
+      "printableUri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/receive-benefits.html",
+      "printableUriHighlights": [
+        {
+          "length": 8,
+          "offset": 34
+        },
+        {
+          "length": 8,
+          "offset": 70
+        }
+      ],
+      "rankingInfo": "Document weights:\nTitle: 646; Quality: 0; Date: 593; Adjacency: 0; Source: 0; Custom: 0; QRE: 3000; Ranking functions: 0; \nQRE:\nExpression: \"@uri=veterans.gc.ca @uri=(remembrance/memorials/books/page,remembrance/memorials/canadian-virtual-war-memorial/detail)\" Score: 0\nExpression: \"@title=(\"Error 500\",\"Error 404\",archive,archivé,archivée)\" Score: 0\nExpression: \"@uri=canada.ca/en/news/archive/ OR @uri=canada.ca/fr/nouvelles/archive/ OR (@generator==gcnews ((@declared_type=\"news releases\" @date<today-730d) OR (@declared_type=\"communiqués de presse\" @date<today-730d)))\" Score: 0\nExpression: \"@uri==(https://www.canada.ca/en/news/archive/2008/06/measles.html,https://www.canada.ca/fr/nouvelles/archive/2008/06/rougeole.html,https://www.canada.ca/fr/sante-publique/services/rapports-publications/releve-maladies-transmissibles-canada-rmtc/numero-mensuel/2009-35/definitions-nosologiques-maladies-transmissibles-surveillance-nationale/rougeole.html)\" Score: 0\nExpression: \"@uri==https://www.canada.ca/en/privy-council/deputy-prime-minister/dpminister.html\" Score: 0\nExpression: \"@hostname==canada.ca\" Score: 1000\nExpression: \"@uri=(https://www.canada.ca/en/services/,https://www.canada.ca/fr/services/)\" Score: 2000\nExpression: \"@generator==gcnews ((@declared_type=\"media advisories\" @date<today-7d) OR (@declared_type=\"avis aux médias\" @date<today-7d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=backgrounders @date<today-180d) OR (@declared_type=\"documents d&#39;information\" @date<today-180d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=readouts @date<today-365d) OR (@declared_type=\"comptes rendus\" @date<today-365d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=speeches @date<today-730d) OR (@declared_type=discours @date<today-730d))\" Score: 0\nExpression: \"@generator==gcnews ((@declared_type=statements @date<today-730d) OR (@declared_type=déclarations @date<today-730d))\" Score: 0\nExpression: \"@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb\" Score: 0\nExpression: \"@permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a\" Score: 0\nExpression: \"@permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94\" Score: 0\nExpression: \"@permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc\" Score: 0\nRanking Functions:\n\nTerms weights:\nbenefits: 100, 23; benefit: 74, 22; \nTitle: 1120; Concept: 0; Summary: 300; URI: 500; Formatted: 200; Casing: 0; Relation: 200; Frequency: 1349; \n\nTotal weight: 7908",
+      "rating": 0,
+      "raw": {
+        "author": [
+          "Service Canada"
+        ],
+        "collection": "default",
+        "date": 1781740800000,
+        "description": "What happens once you start receiving your Canada Pension Plan (CPP) retirement benefits.",
+        "disp_declared_type": "service initiation",
+        "displaynavlabel": "www.canada.ca > Canada Pension Plan retirement pension",
+        "hostname": "canada.ca",
+        "language": [
+          "English"
+        ],
+        "permanentid": "9472b4909e0543e71984a0fa7647560485e4e9596b0109cbfb5defd4d4a0",
+        "source": "priority_canada_ca_sitemap",
+        "sourcetype": "Sitemap",
+        "sysauthor": [
+          "Service Canada"
+        ],
+        "syscollection": "default",
+        "sysdate": 1781740800000,
+        "syslanguage": [
+          "English"
+        ],
+        "syssource": "priority_canada_ca_sitemap",
+        "syssourcetype": "Sitemap",
+        "sysurihash": "pIH8sUUR66RojIpd",
+        "urihash": "pIH8sUUR66RojIpd"
+      },
+      "score": 7908,
+      "summary": null,
+      "summaryHighlights": [],
+      "title": "Receive your benefits",
+      "titleHighlights": [
+        {
+          "length": 8,
+          "offset": 13
+        }
+      ],
+      "totalNumberOfChildResults": 0,
+      "uniqueId": "42.2001$https://www.canada.ca/en/services/benefits/publicpensions/cpp/receive-benefits.html",
+      "uri": "https://www.canada.ca/en/services/benefits/publicpensions/cpp/receive-benefits.html"
+    }
+  ],
+  "searchUid": "ac01518d-3264-4aba-8b24-815a6f3e0a7f",
+  "splitTestRun": "Canada public websites - Gene...-mirror-1733855881",
+  "suggestedFacets": [],
+  "termsToHighlight": {
+    "benefits": [
+      "benefit",
+      "benefited",
+      "benefitically",
+      "benefiting",
+      "benefitted",
+      "benefitting",
+      "benefıts",
+      "bénefit",
+      "bénéfition",
+      "bénéfits"
+    ]
+  },
+  "topResults": [
+    {
+      "applyToEveryResult": true,
+      "exclusive": false,
+      "expression": "@permanentid=8474a65cdb75baf0af880228aaae5e8a374fff804e0d571fc41dce1734bb",
+      "includeInFacets": true,
+      "isConstant": false,
+      "matchAdvancedQuery": true,
+      "matchQuery": false,
+      "modifier": 250
+    },
+    {
+      "applyToEveryResult": true,
+      "exclusive": false,
+      "expression": "@permanentid=a79ff2303b93e98d68ed051a1e90c03332f7b962d15f2ac4c1d47ef13fbc",
+      "includeInFacets": true,
+      "isConstant": false,
+      "matchAdvancedQuery": true,
+      "matchQuery": false,
+      "modifier": 159
+    },
+    {
+      "applyToEveryResult": true,
+      "exclusive": false,
+      "expression": "@permanentid=ddd67756dd4fe0de6cf866d8fab51fa01909840c9b39a9ef76955d5bdc94",
+      "includeInFacets": true,
+      "isConstant": false,
+      "matchAdvancedQuery": true,
+      "matchQuery": false,
+      "modifier": 250
+    },
+    {
+      "applyToEveryResult": true,
+      "exclusive": false,
+      "expression": "@permanentid=e0002bdd6d3c6f7ca8d2ecac1f81d3c3944b01cb0ca32e73838659ec443a",
+      "includeInFacets": true,
+      "isConstant": false,
+      "matchAdvancedQuery": true,
+      "matchQuery": false,
+      "modifier": 250
+    }
+  ],
+  "totalCount": 193654,
+  "totalCountFiltered": 193653,
+  "triggers": [],
+  "userIdentities": [
+    {
+      "name": "anonymous_user@anonymous.coveo.com",
+      "provider": "Email Security Provider",
+      "type": "User"
+    }
+  ]
+}
