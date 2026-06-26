@@ -13,6 +13,7 @@ import {
 	buildNotifyTrigger,
 	loadAdvancedSearchQueryActions,
 	loadSortCriteriaActions,
+	loadGenericAnalyticsActions,
 	HighlightUtils
 } from './headless.esm.js';
 
@@ -1314,6 +1315,18 @@ function updateNotifyTriggerState ( newState ) {
 
 	if ( notificationState.notifications?.length ) {
 		notificationTriggerElement.innerHTML = notificationTriggerTemplateHTML.replace( "%[notification]", DOMPurify.sanitize( notificationState.notifications[0] ) );
+		notificationTriggerElement.onclick = ( elemClicked ) => {
+			if ( elemClicked.target.tagName.toLowerCase() === 'a' ) {
+				const { logCustomEvent } = loadGenericAnalyticsActions( headlessEngine );
+				const payload = {
+					type: 'queryPipelineNotificationTrigger',
+					meta: { 'triggerLinkUrl': elemClicked.target?.href },
+					evt: 'click'
+				};
+
+				headlessEngine.dispatch( logCustomEvent( payload ) );
+			}
+		};
 		focusToView();
 	}
 	else {
