@@ -180,10 +180,16 @@ function initEngine() {
 	if ( searchBoxElement ) {
 		searchBoxElement.onkeydown = ( e ) => {
 			// Enter
-			if ( e.keyCode === 13 && ( activeSuggestion !== 0 && suggestionsElement && !suggestionsElement.hidden ) ) {
-				selectSuggestion();
-				closeSuggestionsBox();
-				e.preventDefault();
+			if ( e.keyCode === 13 ) {
+
+				// Save that the last input change came from the Enter key so QS doesn't reopen after a search is submitted
+				lastCharKeyUp = 13;
+
+				if ( activeSuggestion !== 0 && suggestionsElement && !suggestionsElement.hidden ) {
+					selectSuggestion();
+					closeSuggestionsBox();
+					e.preventDefault();
+				}
 			}
 			// Escape or Tab
 			else if ( e.keyCode === 27 || e.keyCode === 9 ) {
@@ -209,16 +215,14 @@ function initEngine() {
 				}
 			}
 		};
-		searchBoxElement.onkeyup = ( e ) => {
+		searchBoxElement.onkeyup = () => {
 			waitForkeyUp = false;
-			lastCharKeyUp = e.keyCode;
-			// Keys that don't changes the input value
-			if ( ( e.key.length !== 1 && e.keyCode !== 46 && e.keyCode !== 8 ) ||                       // Non-printable char except Delete or Backspace
-				( e.ctrlKey && e.key !== "x" && e.key !== "X" && e.key !== "v" && e.key !== "V" ) ) {   // Ctrl-key is pressed but not X or V is use 
-				return;
-			}
+		};
 
-			// Any other key
+		// Use the "input" events to detect text changes (better support across devices, e.g., Android)
+		searchBoxElement.oninput = ( e ) => {
+			lastCharKeyUp = null;
+
 			if ( e.target.value ) {
 				updateSearchBoxText( sanitizeQuery( e.target.value ) );
 			}
