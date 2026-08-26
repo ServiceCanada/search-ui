@@ -13,8 +13,8 @@ import {
 	buildNotifyTrigger,
 	loadAdvancedSearchQueryActions,
 	loadSortCriteriaActions,
-	HighlightUtils,
-	getOrganizationEndpoints
+	loadGenericAnalyticsActions,
+	HighlightUtils
 } from './headless.esm.js';
 
 // Search UI base
@@ -193,10 +193,6 @@ function initSearchUI() {
 	}
 	else {
 		originLevel3RelativeUrl = params.originLevel3;
-	}
-
-	if ( !params.endpoints ) {
-		params.endpoints = getOrganizationEndpoints( params.organizationId, 'prod' );
 	}
 
 	// Show error on load if no access token is provided
@@ -599,13 +595,21 @@ function getGMTDate( date ) {
 function initEngine() {
 	headlessEngine = buildSearchEngine( {
 		configuration: {
-			organizationEndpoints: params.endpoints,
 			organizationId: params.organizationId,
 			accessToken: params.accessToken,
 			search: {
 				locale: params.lang,
 				searchHub: params.searchHub,
-				pipeline: params.pipeline
+				pipeline: params.pipeline,
+				...(params.endpoints?.search && { 
+					proxyBaseUrl: params.endpoints.search, 
+				}),
+			},
+			analytics: {
+				analyticsMode: "legacy",
+				...(params.endpoints?.analytics && { 
+					proxyBaseUrl: params.endpoints.analytics, 
+				}),
 			},
 			preprocessRequest: ( request, clientOrigin ) => {
 				try {
@@ -657,16 +661,18 @@ function initEngine() {
 						requestContent.q = sanitizeQuery( q );
 
 						// Filters out actions history items older than 7 days
-						const actionsHistory = limitCoveoAnalyticsHistory( requestContent.actionsHistory );
-						if ( actionsHistory.length !== requestContent.actionsHistory.length ) {
-							requestContent.actionsHistory = actionsHistory;
-							saveCoveoAnalyticsHistory( actionsHistory );
+						if ( requestContent.actionsHistory ) {
+							const actionsHistory = limitCoveoAnalyticsHistory( requestContent.actionsHistory );
+							if ( actionsHistory.length !== requestContent.actionsHistory.length ) {
+								requestContent.actionsHistory = actionsHistory;
+								saveCoveoAnalyticsHistory( actionsHistory );
+							}
 						}
 						
 						request.body = JSON.stringify( requestContent );
 					}
-				} catch {
-					console.warn( "No Headless Engine Loaded." );
+				} catch ( error ) {
+					console.warn( "preprocessRequest error : " + error.message );
 				}
 
 				return request;
@@ -958,10 +964,16 @@ function initEngine() {
 	if ( searchBoxElement ) {
 		searchBoxElement.onkeydown = ( e ) => {
 			// Enter
-			if ( e.keyCode === 13 && ( activeSuggestion !== 0 && suggestionsElement && !suggestionsElement.hidden ) ) {
-				selectSuggestion();
-				closeSuggestionsBox();
-				e.preventDefault();
+			if ( e.keyCode === 13 ) {
+
+				// Save that the last input change came from the Enter key so QS doesn't reopen after a search is submitted
+				lastCharKeyUp = 13;
+
+				if ( activeSuggestion !== 0 && suggestionsElement && !suggestionsElement.hidden ) {
+					selectSuggestion();
+					closeSuggestionsBox();
+					e.preventDefault();
+				}
 			}
 			// Escape or Tab
 			else if ( e.keyCode === 27 || e.keyCode === 9 ) {
@@ -987,16 +999,14 @@ function initEngine() {
 				}
 			}
 		};
-		searchBoxElement.onkeyup = ( e ) => {
+		searchBoxElement.onkeyup = () => {
 			waitForkeyUp = false;
-			lastCharKeyUp = e.keyCode;
-			// Keys that don't changes the input value
-			if ( ( e.key.length !== 1 && e.keyCode !== 46 && e.keyCode !== 8 ) ||                       // Non-printable char except Delete or Backspace
-				( e.ctrlKey && e.key !== "x" && e.key !== "X" && e.key !== "v" && e.key !== "V" ) ) {   // Ctrl-key is pressed but not X or V is use 
-				return;
-			}
+		};
 
-			// Any other key
+		// Use the "input" events to detect text changes (better support across devices, e.g., Android)
+		searchBoxElement.oninput = ( e ) => {
+			lastCharKeyUp = null;
+
 			if ( searchBoxController.state.value !== e.target.value ) {
 				searchBoxController.updateText( stripHtml( e.target.value ) );
 			}
@@ -1309,6 +1319,18 @@ function updateNotifyTriggerState ( newState ) {
 
 	if ( notificationState.notifications?.length ) {
 		notificationTriggerElement.innerHTML = notificationTriggerTemplateHTML.replace( "%[notification]", DOMPurify.sanitize( notificationState.notifications[0] ) );
+		notificationTriggerElement.onclick = ( elemClicked ) => {
+			if ( elemClicked.target.tagName.toLowerCase() === 'a' ) {
+				const { logCustomEvent } = loadGenericAnalyticsActions( headlessEngine );
+				const payload = {
+					type: 'queryPipelineNotificationTrigger',
+					meta: { 'triggerLinkUrl': elemClicked.target?.href },
+					evt: 'click'
+				};
+
+				headlessEngine.dispatch( logCustomEvent( payload ) );
+			}
+		};
 		focusToView();
 	}
 	else {
