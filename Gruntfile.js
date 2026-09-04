@@ -24,7 +24,27 @@ module.exports = function(grunt) {
 
 			dist: {
 				files: {
-					'dist/connector.min.js': ['src/connector.js']
+					'dist/connector.min.js': ['src/connector.js'],
+					'dist/suggestions.min.js': ['src/suggestions.js']
+				}
+			}
+		},
+
+		postcss: {
+			options: {
+				map: false,
+				processors: [
+					require('postcss-preset-env')({
+						stage: 1,
+						features: {
+							'nesting-rules': true
+						}
+					})
+				]
+			},
+			dist: {
+				files: {
+					'dist/connector.css': 'src/connector.css'
 				}
 			}
 		},
@@ -32,7 +52,7 @@ module.exports = function(grunt) {
 		cssmin: {
 			dist: {
 				files: {
-					'dist/connector.min.css': ['src/connector.css']
+					'dist/connector.min.css': ['dist/connector.css']
 				}
 			}
 		},
@@ -74,7 +94,7 @@ module.exports = function(grunt) {
 					esversion: 11,
 					'-W067': true	// To ignore Unorthodox function invocation
 				},
-				src: ['Gruntfile.js', 'src/connector.js']
+				src: ['Gruntfile.js', 'src/connector.js', 'src/suggestions.js']
 			}
 		},
 
@@ -83,13 +103,14 @@ module.exports = function(grunt) {
 				overrideConfigFile: ".eslintrc.json",
 				quiet: true
 			},
-			target: ['Gruntfile.js', 'src/connector.js']
+			target: ['Gruntfile.js', 'src/connector.js', 'src/suggestions.js']
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('@lodder/grunt-postcss');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-banner');
@@ -103,5 +124,5 @@ module.exports = function(grunt) {
 		grunt.file.write('dist/connector.min.css', content);
 	});
 
-	grunt.registerTask('default', ['clean', 'htmllint', 'jshint', 'eslint', 'copy', 'uglify', 'cssmin', 'usebanner', 'fixLineEndings']);
+	grunt.registerTask('default', ['clean', 'htmllint', 'jshint', 'eslint', 'copy', 'uglify', 'postcss', 'cssmin', 'usebanner', 'fixLineEndings']);
 };

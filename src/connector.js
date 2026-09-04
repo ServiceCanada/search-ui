@@ -10,10 +10,11 @@ import {
 	buildDidYouMean,
 	buildContext,
 	buildInteractiveResult,
+	buildNotifyTrigger,
 	loadAdvancedSearchQueryActions,
 	loadSortCriteriaActions,
-	HighlightUtils,
-	getOrganizationEndpoints
+	loadGenericAnalyticsActions,
+	HighlightUtils
 } from './headless.esm.js';
 
 // Search UI base
@@ -59,6 +60,7 @@ let querySummaryController;
 let didYouMeanController;
 let pagerController;
 let statusController;
+let notifyTriggerController;
 let urlManager;
 let unsubscribeManager;
 let unsubscribeSearchBoxController;
@@ -66,12 +68,14 @@ let unsubscribeResultListController;
 let unsubscribeQuerySummaryController;
 let unsubscribeDidYouMeanController;
 let unsubscribePagerController;
+let unsubscribeNotifyTriggerController;
 
 // UI states
 let updateSearchBoxFromState = false;
 let searchBoxState;
 let resultListState;
 let querySummaryState;
+let notificationState;
 let didYouMeanState;
 let pagerState;
 let lastCharKeyUp;
@@ -89,6 +93,7 @@ let formElement = document.querySelector( `.page-type-search main [role=search],
 let resultsSection = document.querySelector( `#${resultSectionID}` );
 let resultListElement = document.querySelector( '#result-list' );
 let querySummaryElement = document.querySelector( '#query-summary' );
+let notificationTriggerElement = document.querySelector( '#notification-trigger' );
 let pagerElement = document.querySelector( '#pager' );
 let suggestionsElement = document.querySelector( '#suggestions' );
 let didYouMeanElement = document.querySelector( '#did-you-mean' );
@@ -97,6 +102,7 @@ let didYouMeanElement = document.querySelector( '#did-you-mean' );
 let resultTemplateHTML = document.getElementById( 'sr-single' )?.innerHTML;
 let noResultTemplateHTML = document.getElementById( 'sr-nores' )?.innerHTML;
 let resultErrorTemplateHTML = document.getElementById( 'sr-error' )?.innerHTML;
+let notificationTriggerTemplateHTML = document.getElementById( 'sr-notification-trigger' )?.innerHTML;
 let querySummaryTemplateHTML = document.getElementById( 'sr-query-summary' )?.innerHTML;
 let didYouMeanTemplateHTML = document.getElementById( 'sr-did-you-mean' )?.innerHTML;
 let noQuerySummaryTemplateHTML = document.getElementById( 'sr-noquery-summary' )?.innerHTML;
@@ -163,6 +169,17 @@ function initSearchUI() {
 	if (urlParams.sort) {
 		params.sort = urlParams.sort;
 	}						 
+	// set the custom action cause for the initial search 
+	if ( urlParams.actionCause ) {
+		params.actionCause = urlParams.actionCause;
+
+		// changing the URL without reloading the page to remove actionCause
+		if ( window.history.replaceState ) {
+			var newUrl = new URL( winLoc.href );
+			newUrl.searchParams.delete( 'actionCause' );
+			window.history.replaceState( { path : newUrl.href }, '', newUrl.href );
+		}
+	}
 	
 	// Auto detect relative path from originLevel3
 	if( !params.originLevel3.startsWith( "/" ) && /http|www/.test( params.originLevel3 ) ) {
@@ -176,10 +193,6 @@ function initSearchUI() {
 	}
 	else {
 		originLevel3RelativeUrl = params.originLevel3;
-	}
-
-	if ( !params.endpoints ) {
-		params.endpoints = getOrganizationEndpoints( params.organizationId, 'prod' );
 	}
 
 	// Show error on load if no access token is provided
@@ -217,7 +230,7 @@ function initTpl() {
 	if ( !noResultTemplateHTML ) {
 		if ( lang === "fr" ) {
 			noResultTemplateHTML = 
-				`<section class="alert alert-warning">
+				`<div class="alert alert-warning">
 					<h2>Aucun résultat</h2>
 					<p>Aucun résultat ne correspond à vos critères de recherche.</p>
 					<p>Suggestions&nbsp;:</p>
@@ -228,11 +241,11 @@ function initTpl() {
 						<li>Consultez les&nbsp;<a href="/fr/sr/tr.html"> trucs de recherche </a></li>
 						<li>Essayez la <a href="/fr/sr/srb/sra.html">recherche avancée</a></li>
 					</ul>
-				</section>`;
+				</div>`;
 		}
 		else {
 			noResultTemplateHTML = 
-				`<section class="alert alert-warning">
+				`<div class="alert alert-warning">
 					<h2>No results</h2>
 					<p>No pages were found that match your search terms.</p>
 					<p>Suggestions:</p>
@@ -243,25 +256,30 @@ function initTpl() {
 						<li>Consult the&nbsp;<a href="/en/sr/st.html">search tips</a></li>
 						<li>Try the&nbsp;<a href="/en/sr/srb/sra.html">advanced search</a></li>
 					</ul>
-				</section>`;
+				</div>`;
 		}
 	}
 
 	if ( !resultErrorTemplateHTML ) {
 		if ( lang === "fr" ) {
 			resultErrorTemplateHTML = 
-				`<section class="alert alert-warning">
+				`<div class="alert alert-warning">
 					<h2>Nous éprouvons actuellement des problèmes avec la fonction de recherche sur le site Web Canada.ca</h2>
 					<p>L'équipe chargée de rétablir les services touchés travaille de façon à résoudre le problème aussi rapidement que possible. Nous vous prions de nous excuser pour tout inconvénient.</p>
-				</section>`;
+				</div>`;
 		}
 		else {
 			resultErrorTemplateHTML = 
-				`<section class="alert alert-warning">
+				`<div class="alert alert-warning">
 					<h2>The Canada.ca Search is currently experiencing issues</h2>
 					<p>A resolution for the restoration is presently being worked.	We apologize for any inconvenience.</p>
-				</section>`;
+				</div>`;
 		}
+	}
+
+	if ( !notificationTriggerTemplateHTML ) {
+		notificationTriggerTemplateHTML = 
+			`<section class="alert alert-info">%[notification]</section>`;
 	}
 
 	if ( !querySummaryTemplateHTML ) {
@@ -278,11 +296,11 @@ function initTpl() {
 	if ( !didYouMeanTemplateHTML ) {
 		if ( lang === "fr" ) {
 			didYouMeanTemplateHTML = 
-				`<p class="h5">Rechercher plutôt <button class="btn btn-lg btn-link p-0 mrgn-bttm-sm" type="button">%[correctedQuery]</button> ?</p>`;
+				`<p>Rechercher plutôt <button class="btn btn-lg btn-link" type="button">%[correctedQuery]</button> ?</p>`;
 		}
 		else {
 			didYouMeanTemplateHTML = 
-				`<p class="h5">Did you mean <button class="btn btn-lg btn-link p-0 mrgn-bttm-sm" type="button">%[correctedQuery]</button> ?</p>`;
+				`<p>Did you mean <button class="btn btn-lg btn-link" type="button">%[correctedQuery]</button> ?</p>`;
 		}
 	}
 
@@ -300,11 +318,11 @@ function initTpl() {
 	if ( !previousPageTemplateHTML ) {
 		if ( lang === "fr" ) {
 			previousPageTemplateHTML = 
-				`<button class="page-button previous-page-button">Précédente<span class="wb-inv">: Page précédente des résultats de recherche</span></ button>`;
+				`<button class="page-button paginate-prev">Précédente<span class="wb-inv">: Page précédente des résultats de recherche</span></ button>`;
 		}
 		else {
 			previousPageTemplateHTML = 
-				`<button class="page-button previous-page-button">Previous<span class="wb-inv">: Previous page of search results</span></ button>`;
+				`<button class="page-button paginate-prev">Previous<span class="wb-inv">: Previous page of search results</span></ button>`;
 		}
 	}
 
@@ -322,18 +340,18 @@ function initTpl() {
 	if ( !nextPageTemplateHTML ) {
 		if ( lang === "fr" ) {
 			nextPageTemplateHTML = 
-				`<button class="page-button next-page-button">Suivante<span class="wb-inv">: Page suivante des résultats de recherche</span></ button>`;
+				`<button class="page-button paginate-next">Suivante<span class="wb-inv">: Page suivante des résultats de recherche</span></ button>`;
 		}
 		else {
 			nextPageTemplateHTML = 
-				`<button class="page-button next-page-button">Next<span class="wb-inv">: Next page of search results</span></ button>`;
+				`<button class="page-button paginate-next">Next<span class="wb-inv">: Next page of search results</span></ button>`;
 		}
 	}
 
 	if ( !pagerContainerTemplateHTML ) {
 		if ( lang === "fr" ) {
 			pagerContainerTemplateHTML = 
-				`<div class="text-center" >
+				`<div class="text-center wb-paginate-pager" >
 					<p class="wb-inv">Pagination des résultats de recherche</p>
 					<ul id="pager" class="pagination mrgn-bttm-0">
 					</ul>
@@ -341,7 +359,7 @@ function initTpl() {
 		}
 		else {
 			pagerContainerTemplateHTML = 
-				`<div class="text-center" >
+				`<div class="text-center wb-paginate-pager" >
 					<p class="wb-inv">Search results pages</p>
 					<ul id="pager" class="pagination mrgn-bttm-0">
 					</ul>
@@ -364,6 +382,14 @@ function initTpl() {
 	if ( !resultsSection ) {
 		resultsSection = document.createElement( "section" );
 		resultsSection.id = resultSectionID;
+	}
+
+	// auto-create notification trigger element
+	if ( !notificationTriggerElement ) {
+		notificationTriggerElement = document.createElement( "div" );
+		notificationTriggerElement.id = "notification-trigger";
+
+		resultsSection.append( notificationTriggerElement );
 	}
 
 	// auto-create query summary element
@@ -569,13 +595,21 @@ function getGMTDate( date ) {
 function initEngine() {
 	headlessEngine = buildSearchEngine( {
 		configuration: {
-			organizationEndpoints: params.endpoints,
 			organizationId: params.organizationId,
 			accessToken: params.accessToken,
 			search: {
 				locale: params.lang,
 				searchHub: params.searchHub,
-				pipeline: params.pipeline
+				pipeline: params.pipeline,
+				...(params.endpoints?.search && { 
+					proxyBaseUrl: params.endpoints.search, 
+				}),
+			},
+			analytics: {
+				analyticsMode: "legacy",
+				...(params.endpoints?.analytics && { 
+					proxyBaseUrl: params.endpoints.analytics, 
+				}),
 			},
 			preprocessRequest: ( request, clientOrigin ) => {
 				try {
@@ -584,6 +618,12 @@ function initEngine() {
 
 						// filter user sensitive content
 						requestContent.originLevel3 = params.originLevel3;
+
+						// override actionCause if present
+						if ( params.actionCause ) {
+							requestContent.actionCause = params.actionCause;
+							params.actionCause = ""; // reset the parameter to avoid polluting future searches with the same action cause
+						}
 
 						// documentAuthor cannot be longer than 128 chars based on search platform
 						if ( requestContent.documentAuthor ) {
@@ -594,7 +634,7 @@ function initEngine() {
 
 						// Event used to expose a data layer when search events occur; useful for analytics
 						const searchEvent = new CustomEvent( "searchEvent", { detail: requestContent } );
-						document.dispatchEvent( searchEvent );
+						baseElement.dispatchEvent( searchEvent );
 					}
 					if ( clientOrigin === 'searchApiFetch' ) {
 						let requestContent = JSON.parse( request.body );
@@ -612,20 +652,27 @@ function initEngine() {
 							requestContent.analytics.originLevel3 = params.originLevel3;
 						}
 
+						// override actionCause if present
+						if ( params.actionCause ) {
+							requestContent.analytics.actionCause = params.actionCause;
+						}
+
 						let q = requestContent.q;
 						requestContent.q = sanitizeQuery( q );
 
 						// Filters out actions history items older than 7 days
-						const actionsHistory = limitCoveoAnalyticsHistory( requestContent.actionsHistory );
-						if ( actionsHistory.length !== requestContent.actionsHistory.length ) {
-							requestContent.actionsHistory = actionsHistory;
-							saveCoveoAnalyticsHistory( actionsHistory );
+						if ( requestContent.actionsHistory ) {
+							const actionsHistory = limitCoveoAnalyticsHistory( requestContent.actionsHistory );
+							if ( actionsHistory.length !== requestContent.actionsHistory.length ) {
+								requestContent.actionsHistory = actionsHistory;
+								saveCoveoAnalyticsHistory( actionsHistory );
+							}
 						}
 						
 						request.body = JSON.stringify( requestContent );
 					}
-				} catch {
-					console.warn( "No Headless Engine Loaded." );
+				} catch ( error ) {
+					console.warn( "preprocessRequest error : " + error.message );
 				}
 
 				return request;
@@ -658,6 +705,7 @@ function initEngine() {
 	didYouMeanController = buildDidYouMean( headlessEngine, { options: { automaticallyCorrectQuery: params.automaticallyCorrectQuery } } );
 	pagerController = buildPager( headlessEngine, { options: { numberOfPages: params.numberOfPages } } );
 	statusController = buildSearchStatus( headlessEngine );
+	notifyTriggerController = buildNotifyTrigger( headlessEngine );
 
 	// Refine search based on URL parameters for filters, mostly used in Advanced Search to trigger only one search per page load
 	if ( urlParams.allq || urlParams.exctq || urlParams.anyq || urlParams.noneq || urlParams.fqupdate || urlParams.dmn || urlParams.fqocct || urlParams.elctn_cat || urlParams.filetype || urlParams.site || urlParams.year || urlParams.declaredtype || urlParams.startdate || urlParams.enddate || urlParams.dprtmnt ) { 
@@ -892,6 +940,7 @@ function initEngine() {
 	unsubscribeQuerySummaryController = querySummaryController.subscribe( () => updateQuerySummaryState( querySummaryController.state ) );
 	unsubscribeDidYouMeanController = didYouMeanController.subscribe( () => updateDidYouMeanState( didYouMeanController.state ) );
 	unsubscribePagerController = pagerController.subscribe( () => updatePagerState( pagerController.state ) );
+	unsubscribeNotifyTriggerController = notifyTriggerController.subscribe( () => updateNotifyTriggerState( notifyTriggerController.state ) );
 
 	// Clear event tracking, for legacy browsers
 	const onUnload = () => { 
@@ -902,6 +951,7 @@ function initEngine() {
 		unsubscribeQuerySummaryController?.();
 		unsubscribeDidYouMeanController?.();
 		unsubscribePagerController?.();
+		unsubscribeNotifyTriggerController?.();
 	};
 
 	// Listen to URL change (hash)
@@ -914,10 +964,16 @@ function initEngine() {
 	if ( searchBoxElement ) {
 		searchBoxElement.onkeydown = ( e ) => {
 			// Enter
-			if ( e.keyCode === 13 && ( activeSuggestion !== 0 && suggestionsElement && !suggestionsElement.hidden ) ) {
-				selectSuggestion();
-				closeSuggestionsBox();
-				e.preventDefault();
+			if ( e.keyCode === 13 ) {
+
+				// Save that the last input change came from the Enter key so QS doesn't reopen after a search is submitted
+				lastCharKeyUp = 13;
+
+				if ( activeSuggestion !== 0 && suggestionsElement && !suggestionsElement.hidden ) {
+					selectSuggestion();
+					closeSuggestionsBox();
+					e.preventDefault();
+				}
 			}
 			// Escape or Tab
 			else if ( e.keyCode === 27 || e.keyCode === 9 ) {
@@ -943,16 +999,14 @@ function initEngine() {
 				}
 			}
 		};
-		searchBoxElement.onkeyup = ( e ) => {
+		searchBoxElement.onkeyup = () => {
 			waitForkeyUp = false;
-			lastCharKeyUp = e.keyCode;
-			// Keys that don't changes the input value
-			if ( ( e.key.length !== 1 && e.keyCode !== 46 && e.keyCode !== 8 ) ||                       // Non-printable char except Delete or Backspace
-				( e.ctrlKey && e.key !== "x" && e.key !== "X" && e.key !== "v" && e.key !== "V" ) ) {   // Ctrl-key is pressed but not X or V is use 
-				return;
-			}
+		};
 
-			// Any other key
+		// Use the "input" events to detect text changes (better support across devices, e.g., Android)
+		searchBoxElement.oninput = ( e ) => {
+			lastCharKeyUp = null;
+
 			if ( searchBoxController.state.value !== e.target.value ) {
 				searchBoxController.updateText( stripHtml( e.target.value ) );
 			}
@@ -1200,8 +1254,17 @@ function updateResultListState( newState ) {
 
 			if ( result.raw.hostname && result.raw.displaynavlabel ) {
 				const splittedNavLabel = ( Array.isArray( result.raw.displaynavlabel ) ? result.raw.displaynavlabel[0] : result.raw.displaynavlabel).split( '>' );
-				breadcrumb = '<ol class="location"><li>' + stripHtml( result.raw.hostname ) + 
-					'&nbsp;</li><li>' + stripHtml( splittedNavLabel[splittedNavLabel.length-1] ) + '</li></ol>';
+				const hostname = stripHtml( result.raw.hostname );
+				const lastBreadcrumb = stripHtml( splittedNavLabel[splittedNavLabel.length-1] );
+
+				// If the hostname is already part of the breadcrumb, just show the hostname
+				breadcrumb = '<ol class="location">';
+				if ( lastBreadcrumb.indexOf(hostname) > -1 ){
+					breadcrumb += '<li>' + hostname + '</li>';
+				} else {
+					breadcrumb += '<li>' + hostname + '&nbsp;</li><li>' + lastBreadcrumb + '</li>';
+				}
+				breadcrumb += '</ol>';
 			} else {
 				breadcrumb = '<p class="location"><cite><a href="' + clickUri + '">' + printableUri + '</a></cite></p>';
 			}
@@ -1248,6 +1311,31 @@ function updateResultListState( newState ) {
 
 			resultListElement.appendChild( sectionNode );
 		} );
+	}
+}
+
+// Update notification displayed
+function updateNotifyTriggerState ( newState ) {
+	notificationState = newState;
+
+	if ( notificationState.notifications?.length ) {
+		notificationTriggerElement.innerHTML = notificationTriggerTemplateHTML.replace( "%[notification]", DOMPurify.sanitize( notificationState.notifications[0] ) );
+		notificationTriggerElement.onclick = ( elemClicked ) => {
+			if ( elemClicked.target.tagName.toLowerCase() === 'a' ) {
+				const { logCustomEvent } = loadGenericAnalyticsActions( headlessEngine );
+				const payload = {
+					type: 'queryPipelineNotificationTrigger',
+					meta: { 'triggerLinkUrl': elemClicked.target?.href },
+					evt: 'click'
+				};
+
+				headlessEngine.dispatch( logCustomEvent( payload ) );
+			}
+		};
+		focusToView();
+	}
+	else {
+		notificationTriggerElement.textContent = "";
 	}
 }
 
@@ -1329,26 +1417,39 @@ function updatePagerState( newState ) {
 		pagerElement.innerHTML = pagerContainerTemplateHTML;
 	}
 
-	let pagerComponentElement = pagerElement.querySelector( "#pager" );
+	let prevLiNode = document.createElement( "li" ),
+		nextLiNode = document.createElement( "li" ),
+		pagerComponentElement = pagerElement.querySelector( "#pager" );
+
 	pagerComponentElement.textContent = "";
+	prevLiNode.innerHTML = previousPageTemplateHTML;
+	nextLiNode.innerHTML = nextPageTemplateHTML;
 
-	if ( pagerState.hasPreviousPage ) {
-		const liNode = document.createElement( "li" );
-
-		liNode.innerHTML = previousPageTemplateHTML;
-
-		const buttonNode = liNode.querySelector( 'button' );
-
-		buttonNode.onclick = () => { 
-			pagerController.previousPage();
-			
-			if ( params.isAdvancedSearch ) {
-				updatePagerUrlParam( pagerState.currentPage );
-			}
-		};
-
-		pagerComponentElement.appendChild( liNode );
+	if ( !pagerState.hasPreviousPage ) {
+		prevLiNode.classList.add( "disabled" );
 	}
+
+	if ( !pagerState.hasNextPage ) {
+		nextLiNode.classList.add( "disabled" );
+	}
+
+	prevLiNode.querySelector( "button" ).onclick = () => { 
+		pagerController.previousPage();
+		
+		if ( params.isAdvancedSearch ) {
+			updatePagerUrlParam( pagerState.currentPage );
+		}
+	};
+
+	nextLiNode.querySelector( "button" ).onclick = () => { 
+		pagerController.nextPage(); 
+		
+		if ( params.isAdvancedSearch ) {
+			updatePagerUrlParam( pagerState.currentPage );
+		}
+	};
+
+	pagerComponentElement.appendChild( prevLiNode );
 
 	pagerState.currentPages.forEach( ( page ) => {
 		const liNode = document.createElement( "li" );
@@ -1381,23 +1482,7 @@ function updatePagerState( newState ) {
 		pagerComponentElement.appendChild( liNode );
 	} );
 
-	if ( pagerState.hasNextPage ) {
-		const liNode = document.createElement( "li" );
-
-		liNode.innerHTML = nextPageTemplateHTML;
-
-		const buttonNode = liNode.querySelector( 'button' );
-
-		buttonNode.onclick = () => { 
-			pagerController.nextPage(); 
-			
-			if ( params.isAdvancedSearch ) {
-				updatePagerUrlParam( pagerState.currentPage );
-			}
-		};
-
-		pagerComponentElement.appendChild( liNode );
-	}
+	pagerComponentElement.appendChild( nextLiNode );
 }
 
 // Update the URL parameter for pagination in advanced search mode
