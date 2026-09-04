@@ -168,8 +168,11 @@ function buildCleanQueryString( paramsObject ) {
 }
 
 // Strip HTML tags of a given string
-function stripHtml( html ) {
-	return DOMPurify.sanitize( html, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] } );
+ function stripHtml(html) {
+	let tmp = document.createElement( "DIV" );
+	tmp.innerHTML = html;
+	return tmp.textContent || tmp.innerText || "";
+}
 // Initiate engine
 function initEngine() {
 	// Listen to "Enter" key up event for search suggestions
