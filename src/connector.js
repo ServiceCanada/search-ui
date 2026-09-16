@@ -43,6 +43,7 @@ const defaults = {
 	"isAdvancedSearch": false,
 	"originLevel3": originPath,
 	"pipeline": "",
+	"customContext": "",
 	"automaticallyCorrectQuery": false,
 	"numberOfPages": 9
 };
@@ -848,7 +849,11 @@ function initEngine() {
 
 	contextController = buildContext( headlessEngine );
 	contextController.set( { "searchPageUrl" : params.originLevel3, "searchPageRelativeUrl" : originLevel3RelativeUrl } );
-	
+
+	if ( params.customContext ) {
+		contextController.add( "customContext", params.customContext );
+	}
+
 	// build controllers
 	searchBoxController = buildSearchBox( headlessEngine, {
 		options: {
