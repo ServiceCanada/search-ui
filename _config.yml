@@ -25,8 +25,12 @@ exclude:
   - docker-compose.yml
   - Gruntfile.js
   - dist/
+  - e2e/
+  - playwright-report/
+  - test-results/
   - package.json
   - package-lock.json
+  - playwright.config.js
   - LICENSE
   - CONDE_OF_CONDUCT.md
   - CONTRIBUTING.md
