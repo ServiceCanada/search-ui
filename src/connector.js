@@ -532,10 +532,8 @@ function filterProtocol( uri ) {
 }
 
 // Strip HTML tags of a given string
-function stripHtml(html) {
-	let tmp = document.createElement( "DIV" );
-	tmp.innerHTML = html;
-	return tmp.textContent || tmp.innerText || "";
+function stripHtml( html ) {
+	return DOMPurify.sanitize( html, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] } );
 }
 
 // Focus to H2 heading in results section
