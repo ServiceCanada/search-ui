@@ -50,3 +50,11 @@
 		width: 100%;
 	}
 }
+
+.sitelinks {
+	font-size: 18px;
+}
+
+.sitelinks dt {
+	font-weight: normal;
+}

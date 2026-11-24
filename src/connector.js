@@ -214,16 +214,18 @@ function initTpl() {
 		if ( lang === "fr" ) {
 			resultTemplateHTML = 
 				`<h3><a class="result-link" href="%[result.clickUri]" data-dtm-srchlnknm="%[index]">%[result.title]</a></h3> 
-				<ul class="context-labels"><li>%[result.raw.author]</li></ul> 
+				<ul class="context-labels"><li>%[result.raw.author]</li></ul>
 				%[result.breadcrumb] 
-				<p><time datetime="%[short-date-fr]" class="text-muted">%[long-date-fr]</time> - %[highlightedExcerpt]</p>`;
+				<p><time datetime="%[short-date-fr]" class="text-muted">%[long-date-fr]</time> - %[highlightedExcerpt]</p>
+				<nav class="gc-subway gc-subway-index sitelinks">%[result.raw.sitelinks]</nav>`;
 		}
 		else {
 			resultTemplateHTML = 
 				`<h3><a class="result-link" href="%[result.clickUri]" data-dtm-srchlnknm="%[index]">%[result.title]</a></h3> 
-				<ul class="context-labels"><li>%[result.raw.author]</li></ul> 
+				<ul class="context-labels"><li>%[result.raw.author]</li></ul>
 				%[result.breadcrumb]
-				<p><time datetime="%[short-date-en]" class="text-muted">%[long-date-en]</time> - %[highlightedExcerpt]</p>`;
+				<p><time datetime="%[short-date-en]" class="text-muted">%[long-date-en]</time> - %[highlightedExcerpt]</p>
+				<nav class="gc-subway gc-subway-index sitelinks">%[result.raw.sitelinks]</nav>`;
 		}
 	}
 
@@ -696,7 +698,7 @@ function initEngine() {
 
 	resultListController = buildResultList( headlessEngine, {
 		options: {
-			fieldsToInclude: [ "author", "date", "language", "urihash", "objecttype", "collection", "source", "permanentid", "displaynavlabel", "hostname", "disp_declared_type", "description" ]
+			fieldsToInclude: [ "author", "date", "language", "urihash", "objecttype", "collection", "source", "permanentid", "displaynavlabel", "hostname", "disp_declared_type", "description", "sitelinks" ]
 		}
 	} );
 	querySummaryController = buildQuerySummary( headlessEngine );
@@ -1243,6 +1245,7 @@ function updateResultListState( newState ) {
 			let printableUri = encodeURI( result.printableUri );
 			let clickUri = encodeURI( result.clickUri );
 			let title = stripHtml( result.title );
+			let siteLinks = ( index === 0 ) ? DOMPurify.sanitize( result.raw.sitelinks ) : '';
 
 			printableUri = printableUri.replaceAll( '&' , '&amp;' );
 			printableUri = printableUri.replaceAll( '%252F' , '/' ); // handle slash	
@@ -1281,6 +1284,7 @@ function updateResultListState( newState ) {
 				.replace( '%[result.clickUri]', filterProtocol( clickUri ) )
 				.replace( '%[result.title]', title )
 				.replace( '%[result.raw.author]', author )
+				.replace( '%[result.raw.sitelinks]', siteLinks )
 				.replace( '%[result.breadcrumb]', breadcrumb )
 				.replace( '%[result.printableUri]', printableUri )
 				.replace( '%[result.raw.disp_declared_type]', disp_declared_type )
