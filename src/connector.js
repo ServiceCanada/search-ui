@@ -1245,7 +1245,7 @@ function updateResultListState( newState ) {
 			let printableUri = encodeURI( result.printableUri );
 			let clickUri = encodeURI( result.clickUri );
 			let title = stripHtml( result.title );
-			let siteLinks = ( index == 0 ) ? DOMPurify.sanitize( result.raw.sitelinks ) : '';
+			let siteLinks = ( index === 0 ) ? DOMPurify.sanitize( result.raw.sitelinks ) : '';
 
 			printableUri = printableUri.replaceAll( '&' , '&amp;' );
 			printableUri = printableUri.replaceAll( '%252F' , '/' ); // handle slash	
